@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
 import { CustomerService } from '../shared/services';
 import { Customer } from '../shared/models';
 
@@ -16,12 +15,6 @@ export class SettingsComponent implements OnInit {
   saveSuccess = false;
   saveError = '';
 
-  // Reddit OAuth
-  isConnectingReddit = false;
-  isDisconnectingReddit = false;
-  redditMessage = '';
-  redditError = '';
-
   // Form fields
   form = {
     name: '',
@@ -33,29 +26,18 @@ export class SettingsComponent implements OnInit {
     example_response: '',
     keywords: '',
     negative_keywords: '',
-    link_display_name: ''
+    link_display_name: '',
+    // Notification preferences
+    email_notifications_enabled: true,
+    notify_on_opportunities: true,
+    notify_on_responses_ready: true,
+    notification_frequency: 'daily' as 'instant' | 'daily' | 'weekly'
   };
 
-  constructor(
-    private customerService: CustomerService,
-    private route: ActivatedRoute
-  ) {}
+  constructor(private customerService: CustomerService) {}
 
   ngOnInit(): void {
     this.loadProfile();
-    this.handleOAuthCallback();
-  }
-
-  handleOAuthCallback(): void {
-    this.route.queryParams.subscribe(params => {
-      if (params['reddit_connected'] === 'true') {
-        this.redditMessage = `Successfully connected Reddit account: u/${params['reddit_username'] || 'unknown'}`;
-        this.loadProfile(); // Reload to get updated reddit_connected status
-      }
-      if (params['reddit_error']) {
-        this.redditError = `Failed to connect Reddit: ${params['reddit_error'].replace(/_/g, ' ')}`;
-      }
-    });
   }
 
   loadProfile(): void {
@@ -73,7 +55,12 @@ export class SettingsComponent implements OnInit {
           example_response: customer.example_response || '',
           keywords: (customer.keywords || []).join(', '),
           negative_keywords: (customer.negative_keywords || []).join(', '),
-          link_display_name: customer.link_display_name || ''
+          link_display_name: customer.link_display_name || '',
+          // Notification preferences
+          email_notifications_enabled: customer.email_notifications_enabled ?? true,
+          notify_on_opportunities: customer.notify_on_opportunities ?? true,
+          notify_on_responses_ready: customer.notify_on_responses_ready ?? true,
+          notification_frequency: customer.notification_frequency || 'daily'
         };
         this.isLoading = false;
       },
@@ -98,7 +85,12 @@ export class SettingsComponent implements OnInit {
       example_response: this.form.example_response,
       keywords: this.form.keywords.split(',').map(k => k.trim()).filter(k => k),
       negative_keywords: this.form.negative_keywords.split(',').map(k => k.trim()).filter(k => k),
-      link_display_name: this.form.link_display_name
+      link_display_name: this.form.link_display_name,
+      // Notification preferences
+      email_notifications_enabled: this.form.email_notifications_enabled,
+      notify_on_opportunities: this.form.notify_on_opportunities,
+      notify_on_responses_ready: this.form.notify_on_responses_ready,
+      notification_frequency: this.form.notification_frequency
     };
 
     this.customerService.updateProfile(data).subscribe({
@@ -124,44 +116,5 @@ export class SettingsComponent implements OnInit {
       agency: 'Agency'
     };
     return names[tier] || tier;
-  }
-
-  connectReddit(): void {
-    this.isConnectingReddit = true;
-    this.redditError = '';
-    this.redditMessage = '';
-
-    this.customerService.getRedditConnectUrl().subscribe({
-      next: (response) => {
-        // Redirect to Reddit OAuth
-        window.location.href = response.auth_url;
-      },
-      error: (error) => {
-        this.isConnectingReddit = false;
-        this.redditError = error.error?.error || 'Failed to start Reddit connection';
-      }
-    });
-  }
-
-  disconnectReddit(): void {
-    if (!confirm('Are you sure you want to disconnect your Reddit account?')) {
-      return;
-    }
-
-    this.isDisconnectingReddit = true;
-    this.redditError = '';
-    this.redditMessage = '';
-
-    this.customerService.disconnectReddit().subscribe({
-      next: () => {
-        this.isDisconnectingReddit = false;
-        this.redditMessage = 'Reddit account disconnected';
-        this.loadProfile(); // Reload to get updated status
-      },
-      error: (error) => {
-        this.isDisconnectingReddit = false;
-        this.redditError = error.error?.error || 'Failed to disconnect Reddit';
-      }
-    });
   }
 }

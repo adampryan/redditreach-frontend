@@ -19,6 +19,8 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 
 // ngx-bootstrap
 import { ModalModule } from 'ngx-bootstrap/modal';
@@ -44,6 +46,8 @@ const MATERIAL_MODULES = [
   MatPaginatorModule,
   MatTooltipModule,
   MatSnackBarModule,
+  MatCheckboxModule,
+  MatSlideToggleModule,
 ];
 
 @NgModule({

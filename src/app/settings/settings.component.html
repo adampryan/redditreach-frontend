@@ -25,57 +25,85 @@
         </div>
         <div class="info-row">
           <span class="label">Plan</span>
-          <span class="value plan-badge">{{ getTierName(customer.subscription_tier) }}</span>
+          <span class="value">
+            <span class="plan-badge">{{ getTierName(customer.subscription_tier) }}</span>
+            <a mat-button color="primary" routerLink="/billing" class="upgrade-link">
+              {{ customer.subscription_tier === 'trial' ? 'Upgrade' : 'Manage Plan' }}
+            </a>
+          </span>
         </div>
       </mat-card-content>
     </mat-card>
 
-    <!-- Reddit Connection -->
+    <!-- Reddit Posting Info -->
     <mat-card class="settings-card reddit-card">
       <mat-card-header>
-        <mat-card-title>Reddit Connection</mat-card-title>
-        <mat-card-subtitle>Connect your Reddit account to post responses</mat-card-subtitle>
+        <mat-card-title>Reddit Posting</mat-card-title>
+        <mat-card-subtitle>How your approved responses get posted</mat-card-subtitle>
       </mat-card-header>
       <mat-card-content>
-        <!-- Success/Error Messages -->
-        <div class="reddit-message success" *ngIf="redditMessage">
-          <mat-icon>check_circle</mat-icon>
-          {{ redditMessage }}
-        </div>
-        <div class="reddit-message error" *ngIf="redditError">
-          <mat-icon>error</mat-icon>
-          {{ redditError }}
-        </div>
-
-        <!-- Connected State -->
-        <div class="reddit-status connected" *ngIf="customer.reddit_connected">
+        <div class="reddit-status connected">
           <div class="status-info">
             <mat-icon class="reddit-icon">check_circle</mat-icon>
             <div class="status-text">
-              <span class="status-label">Connected as</span>
-              <span class="username">u/{{ customer.reddit_username }}</span>
+              <span class="status-label">Managed Posting</span>
+              <span class="status-hint">Your approved responses are posted by our service within 1-2 hours</span>
             </div>
           </div>
-          <button mat-stroked-button color="warn" (click)="disconnectReddit()" [disabled]="isDisconnectingReddit">
-            <mat-spinner *ngIf="isDisconnectingReddit" diameter="18"></mat-spinner>
-            <span *ngIf="!isDisconnectingReddit">Disconnect</span>
-          </button>
+        </div>
+        <div class="posting-info">
+          <p>When you approve an opportunity, our system automatically posts your response to Reddit. This ensures:</p>
+          <ul>
+            <li>Optimal posting times for engagement</li>
+            <li>Rate limit compliance</li>
+            <li>No need to manage Reddit credentials</li>
+          </ul>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Email Notifications -->
+    <mat-card class="settings-card">
+      <mat-card-header>
+        <mat-card-title>Email Notifications</mat-card-title>
+        <mat-card-subtitle>Control when and how you receive email updates</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="toggle-row">
+          <mat-slide-toggle [(ngModel)]="form.email_notifications_enabled">
+            Email notifications enabled
+          </mat-slide-toggle>
+          <p class="toggle-hint">Master toggle for all email notifications</p>
         </div>
 
-        <!-- Not Connected State -->
-        <div class="reddit-status not-connected" *ngIf="!customer.reddit_connected">
-          <div class="status-info">
-            <mat-icon class="warning-icon">warning</mat-icon>
-            <div class="status-text">
-              <span class="status-label">Not connected</span>
-              <span class="status-hint">Connect your Reddit account to start posting responses</span>
-            </div>
+        <div class="notification-options" [class.disabled]="!form.email_notifications_enabled">
+          <div class="form-group">
+            <mat-form-field appearance="outline">
+              <mat-label>Notification Frequency</mat-label>
+              <mat-select [(ngModel)]="form.notification_frequency" [disabled]="!form.email_notifications_enabled">
+                <mat-option value="instant">Instant - As they happen</mat-option>
+                <mat-option value="daily">Daily digest</mat-option>
+                <mat-option value="weekly">Weekly digest</mat-option>
+              </mat-select>
+              <mat-hint>How often you want to receive email updates</mat-hint>
+            </mat-form-field>
           </div>
-          <button mat-raised-button color="primary" (click)="connectReddit()" [disabled]="isConnectingReddit">
-            <mat-spinner *ngIf="isConnectingReddit" diameter="18"></mat-spinner>
-            <mat-icon *ngIf="!isConnectingReddit">link</mat-icon>
-            <span *ngIf="!isConnectingReddit">Connect Reddit</span>
-          </button>
+
+          <div class="toggle-row">
+            <mat-slide-toggle [(ngModel)]="form.notify_on_opportunities"
+              [disabled]="!form.email_notifications_enabled">
+              New opportunities found
+            </mat-slide-toggle>
+            <p class="toggle-hint">Get notified when we find new Reddit posts matching your criteria</p>
+          </div>
+
+          <div class="toggle-row">
+            <mat-slide-toggle [(ngModel)]="form.notify_on_responses_ready"
+              [disabled]="!form.email_notifications_enabled">
+              Responses ready for review
+            </mat-slide-toggle>
+            <p class="toggle-hint">Get notified when AI has drafted responses for your approval</p>
+          </div>
         </div>
       </mat-card-content>
     </mat-card>

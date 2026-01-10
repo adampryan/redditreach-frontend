@@ -20,6 +20,11 @@ export interface Customer {
   responses_posted_this_period: number;
   reddit_username: string;
   reddit_connected: boolean;
+  // Email notification preferences
+  email_notifications_enabled: boolean;
+  notify_on_opportunities: boolean;
+  notify_on_responses_ready: boolean;
+  notification_frequency: 'instant' | 'daily' | 'weekly';
   is_active: boolean;
   is_onboarded: boolean;
   created_at: string;
