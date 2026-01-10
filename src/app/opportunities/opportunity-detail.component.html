@@ -1,0 +1,152 @@
+<div class="detail-container">
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="loading-spinner">
+    <mat-spinner diameter="40"></mat-spinner>
+  </div>
+
+  <ng-container *ngIf="!isLoading && opportunity">
+    <!-- Header -->
+    <header class="detail-header">
+      <button mat-icon-button (click)="goBack()">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <div class="header-info">
+        <span class="subreddit">r/{{ opportunity.subreddit_name }}</span>
+        <span class="status" [ngClass]="getStatusClass(opportunity.status)">
+          {{ formatStatus(opportunity.status) }}
+        </span>
+      </div>
+    </header>
+
+    <!-- Reddit Post -->
+    <mat-card class="post-card">
+      <mat-card-header>
+        <mat-card-title>{{ opportunity.post_title }}</mat-card-title>
+        <mat-card-subtitle>
+          Posted by u/{{ opportunity.post_author }}
+          <span class="post-stats">
+            <mat-icon>arrow_upward</mat-icon> {{ opportunity.post_score }}
+            <mat-icon>chat_bubble_outline</mat-icon> {{ opportunity.post_num_comments }}
+          </span>
+        </mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="post-body" *ngIf="opportunity.post_body">
+          {{ opportunity.post_body }}
+        </div>
+        <div class="relevance-info">
+          <strong>Relevance:</strong> {{ (opportunity.relevance_score * 100).toFixed(0) }}%
+          <span class="relevance-reason" *ngIf="opportunity.relevance_reasoning">
+            - {{ opportunity.relevance_reasoning }}
+          </span>
+        </div>
+        <div class="keywords" *ngIf="opportunity.detected_keywords?.length">
+          <mat-chip *ngFor="let keyword of opportunity.detected_keywords">{{ keyword }}</mat-chip>
+        </div>
+      </mat-card-content>
+      <mat-card-actions>
+        <button mat-button color="primary" (click)="openRedditPost()">
+          <mat-icon>open_in_new</mat-icon>
+          View on Reddit
+        </button>
+      </mat-card-actions>
+    </mat-card>
+
+    <!-- Posted Response (if already posted) -->
+    <mat-card class="posted-card" *ngIf="opportunity.posted_response">
+      <mat-card-header>
+        <mat-card-title>Posted Response</mat-card-title>
+        <mat-card-subtitle>
+          Posted {{ opportunity.posted_response.posted_at | date:'medium' }}
+          by u/{{ opportunity.posted_response.posted_by_username }}
+        </mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="response-text">{{ opportunity.posted_response.final_text }}</div>
+        <div class="response-stats">
+          <span><mat-icon>arrow_upward</mat-icon> {{ opportunity.posted_response.comment_score }}</span>
+          <span><mat-icon>reply</mat-icon> {{ opportunity.posted_response.reply_count }} replies</span>
+          <span *ngIf="opportunity.posted_response.was_removed" class="removed">
+            <mat-icon>warning</mat-icon> Removed
+          </span>
+        </div>
+      </mat-card-content>
+      <mat-card-actions>
+        <a mat-button color="primary" [href]="opportunity.posted_response.reddit_comment_url" target="_blank">
+          <mat-icon>open_in_new</mat-icon>
+          View Comment
+        </a>
+      </mat-card-actions>
+    </mat-card>
+
+    <!-- Draft Selection (if pending approval) -->
+    <ng-container *ngIf="opportunity.is_respondable && opportunity.drafts.length > 0">
+      <h2 class="section-title">Select a Response</h2>
+
+      <div class="drafts-list">
+        <mat-card
+          *ngFor="let draft of opportunity.drafts"
+          class="draft-card"
+          [class.selected]="selectedDraft?.id === draft.id"
+          (click)="selectDraft(draft)">
+          <div class="draft-header">
+            <span class="draft-label">{{ draft.variation_label }}</span>
+            <mat-icon *ngIf="selectedDraft?.id === draft.id">check_circle</mat-icon>
+          </div>
+          <div class="draft-text">{{ draft.response_text }}</div>
+        </mat-card>
+      </div>
+
+      <!-- Edit Mode -->
+      <div class="edit-section" *ngIf="selectedDraft">
+        <div class="edit-header">
+          <h3>Your Response</h3>
+          <button mat-button (click)="toggleEditMode()">
+            <mat-icon>{{ showEditMode ? 'visibility' : 'edit' }}</mat-icon>
+            {{ showEditMode ? 'Preview' : 'Edit' }}
+          </button>
+        </div>
+
+        <mat-form-field *ngIf="showEditMode" appearance="outline" class="edit-textarea">
+          <textarea
+            matInput
+            [(ngModel)]="editedText"
+            rows="8"
+            placeholder="Edit your response..."></textarea>
+        </mat-form-field>
+
+        <div *ngIf="!showEditMode" class="preview-text">
+          {{ editedText }}
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="action-buttons">
+        <button
+          mat-raised-button
+          color="primary"
+          (click)="approve()"
+          [disabled]="isSubmitting || !selectedDraft">
+          <mat-icon>check</mat-icon>
+          Approve & Post
+        </button>
+        <button
+          mat-stroked-button
+          color="warn"
+          (click)="reject()"
+          [disabled]="isSubmitting">
+          <mat-icon>close</mat-icon>
+          Reject
+        </button>
+      </div>
+    </ng-container>
+
+    <!-- No Drafts Message -->
+    <mat-card *ngIf="opportunity.is_respondable && opportunity.drafts.length === 0" class="no-drafts">
+      <mat-card-content>
+        <mat-icon>hourglass_empty</mat-icon>
+        <p>Response drafts are being generated. Check back shortly.</p>
+      </mat-card-content>
+    </mat-card>
+  </ng-container>
+</div>

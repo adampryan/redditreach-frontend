@@ -1,0 +1,117 @@
+<div class="subreddits-container">
+  <header class="page-header">
+    <div class="header-left">
+      <h1>Subreddits</h1>
+      <span class="usage-badge" *ngIf="stats">
+        {{ subreddits.length }} of {{ stats.tier_limits.subreddits }} used
+      </span>
+    </div>
+    <div class="header-right">
+      <a mat-button routerLink="/dashboard">
+        <mat-icon>arrow_back</mat-icon>
+        Dashboard
+      </a>
+      <button mat-raised-button color="primary" (click)="toggleAddForm()" *ngIf="!showAddForm">
+        <mat-icon>add</mat-icon>
+        Add Subreddit
+      </button>
+    </div>
+  </header>
+
+  <!-- Add Form -->
+  <mat-card class="add-form" *ngIf="showAddForm">
+    <mat-card-header>
+      <mat-card-title>Add Subreddit</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="form-row">
+        <mat-form-field appearance="outline">
+          <mat-label>Subreddit Name</mat-label>
+          <input matInput [(ngModel)]="newSubredditName" placeholder="e.g., baseballcards">
+          <span matPrefix>r/</span>
+        </mat-form-field>
+      </div>
+      <div class="form-row">
+        <mat-form-field appearance="outline">
+          <mat-label>Keywords (optional)</mat-label>
+          <input matInput [(ngModel)]="newKeywords" placeholder="e.g., grading, PSA, vintage">
+          <mat-hint>Comma-separated keywords to match relevant posts</mat-hint>
+        </mat-form-field>
+      </div>
+      <div class="error-message" *ngIf="addError">
+        <mat-icon>error</mat-icon>
+        {{ addError }}
+      </div>
+    </mat-card-content>
+    <mat-card-actions>
+      <button mat-raised-button color="primary" (click)="addSubreddit()" [disabled]="isSubmitting">
+        <mat-spinner *ngIf="isSubmitting" diameter="18"></mat-spinner>
+        <span *ngIf="!isSubmitting">Add Subreddit</span>
+      </button>
+      <button mat-button (click)="toggleAddForm()">Cancel</button>
+    </mat-card-actions>
+  </mat-card>
+
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="loading-spinner">
+    <mat-spinner diameter="40"></mat-spinner>
+  </div>
+
+  <!-- Empty State -->
+  <mat-card *ngIf="!isLoading && subreddits.length === 0 && !showAddForm" class="empty-state">
+    <mat-card-content>
+      <mat-icon>forum</mat-icon>
+      <h2>No subreddits yet</h2>
+      <p>Add subreddits to start finding opportunities.</p>
+      <button mat-raised-button color="primary" (click)="toggleAddForm()">
+        <mat-icon>add</mat-icon>
+        Add Your First Subreddit
+      </button>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Subreddits List -->
+  <div class="subreddits-list" *ngIf="!isLoading && subreddits.length > 0">
+    <mat-card *ngFor="let sub of subreddits" class="subreddit-card" [class.inactive]="!sub.is_active">
+      <div class="card-main">
+        <div class="subreddit-info">
+          <div class="subreddit-name">
+            r/{{ sub.subreddit_name }}
+            <mat-chip *ngIf="!sub.is_active" class="inactive-chip">Paused</mat-chip>
+          </div>
+          <div class="keywords" *ngIf="sub.keywords?.length">
+            <mat-chip *ngFor="let keyword of sub.keywords">{{ keyword }}</mat-chip>
+          </div>
+        </div>
+        <div class="subreddit-stats">
+          <div class="stat">
+            <span class="value">{{ sub.total_opportunities_found }}</span>
+            <span class="label">Opportunities</span>
+          </div>
+          <div class="stat">
+            <span class="value">{{ sub.total_responses_posted }}</span>
+            <span class="label">Posted</span>
+          </div>
+          <div class="stat">
+            <span class="value">{{ sub.responses_today }}/{{ sub.max_responses_per_day }}</span>
+            <span class="label">Today</span>
+          </div>
+        </div>
+      </div>
+      <div class="card-footer">
+        <span class="last-scanned">
+          <mat-icon>schedule</mat-icon>
+          Scanned {{ getLastScanned(sub.last_scanned) }}
+        </span>
+        <div class="actions">
+          <button mat-icon-button [matTooltip]="sub.is_active ? 'Pause' : 'Resume'" (click)="toggleActive(sub)">
+            <mat-icon>{{ sub.is_active ? 'pause' : 'play_arrow' }}</mat-icon>
+          </button>
+          <button mat-icon-button matTooltip="Delete" color="warn" (click)="deleteSubreddit(sub)">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
+      </div>
+    </mat-card>
+  </div>
+</div>

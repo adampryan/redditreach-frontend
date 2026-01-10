@@ -1,0 +1,173 @@
+<div class="settings-container">
+  <header class="page-header">
+    <h1>Settings</h1>
+    <a mat-button routerLink="/dashboard">
+      <mat-icon>arrow_back</mat-icon>
+      Dashboard
+    </a>
+  </header>
+
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="loading-spinner">
+    <mat-spinner diameter="40"></mat-spinner>
+  </div>
+
+  <ng-container *ngIf="!isLoading && customer">
+    <!-- Account Info -->
+    <mat-card class="settings-card">
+      <mat-card-header>
+        <mat-card-title>Account</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="info-row">
+          <span class="label">Email</span>
+          <span class="value">{{ customer.email }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Plan</span>
+          <span class="value plan-badge">{{ getTierName(customer.subscription_tier) }}</span>
+        </div>
+        <div class="info-row" *ngIf="customer.reddit_username">
+          <span class="label">Reddit Account</span>
+          <span class="value reddit-connected">
+            <mat-icon>check_circle</mat-icon>
+            u/{{ customer.reddit_username }}
+          </span>
+        </div>
+        <div class="info-row" *ngIf="!customer.reddit_username">
+          <span class="label">Reddit Account</span>
+          <span class="value reddit-not-connected">
+            <mat-icon>warning</mat-icon>
+            Not connected
+          </span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Business Profile -->
+    <mat-card class="settings-card">
+      <mat-card-header>
+        <mat-card-title>Business Profile</mat-card-title>
+        <mat-card-subtitle>This information helps us generate better responses</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="form-group">
+          <mat-form-field appearance="outline">
+            <mat-label>Business Name</mat-label>
+            <input matInput [(ngModel)]="form.name">
+          </mat-form-field>
+        </div>
+
+        <div class="form-group">
+          <mat-form-field appearance="outline">
+            <mat-label>Website</mat-label>
+            <input matInput [(ngModel)]="form.website" placeholder="https://example.com">
+          </mat-form-field>
+        </div>
+
+        <div class="form-group">
+          <mat-form-field appearance="outline">
+            <mat-label>Link Display Name</mat-label>
+            <input matInput [(ngModel)]="form.link_display_name" placeholder="e.g., My Website">
+            <mat-hint>How your link will be displayed in responses</mat-hint>
+          </mat-form-field>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Product Context -->
+    <mat-card class="settings-card">
+      <mat-card-header>
+        <mat-card-title>Product Context</mat-card-title>
+        <mat-card-subtitle>Help our AI understand your product/service</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="form-group">
+          <mat-form-field appearance="outline">
+            <mat-label>Product Description</mat-label>
+            <textarea matInput [(ngModel)]="form.product_description" rows="4"
+              placeholder="What does your product/service do? What problem does it solve?"></textarea>
+          </mat-form-field>
+        </div>
+
+        <div class="form-group">
+          <mat-form-field appearance="outline">
+            <mat-label>Target Audience</mat-label>
+            <textarea matInput [(ngModel)]="form.target_audience" rows="3"
+              placeholder="Who is your ideal customer? What are they looking for?"></textarea>
+          </mat-form-field>
+        </div>
+
+        <div class="form-group">
+          <mat-form-field appearance="outline">
+            <mat-label>Keywords</mat-label>
+            <input matInput [(ngModel)]="form.keywords"
+              placeholder="e.g., grading, PSA, vintage cards">
+            <mat-hint>Comma-separated keywords that indicate relevant posts</mat-hint>
+          </mat-form-field>
+        </div>
+
+        <div class="form-group">
+          <mat-form-field appearance="outline">
+            <mat-label>Keywords to Avoid</mat-label>
+            <input matInput [(ngModel)]="form.negative_keywords"
+              placeholder="e.g., scam, spam, selling">
+            <mat-hint>Comma-separated keywords to skip</mat-hint>
+          </mat-form-field>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Response Style -->
+    <mat-card class="settings-card">
+      <mat-card-header>
+        <mat-card-title>Response Style</mat-card-title>
+        <mat-card-subtitle>Customize how AI generates your responses</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="form-group">
+          <mat-form-field appearance="outline">
+            <mat-label>Tone Preferences</mat-label>
+            <textarea matInput [(ngModel)]="form.tone_preferences" rows="2"
+              placeholder="e.g., Friendly and helpful, with a touch of expertise"></textarea>
+          </mat-form-field>
+        </div>
+
+        <div class="form-group">
+          <mat-form-field appearance="outline">
+            <mat-label>Things to Avoid</mat-label>
+            <textarea matInput [(ngModel)]="form.things_to_avoid" rows="2"
+              placeholder="e.g., Don't be pushy or salesy, avoid technical jargon"></textarea>
+          </mat-form-field>
+        </div>
+
+        <div class="form-group">
+          <mat-form-field appearance="outline">
+            <mat-label>Example Response</mat-label>
+            <textarea matInput [(ngModel)]="form.example_response" rows="4"
+              placeholder="Provide an example of a response you'd write..."></textarea>
+            <mat-hint>This helps the AI match your writing style</mat-hint>
+          </mat-form-field>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Save Button -->
+    <div class="save-section">
+      <div class="save-status">
+        <span class="success" *ngIf="saveSuccess">
+          <mat-icon>check_circle</mat-icon>
+          Settings saved successfully
+        </span>
+        <span class="error" *ngIf="saveError">
+          <mat-icon>error</mat-icon>
+          {{ saveError }}
+        </span>
+      </div>
+      <button mat-raised-button color="primary" (click)="saveSettings()" [disabled]="isSaving">
+        <mat-spinner *ngIf="isSaving" diameter="18"></mat-spinner>
+        <span *ngIf="!isSaving">Save Settings</span>
+      </button>
+    </div>
+  </ng-container>
+</div>

@@ -1,0 +1,219 @@
+.subreddits-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 16px;
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    h1 {
+      font-size: 28px;
+      font-weight: 600;
+      color: #1a1a2e;
+      margin: 0;
+    }
+
+    .usage-badge {
+      background: #e8eaf6;
+      color: #667eea;
+      padding: 4px 12px;
+      border-radius: 16px;
+      font-size: 13px;
+      font-weight: 500;
+    }
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+}
+
+.add-form {
+  margin-bottom: 24px;
+
+  mat-card-content {
+    padding-top: 16px;
+  }
+
+  .form-row {
+    margin-bottom: 16px;
+
+    mat-form-field {
+      width: 100%;
+    }
+  }
+
+  .error-message {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #dc3545;
+    font-size: 14px;
+    margin-bottom: 16px;
+
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+  }
+
+  mat-card-actions {
+    display: flex;
+    gap: 8px;
+
+    button mat-spinner {
+      display: inline-block;
+    }
+  }
+}
+
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  padding: 60px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 24px;
+
+  mat-icon {
+    font-size: 64px;
+    width: 64px;
+    height: 64px;
+    color: #ccc;
+    margin-bottom: 16px;
+  }
+
+  h2 {
+    font-size: 20px;
+    color: #333;
+    margin-bottom: 8px;
+  }
+
+  p {
+    color: #666;
+    margin-bottom: 24px;
+  }
+}
+
+.subreddits-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.subreddit-card {
+  padding: 16px;
+  transition: opacity 0.2s;
+
+  &.inactive {
+    opacity: 0.6;
+  }
+
+  .card-main {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 24px;
+    margin-bottom: 12px;
+
+    @media (max-width: 600px) {
+      flex-direction: column;
+    }
+  }
+
+  .subreddit-info {
+    flex: 1;
+
+    .subreddit-name {
+      font-size: 18px;
+      font-weight: 600;
+      color: #667eea;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      .inactive-chip {
+        font-size: 10px;
+        background: #e9ecef;
+        color: #6c757d;
+      }
+    }
+
+    .keywords {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+
+      mat-chip {
+        font-size: 11px;
+        min-height: 24px;
+      }
+    }
+  }
+
+  .subreddit-stats {
+    display: flex;
+    gap: 24px;
+
+    .stat {
+      text-align: center;
+
+      .value {
+        display: block;
+        font-size: 20px;
+        font-weight: 600;
+        color: #1a1a2e;
+      }
+
+      .label {
+        font-size: 11px;
+        color: #888;
+        text-transform: uppercase;
+      }
+    }
+  }
+
+  .card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 12px;
+    border-top: 1px solid #eee;
+
+    .last-scanned {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: #888;
+
+      mat-icon {
+        font-size: 14px;
+        width: 14px;
+        height: 14px;
+      }
+    }
+
+    .actions {
+      display: flex;
+      gap: 4px;
+    }
+  }
+}

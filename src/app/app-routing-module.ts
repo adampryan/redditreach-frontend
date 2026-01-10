@@ -14,22 +14,21 @@ const routes: Routes = [
     loadChildren: () => import('./dashboard/dashboard.module').then(m => m.DashboardModule),
     canActivate: [AuthGuard]
   },
-  // Future modules
-  // {
-  //   path: 'opportunities',
-  //   loadChildren: () => import('./opportunities/opportunities.module').then(m => m.OpportunitiesModule),
-  //   canActivate: [AuthGuard]
-  // },
-  // {
-  //   path: 'subreddits',
-  //   loadChildren: () => import('./subreddits/subreddits.module').then(m => m.SubredditsModule),
-  //   canActivate: [AuthGuard]
-  // },
-  // {
-  //   path: 'settings',
-  //   loadChildren: () => import('./settings/settings.module').then(m => m.SettingsModule),
-  //   canActivate: [AuthGuard]
-  // },
+  {
+    path: 'opportunities',
+    loadChildren: () => import('./opportunities/opportunities.module').then(m => m.OpportunitiesModule),
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'subreddits',
+    loadChildren: () => import('./subreddits/subreddits.module').then(m => m.SubredditsModule),
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'settings',
+    loadChildren: () => import('./settings/settings.module').then(m => m.SettingsModule),
+    canActivate: [AuthGuard]
+  },
   {
     path: '',
     redirectTo: '/dashboard',

@@ -1,0 +1,82 @@
+<div class="opportunities-container">
+  <header class="page-header">
+    <h1>Opportunities</h1>
+    <a mat-button routerLink="/dashboard">
+      <mat-icon>arrow_back</mat-icon>
+      Back to Dashboard
+    </a>
+  </header>
+
+  <!-- Filters -->
+  <div class="filters">
+    <mat-chip-listbox>
+      <mat-chip-option
+        *ngFor="let filter of statusFilters"
+        [selected]="currentStatus === filter.value"
+        (click)="filterByStatus(filter.value)">
+        {{ filter.label }}
+      </mat-chip-option>
+    </mat-chip-listbox>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="loading-spinner">
+    <mat-spinner diameter="40"></mat-spinner>
+  </div>
+
+  <!-- Empty State -->
+  <mat-card *ngIf="!isLoading && opportunities.length === 0" class="empty-state">
+    <mat-card-content>
+      <mat-icon>search_off</mat-icon>
+      <h2>No opportunities found</h2>
+      <p *ngIf="currentStatus">Try removing the status filter to see all opportunities.</p>
+      <p *ngIf="!currentStatus">Opportunities will appear here once we find relevant Reddit posts.</p>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Opportunities List -->
+  <div class="opportunities-list" *ngIf="!isLoading && opportunities.length > 0">
+    <mat-card
+      class="opportunity-card"
+      *ngFor="let opp of opportunities"
+      (click)="viewOpportunity(opp.id)">
+      <div class="card-header">
+        <span class="subreddit">r/{{ opp.subreddit_name }}</span>
+        <span class="age">{{ getTimeAgo(opp.age_hours) }}</span>
+      </div>
+      <div class="card-title">{{ opp.post_title }}</div>
+      <div class="card-meta">
+        <span class="author">by u/{{ opp.post_author }}</span>
+        <div class="stats">
+          <span class="score">
+            <mat-icon>arrow_upward</mat-icon>
+            {{ opp.post_score }}
+          </span>
+          <span class="comments">
+            <mat-icon>chat_bubble_outline</mat-icon>
+            {{ opp.post_num_comments }}
+          </span>
+          <span class="relevance" *ngIf="opp.relevance_score">
+            {{ (opp.relevance_score * 100).toFixed(0) }}% match
+          </span>
+        </div>
+      </div>
+      <div class="card-footer">
+        <span class="status" [ngClass]="getStatusClass(opp.status)">
+          {{ formatStatus(opp.status) }}
+        </span>
+        <mat-icon class="action-arrow">chevron_right</mat-icon>
+      </div>
+    </mat-card>
+  </div>
+
+  <!-- Pagination -->
+  <mat-paginator
+    *ngIf="totalCount > pageSize"
+    [length]="totalCount"
+    [pageSize]="pageSize"
+    [pageIndex]="currentPage - 1"
+    (page)="onPageChange($event)"
+    showFirstLastButtons>
+  </mat-paginator>
+</div>
