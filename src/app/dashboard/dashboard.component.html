@@ -1,0 +1,106 @@
+<div class="dashboard-container">
+  <!-- Header -->
+  <header class="dashboard-header">
+    <div class="logo">RedditReach</div>
+    <div class="header-right">
+      <span class="user-name" *ngIf="customer">{{ customer.name }}</span>
+      <button mat-button (click)="logout()">
+        <mat-icon>logout</mat-icon>
+        Logout
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="dashboard-main">
+    <!-- Stats Cards -->
+    <div class="stats-grid" *ngIf="stats">
+      <mat-card class="stat-card">
+        <mat-card-content>
+          <div class="stat-value">{{ stats.pending_approval }}</div>
+          <div class="stat-label">Pending Approval</div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card">
+        <mat-card-content>
+          <div class="stat-value">{{ stats.approved }}</div>
+          <div class="stat-label">Approved</div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card">
+        <mat-card-content>
+          <div class="stat-value">{{ stats.posted }}</div>
+          <div class="stat-label">Posted</div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card highlight">
+        <mat-card-content>
+          <div class="stat-value">{{ stats.responses_remaining }}</div>
+          <div class="stat-label">Responses Left</div>
+          <div class="stat-sublabel">of {{ stats.tier_limits.responses }}/month</div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+      <button mat-raised-button color="primary" routerLink="/opportunities" [queryParams]="{status: 'pending_approval'}">
+        <mat-icon>inbox</mat-icon>
+        Review Opportunities
+      </button>
+      <button mat-stroked-button routerLink="/subreddits">
+        <mat-icon>forum</mat-icon>
+        Manage Subreddits
+      </button>
+      <button mat-stroked-button routerLink="/settings">
+        <mat-icon>settings</mat-icon>
+        Settings
+      </button>
+    </div>
+
+    <!-- Recent Opportunities -->
+    <mat-card class="opportunities-card">
+      <mat-card-header>
+        <mat-card-title>Recent Opportunities</mat-card-title>
+        <a mat-button color="primary" routerLink="/opportunities">View All</a>
+      </mat-card-header>
+      <mat-card-content>
+        <div *ngIf="isLoading" class="loading-spinner">
+          <mat-spinner diameter="40"></mat-spinner>
+        </div>
+
+        <div *ngIf="!isLoading && recentOpportunities.length === 0" class="empty-state">
+          <mat-icon>search_off</mat-icon>
+          <p>No opportunities found yet. Add subreddits to start monitoring.</p>
+          <button mat-raised-button color="primary" routerLink="/subreddits">
+            Add Subreddits
+          </button>
+        </div>
+
+        <div class="opportunities-list" *ngIf="!isLoading && recentOpportunities.length > 0">
+          <div
+            class="opportunity-item"
+            *ngFor="let opp of recentOpportunities"
+            (click)="viewOpportunity(opp.id)">
+            <div class="opp-main">
+              <span class="subreddit">r/{{ opp.subreddit_name }}</span>
+              <span class="title">{{ opp.post_title }}</span>
+            </div>
+            <div class="opp-meta">
+              <span class="score">
+                <mat-icon>arrow_upward</mat-icon>
+                {{ opp.post_score }}
+              </span>
+              <span class="status" [ngClass]="getStatusClass(opp.status)">
+                {{ formatStatus(opp.status) }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </main>
+</div>
