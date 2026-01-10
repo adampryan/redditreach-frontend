@@ -23,4 +23,13 @@ export class CustomerService {
   getStats(): Observable<CustomerStats> {
     return this.http.get<CustomerStats>(`${this.apiUrl}/stats/`);
   }
+
+  // Reddit OAuth
+  getRedditConnectUrl(): Observable<{ auth_url: string }> {
+    return this.http.get<{ auth_url: string }>(`${this.apiUrl}/reddit/connect/`);
+  }
+
+  disconnectReddit(): Observable<{ success: boolean }> {
+    return this.http.post<{ success: boolean }>(`${this.apiUrl}/reddit/disconnect/`, {});
+  }
 }

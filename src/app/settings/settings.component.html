@@ -27,19 +27,55 @@
           <span class="label">Plan</span>
           <span class="value plan-badge">{{ getTierName(customer.subscription_tier) }}</span>
         </div>
-        <div class="info-row" *ngIf="customer.reddit_username">
-          <span class="label">Reddit Account</span>
-          <span class="value reddit-connected">
-            <mat-icon>check_circle</mat-icon>
-            u/{{ customer.reddit_username }}
-          </span>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Reddit Connection -->
+    <mat-card class="settings-card reddit-card">
+      <mat-card-header>
+        <mat-card-title>Reddit Connection</mat-card-title>
+        <mat-card-subtitle>Connect your Reddit account to post responses</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <!-- Success/Error Messages -->
+        <div class="reddit-message success" *ngIf="redditMessage">
+          <mat-icon>check_circle</mat-icon>
+          {{ redditMessage }}
         </div>
-        <div class="info-row" *ngIf="!customer.reddit_username">
-          <span class="label">Reddit Account</span>
-          <span class="value reddit-not-connected">
-            <mat-icon>warning</mat-icon>
-            Not connected
-          </span>
+        <div class="reddit-message error" *ngIf="redditError">
+          <mat-icon>error</mat-icon>
+          {{ redditError }}
+        </div>
+
+        <!-- Connected State -->
+        <div class="reddit-status connected" *ngIf="customer.reddit_connected">
+          <div class="status-info">
+            <mat-icon class="reddit-icon">check_circle</mat-icon>
+            <div class="status-text">
+              <span class="status-label">Connected as</span>
+              <span class="username">u/{{ customer.reddit_username }}</span>
+            </div>
+          </div>
+          <button mat-stroked-button color="warn" (click)="disconnectReddit()" [disabled]="isDisconnectingReddit">
+            <mat-spinner *ngIf="isDisconnectingReddit" diameter="18"></mat-spinner>
+            <span *ngIf="!isDisconnectingReddit">Disconnect</span>
+          </button>
+        </div>
+
+        <!-- Not Connected State -->
+        <div class="reddit-status not-connected" *ngIf="!customer.reddit_connected">
+          <div class="status-info">
+            <mat-icon class="warning-icon">warning</mat-icon>
+            <div class="status-text">
+              <span class="status-label">Not connected</span>
+              <span class="status-hint">Connect your Reddit account to start posting responses</span>
+            </div>
+          </div>
+          <button mat-raised-button color="primary" (click)="connectReddit()" [disabled]="isConnectingReddit">
+            <mat-spinner *ngIf="isConnectingReddit" diameter="18"></mat-spinner>
+            <mat-icon *ngIf="!isConnectingReddit">link</mat-icon>
+            <span *ngIf="!isConnectingReddit">Connect Reddit</span>
+          </button>
         </div>
       </mat-card-content>
     </mat-card>
