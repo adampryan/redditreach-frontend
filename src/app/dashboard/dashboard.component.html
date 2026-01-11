@@ -1,7 +1,9 @@
 <div class="dashboard-container">
   <!-- Header -->
   <header class="dashboard-header">
-    <div class="logo">ThreadCatch</div>
+    <div class="logo">
+      <img src="assets/threadcatch-logo.png" alt="ThreadCatch" class="logo-img">
+    </div>
     <div class="header-right">
       <span class="user-name" *ngIf="customer">{{ customer.name }}</span>
       <button mat-button (click)="logout()">
@@ -13,6 +15,23 @@
 
   <!-- Main Content -->
   <main class="dashboard-main">
+    <!-- Trial Status Banner -->
+    <div class="trial-banner" *ngIf="billingStatus?.is_on_trial && !billingStatus?.is_trial_expired">
+      <mat-icon>schedule</mat-icon>
+      <span *ngIf="billingStatus?.trial_days_remaining !== null">
+        <strong>{{ billingStatus?.trial_days_remaining }} day{{ billingStatus?.trial_days_remaining === 1 ? '' : 's' }}</strong> left in your trial
+      </span>
+      <span *ngIf="billingStatus?.trial_days_remaining === null">You're on the free trial</span>
+      <a mat-stroked-button routerLink="/billing">Upgrade Now</a>
+    </div>
+
+    <!-- Trial Expired Banner -->
+    <div class="trial-banner expired" *ngIf="billingStatus?.is_trial_expired">
+      <mat-icon>warning</mat-icon>
+      <span><strong>Your trial has ended.</strong> Subscribe to continue catching threads.</span>
+      <a mat-raised-button color="primary" routerLink="/billing">Subscribe Now</a>
+    </div>
+
     <!-- Stats Cards -->
     <div class="stats-grid" *ngIf="stats">
       <mat-card class="stat-card">

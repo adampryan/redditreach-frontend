@@ -12,7 +12,7 @@
   border-radius: 12px;
   padding: 40px;
   width: 100%;
-  max-width: 440px;
+  max-width: 500px;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
 }
 
@@ -20,11 +20,10 @@
   text-align: center;
   margin-bottom: 32px;
 
-  .logo {
-    font-size: 28px;
-    font-weight: 700;
-    color: #ff4500;
-    margin: 0 0 8px 0;
+  .logo-img {
+    height: 200px;
+    width: auto;
+    margin-bottom: 8px;
   }
 
   .tagline {

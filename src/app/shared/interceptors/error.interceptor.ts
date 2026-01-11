@@ -60,7 +60,15 @@ export class ErrorInterceptor implements HttpInterceptor {
             });
           }
         } else if (error.status === 403) {
-          this.toastr.error('You do not have permission to perform this action.');
+          // Check if this is a trial expired error
+          const errorMessage = this.extractErrorMessage(error);
+          if (errorMessage.toLowerCase().includes('trial has ended') ||
+              errorMessage.toLowerCase().includes('subscribe to continue')) {
+            this.toastr.warning('Your trial has ended. Please subscribe to continue.', 'Trial Expired');
+            this.router.navigate(['/billing']);
+          } else {
+            this.toastr.error('You do not have permission to perform this action.');
+          }
         } else if (error.status === 404) {
           this.toastr.error('Resource not found.');
         } else if (error.status >= 500) {

@@ -15,8 +15,10 @@ export class BillingComponent implements OnInit {
   currentPlan: Plan | undefined;
 
   isCheckingOut = false;
+  isCancelling = false;
   checkoutError = '';
   successMessage = '';
+  showCancelConfirm = false;
 
   constructor(
     private billingService: BillingService,
@@ -83,8 +85,94 @@ export class BillingComponent implements OnInit {
     });
   }
 
+  cancelSubscription(): void {
+    this.isCancelling = true;
+    this.checkoutError = '';
+
+    this.billingService.cancelSubscription().subscribe({
+      next: (response) => {
+        this.successMessage = 'Your subscription will be cancelled at the end of the billing period. You can resume anytime before then.';
+        this.showCancelConfirm = false;
+        this.isCancelling = false;
+        this.loadBillingStatus();
+      },
+      error: (error) => {
+        this.isCancelling = false;
+        this.checkoutError = error.error?.error || 'Failed to cancel subscription. Please try again.';
+      }
+    });
+  }
+
+  pauseSubscription(): void {
+    this.isCancelling = true;
+    this.checkoutError = '';
+
+    this.billingService.pauseSubscription(1).subscribe({
+      next: (response) => {
+        this.successMessage = 'Your subscription has been paused. We\'ll be here when you\'re ready to come back!';
+        this.showCancelConfirm = false;
+        this.isCancelling = false;
+        this.loadBillingStatus();
+      },
+      error: (error) => {
+        this.isCancelling = false;
+        this.checkoutError = error.error?.error || 'Failed to pause subscription. Please try again.';
+      }
+    });
+  }
+
+  resumeSubscription(): void {
+    this.isCancelling = true;
+    this.checkoutError = '';
+
+    this.billingService.resumeSubscription().subscribe({
+      next: (response) => {
+        this.successMessage = 'Welcome back! Your subscription has been resumed.';
+        this.isCancelling = false;
+        this.loadBillingStatus();
+      },
+      error: (error) => {
+        this.isCancelling = false;
+        this.checkoutError = error.error?.error || 'Failed to resume subscription. Please try again.';
+      }
+    });
+  }
+
   isCurrentPlan(tier: string): boolean {
     return this.billingStatus?.subscription_tier === tier;
+  }
+
+  getButtonText(plan: Plan): string {
+    const tierOrder = ['trial', 'starter', 'growth', 'scale', 'agency'];
+    const currentTier = this.billingStatus?.subscription_tier || 'trial';
+    const currentIndex = tierOrder.indexOf(currentTier);
+    const planIndex = tierOrder.indexOf(plan.tier);
+
+    // Check if user has a real plan (not trial)
+    const hasPaidTier = currentTier !== 'trial' && currentIndex > 0;
+
+    // New users or trial - "Start with"
+    if (!hasPaidTier) {
+      if (plan.tier === 'agency') {
+        return `Go all in with ${plan.name}`;
+      }
+      return `Start with ${plan.name}`;
+    }
+
+    // Users with a plan (with or without active Stripe sub)
+    if (planIndex > currentIndex) {
+      // Upgrade
+      if (plan.tier === 'agency') {
+        return `Go big with ${plan.name}`;
+      }
+      return `Level up to ${plan.name}`;
+    } else {
+      // Downgrade
+      if (plan.tier === 'starter') {
+        return `Keep it simple with ${plan.name}`;
+      }
+      return `Switch to ${plan.name}`;
+    }
   }
 
   formatDate(timestamp: number | null): string {

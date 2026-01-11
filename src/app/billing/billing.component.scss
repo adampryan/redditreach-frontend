@@ -123,6 +123,75 @@
       color: #666;
     }
   }
+
+  .subscription-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .cancel-confirm {
+    margin-top: 16px;
+    padding: 20px;
+    background: #fafafa;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+
+    > p {
+      margin: 0 0 16px 0;
+      color: #333;
+      font-size: 15px;
+      font-weight: 500;
+    }
+
+    .pause-option,
+    .cancel-option {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 12px;
+
+      .option-info {
+        flex: 1;
+
+        strong {
+          display: block;
+          font-size: 14px;
+          color: #1a1a2e;
+          margin-bottom: 4px;
+        }
+
+        span {
+          font-size: 13px;
+          color: #666;
+        }
+      }
+
+      button {
+        flex-shrink: 0;
+        margin-left: 16px;
+      }
+    }
+
+    .pause-option {
+      background: #e3f2fd;
+      border: 1px solid #90caf9;
+    }
+
+    .cancel-option {
+      background: #fff8e1;
+      border: 1px solid #ffcc80;
+    }
+
+    .cancel-actions {
+      display: flex;
+      justify-content: center;
+      margin-top: 8px;
+    }
+  }
 }
 
 // Trial Card
@@ -155,6 +224,26 @@
       margin: 4px 0 0 0;
       color: #bf360c;
       font-size: 14px;
+    }
+  }
+
+  // Expired trial state
+  &.expired {
+    background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+    border: 2px solid #ef5350;
+
+    .trial-icon {
+      color: #c62828;
+    }
+
+    .trial-text {
+      strong {
+        color: #b71c1c;
+      }
+
+      p {
+        color: #c62828;
+      }
     }
   }
 }

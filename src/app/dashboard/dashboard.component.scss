@@ -5,7 +5,7 @@
 
 .dashboard-header {
   background: #fff;
-  padding: 16px 24px;
+  padding: 8px 48px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -13,9 +13,13 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 
   .logo {
-    font-size: 24px;
-    font-weight: 700;
-    color: #ff4500;
+    display: flex;
+    align-items: center;
+  }
+
+  .logo-img {
+    height: 200px;
+    width: auto;
   }
 
   .header-right {
@@ -30,10 +34,57 @@
   }
 }
 
+// Trial Banner
+.trial-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  margin-bottom: 24px;
+  background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+  border: 1px solid #ffcc80;
+  border-radius: 8px;
+
+  mat-icon {
+    color: #f57c00;
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+  }
+
+  span {
+    flex: 1;
+    color: #e65100;
+    font-size: 15px;
+
+    strong {
+      font-weight: 600;
+    }
+  }
+
+  a {
+    flex-shrink: 0;
+  }
+
+  // Expired trial state
+  &.expired {
+    background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+    border: 2px solid #ef5350;
+
+    mat-icon {
+      color: #c62828;
+    }
+
+    span {
+      color: #b71c1c;
+    }
+  }
+}
+
 .dashboard-main {
-  max-width: 1200px;
+  max-width: 100%;
   margin: 0 auto;
-  padding: 24px;
+  padding: 24px 48px;
 }
 
 .stats-grid {

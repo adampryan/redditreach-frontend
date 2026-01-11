@@ -7,15 +7,15 @@
 }
 
 .container {
-  max-width: 1200px;
+  max-width: 100%;
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 0 48px;
 }
 
 /* Header */
 header {
   background: #fff;
-  padding: 20px 0;
+  padding: 8px 0;
   border-bottom: 1px solid #eee;
 }
 
@@ -26,9 +26,13 @@ header {
 }
 
 .logo {
-  font-size: 24px;
-  font-weight: 700;
-  color: #ff4500;
+  display: flex;
+  align-items: center;
+}
+
+.logo-img {
+  height: 200px;
+  width: auto;
 }
 
 .login-link {
@@ -168,14 +172,16 @@ header {
 }
 
 .pricing-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: 30px;
-  max-width: 1100px;
+  max-width: 1200px;
   margin: 0 auto;
 }
 
 .pricing-card {
+  flex: 0 1 280px;
   background: #fff;
   border: 2px solid #eee;
   border-radius: 16px;

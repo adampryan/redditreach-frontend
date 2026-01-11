@@ -13,6 +13,15 @@ export interface Plan {
   features: string[];
 }
 
+export interface AccessStatus {
+  can_access: boolean;
+  status: 'active' | 'trial_active' | 'trial_expired' | 'no_subscription';
+  message: string | null;
+  trial_days_remaining?: number | null;
+  trial_ends_at?: string | null;
+  trial_ended_at?: string | null;
+}
+
 export interface BillingStatus {
   has_subscription: boolean;
   subscription_tier: string;
@@ -20,6 +29,13 @@ export interface BillingStatus {
   current_period_end: number | null;
   cancel_at_period_end: boolean;
   stripe_customer_id: string | null;
+  // Trial status
+  is_on_trial: boolean;
+  trial_days_remaining: number | null;
+  trial_ends_at: string | null;
+  is_trial_expired: boolean;
+  can_use_service: boolean;
+  access_status: AccessStatus;
 }
 
 export interface CheckoutResponse {
@@ -119,6 +135,18 @@ export class BillingService {
 
   createPortalSession(): Observable<PortalResponse> {
     return this.http.post<PortalResponse>(`${this.apiUrl}/billing/portal/`, {});
+  }
+
+  cancelSubscription(): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.apiUrl}/billing/cancel/`, {});
+  }
+
+  pauseSubscription(months: number = 1): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.apiUrl}/billing/pause/`, { months });
+  }
+
+  resumeSubscription(): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.apiUrl}/billing/resume/`, {});
   }
 
   getPlanByTier(tier: string): Plan | undefined {

@@ -33,7 +33,7 @@
     </div>
 
     <!-- Current Subscription -->
-    <mat-card class="current-plan-card" *ngIf="billingStatus?.has_subscription">
+    <mat-card class="current-plan-card" *ngIf="billingStatus?.has_subscription || (billingStatus?.subscription_tier && billingStatus?.subscription_tier !== 'trial')">
       <mat-card-header>
         <mat-card-title>Current Subscription</mat-card-title>
       </mat-card-header>
@@ -52,20 +52,88 @@
             </span>
           </div>
         </div>
-        <button mat-stroked-button (click)="manageSubscription()">
-          <mat-icon>credit_card</mat-icon>
-          Manage Subscription
-        </button>
+        <div class="subscription-actions">
+          <button mat-stroked-button (click)="manageSubscription()">
+            <mat-icon>credit_card</mat-icon>
+            Manage Billing
+          </button>
+
+          <!-- Resume button if cancelling -->
+          <button
+            *ngIf="billingStatus?.cancel_at_period_end"
+            mat-raised-button
+            color="primary"
+            (click)="resumeSubscription()"
+            [disabled]="isCancelling">
+            <mat-icon>replay</mat-icon>
+            {{ isCancelling ? 'Resuming...' : 'Stay with us!' }}
+          </button>
+
+          <!-- Cancel button if active -->
+          <button
+            *ngIf="!billingStatus?.cancel_at_period_end && !showCancelConfirm"
+            mat-button
+            color="warn"
+            (click)="showCancelConfirm = true">
+            Need a break?
+          </button>
+        </div>
+
+        <!-- Cancel/Pause options -->
+        <div class="cancel-confirm" *ngIf="showCancelConfirm">
+          <p>We get it, life happens! What would you like to do?</p>
+
+          <div class="pause-option">
+            <div class="option-info">
+              <strong>Take a breather</strong>
+              <span>Pause for 1-3 months. We'll keep your settings safe.</span>
+            </div>
+            <button
+              mat-stroked-button
+              color="primary"
+              (click)="pauseSubscription()"
+              [disabled]="isCancelling">
+              {{ isCancelling ? 'Processing...' : 'Pause subscription' }}
+            </button>
+          </div>
+
+          <div class="cancel-option">
+            <div class="option-info">
+              <strong>Say goodbye (for now)</strong>
+              <span>Cancel entirely. Access continues until {{ formatDate(billingStatus?.current_period_end ?? null) }}.</span>
+            </div>
+            <button
+              mat-stroked-button
+              color="warn"
+              (click)="cancelSubscription()"
+              [disabled]="isCancelling">
+              {{ isCancelling ? 'Processing...' : 'Cancel subscription' }}
+            </button>
+          </div>
+
+          <div class="cancel-actions">
+            <button mat-button (click)="showCancelConfirm = false">Never mind, I'll stay!</button>
+          </div>
+        </div>
       </mat-card-content>
     </mat-card>
 
     <!-- Trial Notice -->
-    <mat-card class="trial-card" *ngIf="billingStatus?.subscription_tier === 'trial'">
+    <mat-card class="trial-card" *ngIf="billingStatus?.subscription_tier === 'trial'" [class.expired]="billingStatus?.is_trial_expired">
       <mat-card-content>
-        <mat-icon class="trial-icon">hourglass_empty</mat-icon>
+        <mat-icon class="trial-icon">{{ billingStatus?.is_trial_expired ? 'timer_off' : 'hourglass_empty' }}</mat-icon>
         <div class="trial-text">
-          <strong>You're on the free trial</strong>
-          <p>Upgrade to a paid plan to unlock more opportunities and responses.</p>
+          <ng-container *ngIf="billingStatus?.is_trial_expired; else trialActive">
+            <strong>Your trial has ended</strong>
+            <p>Subscribe now to resume monitoring and never miss a conversation.</p>
+          </ng-container>
+          <ng-template #trialActive>
+            <strong *ngIf="billingStatus?.trial_days_remaining !== null">
+              {{ billingStatus?.trial_days_remaining }} day{{ billingStatus?.trial_days_remaining === 1 ? '' : 's' }} left in your trial
+            </strong>
+            <strong *ngIf="billingStatus?.trial_days_remaining === null">You're on the free trial</strong>
+            <p>Upgrade to a paid plan to keep catching threads after your trial ends.</p>
+          </ng-template>
         </div>
       </mat-card-content>
     </mat-card>
@@ -76,9 +144,9 @@
         *ngFor="let plan of plans"
         class="plan-card"
         [class.current]="isCurrentPlan(plan.tier)"
-        [class.popular]="plan.tier === 'growth'">
+        [class.popular]="plan.tier === 'growth' && billingStatus?.subscription_tier === 'starter'">
 
-        <div class="popular-badge" *ngIf="plan.tier === 'growth'">Most Popular</div>
+        <div class="popular-badge" *ngIf="plan.tier === 'growth' && billingStatus?.subscription_tier === 'starter'">Most Popular</div>
 
         <mat-card-header>
           <mat-card-title>{{ plan.name }}</mat-card-title>
@@ -101,12 +169,12 @@
           <button
             *ngIf="!isCurrentPlan(plan.tier)"
             mat-raised-button
-            [color]="plan.tier === 'growth' ? 'primary' : ''"
+            [color]="plan.tier === 'growth' && (billingStatus?.subscription_tier === 'starter' || billingStatus?.subscription_tier === 'trial') ? 'primary' : ''"
             (click)="subscribe(plan.tier)"
             [disabled]="isCheckingOut">
             <mat-spinner *ngIf="isCheckingOut" diameter="18"></mat-spinner>
             <span *ngIf="!isCheckingOut">
-              {{ billingStatus?.has_subscription ? 'Switch to ' + plan.name : 'Get Started' }}
+              {{ getButtonText(plan) }}
             </span>
           </button>
           <button

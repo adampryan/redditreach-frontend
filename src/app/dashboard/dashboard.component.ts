@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { CustomerService, OpportunityService, AuthenticationService } from '../shared/services';
+import { CustomerService, OpportunityService, AuthenticationService, BillingService, BillingStatus } from '../shared/services';
 import { CustomerStats, OpportunityListItem, Customer } from '../shared/models';
 
 @Component({
@@ -12,6 +12,7 @@ import { CustomerStats, OpportunityListItem, Customer } from '../shared/models';
 export class DashboardComponent implements OnInit {
   customer: Customer | null = null;
   stats: CustomerStats | null = null;
+  billingStatus: BillingStatus | null = null;
   recentOpportunities: OpportunityListItem[] = [];
   isLoading = true;
 
@@ -19,6 +20,7 @@ export class DashboardComponent implements OnInit {
     private customerService: CustomerService,
     private opportunityService: OpportunityService,
     private authService: AuthenticationService,
+    private billingService: BillingService,
     private router: Router
   ) {}
 
@@ -54,6 +56,13 @@ export class DashboardComponent implements OnInit {
     this.customerService.getStats().subscribe({
       next: (stats) => {
         this.stats = stats;
+      }
+    });
+
+    // Load billing status for trial info
+    this.billingService.getStatus().subscribe({
+      next: (status) => {
+        this.billingStatus = status;
       }
     });
 

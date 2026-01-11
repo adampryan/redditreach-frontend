@@ -1,8 +1,8 @@
 {
-  "name": "redditreach-frontend",
+  "name": "threadcatch-frontend",
   "compatibility_date": "2026-01-10",
   "assets": {
-    "directory": "./dist/redditreach-frontend",
+    "directory": "./dist/redditreach-frontend/browser",
     "not_found_handling": "single-page-application"
   }
 }

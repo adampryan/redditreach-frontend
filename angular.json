@@ -57,7 +57,9 @@
               {
                 "glob": "_redirects",
                 "input": "src"
-              }
+              },
+              "src/favicon.png",
+              "src/assets"
             ],
             "styles": [
               "src/styles.scss"
