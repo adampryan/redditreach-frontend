@@ -1,0 +1,60 @@
+<div class="signup-container">
+  <div class="signup-card">
+    <div class="signup-header">
+      <h1 class="logo">RedditReach</h1>
+      <p class="tagline">Start finding customers on Reddit today</p>
+    </div>
+
+    <form [formGroup]="signupForm" (ngSubmit)="onSubmit()">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Business Name</mat-label>
+        <input matInput formControlName="business_name" placeholder="Your Company">
+        <mat-error *ngIf="business_name?.hasError('required')">Business name is required</mat-error>
+        <mat-error *ngIf="business_name?.hasError('minlength')">Must be at least 2 characters</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Email</mat-label>
+        <input matInput type="email" formControlName="email" placeholder="you@company.com">
+        <mat-error *ngIf="email?.hasError('required')">Email is required</mat-error>
+        <mat-error *ngIf="email?.hasError('email')">Please enter a valid email</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Password</mat-label>
+        <input matInput type="password" formControlName="password" placeholder="At least 8 characters">
+        <mat-error *ngIf="password?.hasError('required')">Password is required</mat-error>
+        <mat-error *ngIf="password?.hasError('minlength')">Password must be at least 8 characters</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Confirm Password</mat-label>
+        <input matInput type="password" formControlName="password_confirm" placeholder="Confirm your password">
+        <mat-error *ngIf="password_confirm?.hasError('required')">Please confirm your password</mat-error>
+        <mat-error *ngIf="password_confirm?.hasError('passwordMismatch')">Passwords do not match</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Website (optional)</mat-label>
+        <input matInput formControlName="website" placeholder="https://yourcompany.com">
+        <mat-hint>We'll link to this in your Reddit responses</mat-hint>
+      </mat-form-field>
+
+      <button
+        mat-raised-button
+        color="primary"
+        type="submit"
+        class="full-width signup-button"
+        [disabled]="signupForm.invalid || isLoading">
+        <span *ngIf="!isLoading">Start Free Trial</span>
+        <mat-spinner *ngIf="isLoading" diameter="20"></mat-spinner>
+      </button>
+
+      <p class="trial-note">7-day free trial. No credit card required.</p>
+    </form>
+
+    <div class="signup-footer">
+      <p>Already have an account? <a routerLink="/auth/login">Sign in</a></p>
+    </div>
+  </div>
+</div>

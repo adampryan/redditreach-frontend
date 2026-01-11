@@ -32,4 +32,9 @@ export class CustomerService {
   disconnectReddit(): Observable<{ success: boolean }> {
     return this.http.post<{ success: boolean }>(`${this.apiUrl}/reddit/disconnect/`, {});
   }
+
+  // Onboarding
+  completeOnboarding(): Observable<{ success: boolean }> {
+    return this.http.post<{ success: boolean }>(`${this.apiUrl}/onboarding/complete/`, {});
+  }
 }

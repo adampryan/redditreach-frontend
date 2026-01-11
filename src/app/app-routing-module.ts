@@ -30,6 +30,21 @@ const routes: Routes = [
     canActivate: [AuthGuard]
   },
   {
+    path: 'analytics',
+    loadChildren: () => import('./analytics/analytics.module').then(m => m.AnalyticsModule),
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'billing',
+    loadChildren: () => import('./billing/billing.module').then(m => m.BillingModule),
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'onboarding',
+    loadChildren: () => import('./onboarding/onboarding.module').then(m => m.OnboardingModule),
+    canActivate: [AuthGuard]
+  },
+  {
     path: '',
     redirectTo: '/dashboard',
     pathMatch: 'full'

@@ -33,9 +33,23 @@ export class DashboardComponent implements OnInit {
     this.customerService.getProfile().subscribe({
       next: (customer) => {
         this.customer = customer;
+
+        // Redirect to onboarding if not completed
+        if (!customer.is_onboarded) {
+          this.router.navigate(['/onboarding']);
+          return;
+        }
+
+        // Only load other data if onboarded
+        this.loadDashboardData();
+      },
+      error: () => {
+        this.isLoading = false;
       }
     });
+  }
 
+  private loadDashboardData(): void {
     // Load stats
     this.customerService.getStats().subscribe({
       next: (stats) => {

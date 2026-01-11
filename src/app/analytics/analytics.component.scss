@@ -1,0 +1,258 @@
+.analytics-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+
+  h1 {
+    font-size: 28px;
+    font-weight: 600;
+    color: #1a1a2e;
+    margin: 0;
+  }
+
+  .subtitle {
+    color: #666;
+    margin: 4px 0 0 0;
+    font-size: 14px;
+  }
+
+  .header-actions {
+    display: flex;
+    gap: 8px;
+  }
+}
+
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  padding: 60px;
+}
+
+// Summary Cards
+.summary-cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.stat-card {
+  padding: 20px;
+  text-align: center;
+
+  .stat-value {
+    font-size: 32px;
+    font-weight: 700;
+    color: #1a1a2e;
+  }
+
+  .stat-label {
+    font-size: 13px;
+    color: #666;
+    margin-top: 4px;
+  }
+
+  &.highlight {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+
+    .stat-value,
+    .stat-label {
+      color: #fff;
+    }
+  }
+}
+
+// Funnel Card
+.funnel-card {
+  margin-bottom: 24px;
+
+  .funnel-metrics {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    padding: 20px 0;
+  }
+
+  .funnel-step {
+    text-align: center;
+    min-width: 100px;
+
+    .funnel-count {
+      font-size: 28px;
+      font-weight: 700;
+      color: #1a1a2e;
+    }
+
+    .funnel-label {
+      font-size: 13px;
+      color: #666;
+    }
+
+    .funnel-rate {
+      font-size: 12px;
+      color: #28a745;
+      font-weight: 600;
+      margin-top: 4px;
+    }
+  }
+
+  .funnel-arrow {
+    color: #ccc;
+    font-size: 24px;
+  }
+}
+
+// Table Card
+.table-card {
+  margin-bottom: 24px;
+
+  mat-card-header {
+    margin-bottom: 16px;
+  }
+}
+
+.table-container {
+  overflow-x: auto;
+}
+
+.performance-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+
+  th, td {
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+  }
+
+  th {
+    background: #f8f9fa;
+    font-weight: 600;
+    color: #555;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  tbody tr:hover {
+    background: #f8f9fa;
+  }
+
+  .subreddit-name {
+    font-weight: 600;
+    color: #ff4500;
+  }
+
+  .expected-value {
+    font-weight: 600;
+    color: #28a745;
+  }
+}
+
+.confidence-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+
+  &.confidence-high {
+    background: #d4edda;
+    color: #155724;
+  }
+
+  &.confidence-medium {
+    background: #fff3cd;
+    color: #856404;
+  }
+
+  &.confidence-low {
+    background: #f8d7da;
+    color: #721c24;
+  }
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #888;
+
+  mat-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    margin-bottom: 16px;
+    color: #ccc;
+  }
+
+  p {
+    margin: 0;
+  }
+}
+
+// Snippet Card
+.snippet-card {
+  margin-top: 24px;
+  border: 2px solid #667eea;
+
+  mat-card-header {
+    position: relative;
+    margin-bottom: 16px;
+
+    .close-btn {
+      position: absolute;
+      right: -8px;
+      top: -8px;
+    }
+  }
+}
+
+.snippet-instructions {
+  p {
+    margin: 16px 0 8px 0;
+    font-size: 14px;
+  }
+}
+
+.code-block {
+  position: relative;
+  background: #1e1e1e;
+  border-radius: 8px;
+  padding: 16px;
+  overflow-x: auto;
+
+  pre {
+    margin: 0;
+    color: #d4d4d4;
+    font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+    font-size: 12px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
+
+  .copy-btn {
+    position: absolute;
+    right: 8px;
+    top: 8px;
+    color: #888;
+
+    &:hover {
+      color: #fff;
+    }
+  }
+}

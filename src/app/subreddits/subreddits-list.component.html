@@ -52,6 +52,47 @@
     </mat-card-actions>
   </mat-card>
 
+  <!-- Edit Form -->
+  <mat-card class="edit-form" *ngIf="editingSubreddit">
+    <mat-card-header>
+      <mat-card-title>Edit r/{{ editingSubreddit.subreddit_name }}</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="form-row">
+        <mat-form-field appearance="outline">
+          <mat-label>Keywords</mat-label>
+          <input matInput [(ngModel)]="editKeywords" placeholder="e.g., grading, PSA, vintage">
+          <mat-hint>Comma-separated keywords to match relevant posts</mat-hint>
+        </mat-form-field>
+      </div>
+      <div class="form-row">
+        <mat-form-field appearance="outline">
+          <mat-label>Exclude Keywords</mat-label>
+          <input matInput [(ngModel)]="editExcludeKeywords" placeholder="e.g., selling, FS, WTS">
+          <mat-hint>Posts containing these words will be skipped</mat-hint>
+        </mat-form-field>
+      </div>
+      <div class="form-row">
+        <mat-form-field appearance="outline">
+          <mat-label>Max Responses Per Day</mat-label>
+          <input matInput type="number" [(ngModel)]="editMaxResponsesPerDay" min="1" max="10">
+          <mat-hint>Limit daily responses to avoid looking spammy</mat-hint>
+        </mat-form-field>
+      </div>
+      <div class="error-message" *ngIf="editError">
+        <mat-icon>error</mat-icon>
+        {{ editError }}
+      </div>
+    </mat-card-content>
+    <mat-card-actions>
+      <button mat-raised-button color="primary" (click)="saveEdit()" [disabled]="isUpdating">
+        <mat-spinner *ngIf="isUpdating" diameter="18"></mat-spinner>
+        <span *ngIf="!isUpdating">Save Changes</span>
+      </button>
+      <button mat-button (click)="cancelEdit()">Cancel</button>
+    </mat-card-actions>
+  </mat-card>
+
   <!-- Loading -->
   <div *ngIf="isLoading" class="loading-spinner">
     <mat-spinner diameter="40"></mat-spinner>
@@ -104,6 +145,9 @@
           Scanned {{ getLastScanned(sub.last_scanned) }}
         </span>
         <div class="actions">
+          <button mat-icon-button matTooltip="Edit" (click)="startEdit(sub)">
+            <mat-icon>edit</mat-icon>
+          </button>
           <button mat-icon-button [matTooltip]="sub.is_active ? 'Pause' : 'Resume'" (click)="toggleActive(sub)">
             <mat-icon>{{ sub.is_active ? 'pause' : 'play_arrow' }}</mat-icon>
           </button>

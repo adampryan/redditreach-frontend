@@ -1,0 +1,151 @@
+<div class="analytics-container">
+  <header class="page-header">
+    <div>
+      <h1>Analytics & ROI</h1>
+      <p class="subtitle">Track performance and conversions from your Reddit responses</p>
+    </div>
+    <div class="header-actions">
+      <button mat-stroked-button (click)="loadSnippet()">
+        <mat-icon>code</mat-icon>
+        Tracking Snippet
+      </button>
+      <a mat-button routerLink="/dashboard">
+        <mat-icon>arrow_back</mat-icon>
+        Dashboard
+      </a>
+    </div>
+  </header>
+
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="loading-spinner">
+    <mat-spinner diameter="40"></mat-spinner>
+  </div>
+
+  <ng-container *ngIf="!isLoading">
+    <!-- Summary Cards -->
+    <div class="summary-cards" *ngIf="totals">
+      <mat-card class="stat-card">
+        <div class="stat-value">{{ totals.total_responses }}</div>
+        <div class="stat-label">Responses Posted</div>
+      </mat-card>
+      <mat-card class="stat-card">
+        <div class="stat-value">{{ totals.total_clicks }}</div>
+        <div class="stat-label">Link Clicks</div>
+      </mat-card>
+      <mat-card class="stat-card">
+        <div class="stat-value">{{ totals.total_conversions }}</div>
+        <div class="stat-label">Conversions</div>
+      </mat-card>
+      <mat-card class="stat-card highlight">
+        <div class="stat-value">${{ totals.total_revenue | number:'1.0-0' }}</div>
+        <div class="stat-label">Revenue</div>
+      </mat-card>
+    </div>
+
+    <!-- Funnel Metrics -->
+    <mat-card class="funnel-card" *ngIf="totals">
+      <mat-card-header>
+        <mat-card-title>Conversion Funnel</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="funnel-metrics">
+          <div class="funnel-step">
+            <div class="funnel-count">{{ totals.total_responses }}</div>
+            <div class="funnel-label">Responses</div>
+          </div>
+          <mat-icon class="funnel-arrow">arrow_forward</mat-icon>
+          <div class="funnel-step">
+            <div class="funnel-count">{{ totals.total_clicks }}</div>
+            <div class="funnel-label">Clicks</div>
+            <div class="funnel-rate">{{ totals.click_rate }}%</div>
+          </div>
+          <mat-icon class="funnel-arrow">arrow_forward</mat-icon>
+          <div class="funnel-step">
+            <div class="funnel-count">{{ totals.total_conversions }}</div>
+            <div class="funnel-label">Conversions</div>
+            <div class="funnel-rate">{{ totals.conversion_rate }}%</div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Subreddit Performance Table -->
+    <mat-card class="table-card">
+      <mat-card-header>
+        <mat-card-title>Subreddit Performance</mat-card-title>
+        <mat-card-subtitle>Ranked by expected value (Bayesian scoring)</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="table-container" *ngIf="subreddits.length > 0">
+          <table class="performance-table">
+            <thead>
+              <tr>
+                <th>Subreddit</th>
+                <th>Responses</th>
+                <th>Clicks</th>
+                <th>Conversions</th>
+                <th>Revenue</th>
+                <th>Conv. Rate</th>
+                <th>Expected Value</th>
+                <th>Confidence</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let sub of subreddits">
+                <td class="subreddit-name">r/{{ sub.subreddit_name }}</td>
+                <td>{{ sub.total_responses }}</td>
+                <td>{{ sub.total_clicks }}</td>
+                <td>{{ sub.total_conversions }}</td>
+                <td>${{ sub.total_revenue | number:'1.0-0' }}</td>
+                <td>{{ sub.posterior_conversion_rate }}%</td>
+                <td class="expected-value">${{ sub.expected_value | number:'1.2-2' }}</td>
+                <td>
+                  <span class="confidence-badge" [ngClass]="getConfidenceClass(sub.posterior_confidence)">
+                    {{ getConfidenceLabel(sub.posterior_confidence) }}
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="empty-state" *ngIf="subreddits.length === 0">
+          <mat-icon>analytics</mat-icon>
+          <p>No data yet. Start posting responses to see analytics.</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Tracking Snippet Modal -->
+    <mat-card class="snippet-card" *ngIf="showSnippet && snippet">
+      <mat-card-header>
+        <mat-card-title>Tracking Snippet</mat-card-title>
+        <mat-card-subtitle>Add this to your website to track conversions</mat-card-subtitle>
+        <button mat-icon-button (click)="showSnippet = false" class="close-btn">
+          <mat-icon>close</mat-icon>
+        </button>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="snippet-instructions">
+          <p><strong>1. Add to your site's &lt;head&gt; section:</strong></p>
+          <div class="code-block">
+            <pre>{{ snippet.js_snippet }}</pre>
+            <button mat-icon-button (click)="copySnippet()" class="copy-btn">
+              <mat-icon>{{ snippetCopied ? 'check' : 'content_copy' }}</mat-icon>
+            </button>
+          </div>
+
+          <p><strong>2. Track signups (call after user signs up):</strong></p>
+          <div class="code-block">
+            <pre>RedditReach.trackSignup();</pre>
+          </div>
+
+          <p><strong>3. Track conversions (call after purchase):</strong></p>
+          <div class="code-block">
+            <pre>RedditReach.trackConversion(99.00); // pass revenue amount</pre>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </ng-container>
+</div>

@@ -1,0 +1,143 @@
+<div class="billing-container">
+  <header class="page-header">
+    <div>
+      <h1>Billing & Plans</h1>
+      <p class="subtitle">Choose the plan that's right for your business</p>
+    </div>
+    <a mat-button routerLink="/dashboard">
+      <mat-icon>arrow_back</mat-icon>
+      Dashboard
+    </a>
+  </header>
+
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="loading-spinner">
+    <mat-spinner diameter="40"></mat-spinner>
+  </div>
+
+  <ng-container *ngIf="!isLoading">
+    <!-- Success/Error Messages -->
+    <div class="message success" *ngIf="successMessage">
+      <mat-icon>check_circle</mat-icon>
+      {{ successMessage }}
+      <button mat-icon-button (click)="successMessage = ''">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+    <div class="message error" *ngIf="checkoutError">
+      <mat-icon>error</mat-icon>
+      {{ checkoutError }}
+      <button mat-icon-button (click)="checkoutError = ''">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <!-- Current Subscription -->
+    <mat-card class="current-plan-card" *ngIf="billingStatus?.has_subscription">
+      <mat-card-header>
+        <mat-card-title>Current Subscription</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="current-plan-info">
+          <div class="plan-details">
+            <span class="plan-name">{{ currentPlan?.name || billingStatus?.subscription_tier }}</span>
+            <span class="plan-price">${{ currentPlan?.price }}/month</span>
+          </div>
+          <div class="plan-status">
+            <span class="status-badge" [ngClass]="billingStatus?.subscription_status">
+              {{ billingStatus?.subscription_status }}
+            </span>
+            <span class="renewal-date" *ngIf="billingStatus?.current_period_end">
+              {{ billingStatus?.cancel_at_period_end ? 'Ends' : 'Renews' }} {{ formatDate(billingStatus?.current_period_end ?? null) }}
+            </span>
+          </div>
+        </div>
+        <button mat-stroked-button (click)="manageSubscription()">
+          <mat-icon>credit_card</mat-icon>
+          Manage Subscription
+        </button>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Trial Notice -->
+    <mat-card class="trial-card" *ngIf="billingStatus?.subscription_tier === 'trial'">
+      <mat-card-content>
+        <mat-icon class="trial-icon">hourglass_empty</mat-icon>
+        <div class="trial-text">
+          <strong>You're on the free trial</strong>
+          <p>Upgrade to a paid plan to unlock more opportunities and responses.</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Plans Grid -->
+    <div class="plans-grid">
+      <mat-card
+        *ngFor="let plan of plans"
+        class="plan-card"
+        [class.current]="isCurrentPlan(plan.tier)"
+        [class.popular]="plan.tier === 'growth'">
+
+        <div class="popular-badge" *ngIf="plan.tier === 'growth'">Most Popular</div>
+
+        <mat-card-header>
+          <mat-card-title>{{ plan.name }}</mat-card-title>
+          <div class="price">
+            <span class="amount">${{ plan.price }}</span>
+            <span class="period">/month</span>
+          </div>
+        </mat-card-header>
+
+        <mat-card-content>
+          <ul class="features">
+            <li *ngFor="let feature of plan.features">
+              <mat-icon>check</mat-icon>
+              {{ feature }}
+            </li>
+          </ul>
+        </mat-card-content>
+
+        <mat-card-actions>
+          <button
+            *ngIf="!isCurrentPlan(plan.tier)"
+            mat-raised-button
+            [color]="plan.tier === 'growth' ? 'primary' : ''"
+            (click)="subscribe(plan.tier)"
+            [disabled]="isCheckingOut">
+            <mat-spinner *ngIf="isCheckingOut" diameter="18"></mat-spinner>
+            <span *ngIf="!isCheckingOut">
+              {{ billingStatus?.has_subscription ? 'Switch to ' + plan.name : 'Get Started' }}
+            </span>
+          </button>
+          <button
+            *ngIf="isCurrentPlan(plan.tier)"
+            mat-stroked-button
+            disabled>
+            Current Plan
+          </button>
+        </mat-card-actions>
+      </mat-card>
+    </div>
+
+    <!-- FAQ -->
+    <mat-card class="faq-card">
+      <mat-card-header>
+        <mat-card-title>Frequently Asked Questions</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="faq-item">
+          <strong>Can I cancel anytime?</strong>
+          <p>Yes, you can cancel your subscription at any time. You'll continue to have access until the end of your billing period.</p>
+        </div>
+        <div class="faq-item">
+          <strong>What happens when I reach my limits?</strong>
+          <p>You'll still see opportunities but won't be able to approve new responses until your limits reset at the start of your billing period.</p>
+        </div>
+        <div class="faq-item">
+          <strong>Can I upgrade or downgrade?</strong>
+          <p>Yes, you can change your plan at any time. Changes take effect immediately and are prorated.</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </ng-container>
+</div>

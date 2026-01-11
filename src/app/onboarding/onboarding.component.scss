@@ -1,0 +1,186 @@
+.onboarding-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px;
+}
+
+.onboarding-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 40px;
+  width: 100%;
+  max-width: 560px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+}
+
+.progress-bar {
+  height: 4px;
+  background: #e0e0e0;
+  border-radius: 2px;
+  margin-bottom: 8px;
+  overflow: hidden;
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #667eea, #764ba2);
+    border-radius: 2px;
+    transition: width 0.3s ease;
+  }
+}
+
+.step-indicator {
+  text-align: right;
+  font-size: 12px;
+  color: #888;
+  margin-bottom: 24px;
+}
+
+.step-header {
+  text-align: center;
+  margin-bottom: 32px;
+
+  h1 {
+    font-size: 24px;
+    font-weight: 600;
+    color: #1a1a2e;
+    margin: 0 0 8px 0;
+  }
+
+  p {
+    color: #666;
+    font-size: 14px;
+    margin: 0;
+  }
+}
+
+.step-content {
+  form {
+    margin-bottom: 24px;
+  }
+}
+
+.full-width {
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.popular-subreddits {
+  margin-bottom: 24px;
+
+  .section-label {
+    font-size: 13px;
+    color: #666;
+    margin: 0 0 12px 0;
+  }
+
+  .subreddit-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .subreddit-chip {
+    font-size: 13px;
+    border-radius: 20px;
+
+    &.selected {
+      background: #667eea;
+      color: white;
+      border-color: #667eea;
+    }
+  }
+}
+
+.step-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid #eee;
+
+  &.centered {
+    justify-content: center;
+  }
+
+  button {
+    min-width: 120px;
+
+    mat-spinner {
+      display: inline-block;
+    }
+  }
+
+  .large-button {
+    min-width: 200px;
+    height: 48px;
+    font-size: 16px;
+  }
+}
+
+// Success step
+.success-step {
+  text-align: center;
+}
+
+.success-icon {
+  margin-bottom: 16px;
+
+  mat-icon {
+    font-size: 72px;
+    width: 72px;
+    height: 72px;
+    color: #28a745;
+  }
+}
+
+.next-steps {
+  text-align: left;
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 24px;
+  margin: 32px 0;
+
+  h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1a1a2e;
+    margin: 0 0 16px 0;
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+
+    li {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid #e0e0e0;
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      mat-icon {
+        color: #667eea;
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+        flex-shrink: 0;
+        margin-top: 2px;
+      }
+
+      span {
+        color: #555;
+        font-size: 14px;
+        line-height: 1.5;
+      }
+    }
+  }
+}

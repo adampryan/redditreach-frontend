@@ -20,6 +20,14 @@ export class SubredditsListComponent implements OnInit {
   isSubmitting = false;
   addError = '';
 
+  // Edit form
+  editingSubreddit: CustomerSubreddit | null = null;
+  editKeywords = '';
+  editExcludeKeywords = '';
+  editMaxResponsesPerDay = 2;
+  isUpdating = false;
+  editError = '';
+
   constructor(
     private subredditService: SubredditService,
     private customerService: CustomerService
@@ -109,6 +117,50 @@ export class SubredditsListComponent implements OnInit {
     this.subredditService.delete(subreddit.id).subscribe({
       next: () => {
         this.subreddits = this.subreddits.filter(s => s.id !== subreddit.id);
+      }
+    });
+  }
+
+  startEdit(subreddit: CustomerSubreddit): void {
+    this.editingSubreddit = subreddit;
+    this.editKeywords = subreddit.keywords?.join(', ') || '';
+    this.editExcludeKeywords = subreddit.exclude_keywords?.join(', ') || '';
+    this.editMaxResponsesPerDay = subreddit.max_responses_per_day || 2;
+    this.editError = '';
+    this.showAddForm = false;
+  }
+
+  cancelEdit(): void {
+    this.editingSubreddit = null;
+    this.editKeywords = '';
+    this.editExcludeKeywords = '';
+    this.editError = '';
+  }
+
+  saveEdit(): void {
+    if (!this.editingSubreddit) return;
+
+    this.isUpdating = true;
+    this.editError = '';
+
+    const updateData = {
+      keywords: this.editKeywords ? this.editKeywords.split(',').map(k => k.trim()).filter(k => k) : [],
+      exclude_keywords: this.editExcludeKeywords ? this.editExcludeKeywords.split(',').map(k => k.trim()).filter(k => k) : [],
+      max_responses_per_day: this.editMaxResponsesPerDay
+    };
+
+    this.subredditService.update(this.editingSubreddit.id, updateData).subscribe({
+      next: (updated) => {
+        const index = this.subreddits.findIndex(s => s.id === this.editingSubreddit!.id);
+        if (index >= 0) {
+          this.subreddits[index] = updated;
+        }
+        this.isUpdating = false;
+        this.cancelEdit();
+      },
+      error: (error) => {
+        this.isUpdating = false;
+        this.editError = error.error?.error || 'Failed to update subreddit';
       }
     });
   }

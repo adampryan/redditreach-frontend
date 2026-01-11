@@ -13,6 +13,27 @@ interface TokenRefreshResponse {
   access: string;
 }
 
+interface RegisterRequest {
+  email: string;
+  password: string;
+  password_confirm: string;
+  business_name: string;
+  website?: string;
+}
+
+interface RegisterResponse {
+  customer: {
+    id: string;
+    name: string;
+    email: string;
+    subscription_tier: string;
+  };
+  tokens: {
+    access: string;
+    refresh: string;
+  };
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -64,6 +85,14 @@ export class AuthenticationService {
     return this.http.post<LoginResponse>(tokenUrl, { email, password }).pipe(
       tap(response => {
         this.storeTokens(response.access, response.refresh);
+      })
+    );
+  }
+
+  register(data: RegisterRequest): Observable<RegisterResponse> {
+    return this.http.post<RegisterResponse>(`${environment.API_BASE_URL}/register/`, data).pipe(
+      tap(response => {
+        this.storeTokens(response.tokens.access, response.tokens.refresh);
       })
     );
   }
