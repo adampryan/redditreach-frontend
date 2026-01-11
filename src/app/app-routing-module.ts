@@ -2,8 +2,19 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { AuthGuard } from './shared/guards/auth.guard';
 import { AnonymousGuard } from './shared/guards/anonymous.guard';
+import { LandingComponent } from './landing/landing.component';
+import { LandingLiveComponent } from './landing-live/landing-live.component';
 
 const routes: Routes = [
+  {
+    path: '',
+    component: LandingComponent,
+    pathMatch: 'full'
+  },
+  {
+    path: 'live',
+    component: LandingLiveComponent
+  },
   {
     path: 'auth',
     loadChildren: () => import('./auth/auth.module').then(m => m.AuthModule),
@@ -45,13 +56,8 @@ const routes: Routes = [
     canActivate: [AuthGuard]
   },
   {
-    path: '',
-    redirectTo: '/dashboard',
-    pathMatch: 'full'
-  },
-  {
     path: '**',
-    redirectTo: '/dashboard'
+    redirectTo: ''
   }
 ];
 

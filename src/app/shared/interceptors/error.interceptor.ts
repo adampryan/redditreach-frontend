@@ -25,7 +25,10 @@ export class ErrorInterceptor implements HttpInterceptor {
   intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
     return next.handle(request).pipe(
       catchError((error: HttpErrorResponse) => {
-        if (error.status === 401) {
+        // Don't intercept auth endpoints - let the login component handle those errors
+        const isAuthEndpoint = request.url.includes('/api/token') || request.url.includes('/api/register');
+
+        if (error.status === 401 && !isAuthEndpoint) {
           // Try to refresh token
           if (!this.isRefreshing && this.authService.getRefreshToken()) {
             this.isRefreshing = true;
