@@ -14,6 +14,7 @@ export class AnalyticsComponent implements OnInit {
   snippet: TrackingSnippetResponse | null = null;
   showSnippet = false;
   snippetCopied = false;
+  hasConversionData = false;
 
   constructor(private attributionService: AttributionService) {}
 
@@ -27,6 +28,8 @@ export class AnalyticsComponent implements OnInit {
       next: (data) => {
         this.subreddits = data.subreddits;
         this.totals = data.totals;
+        // Check if conversion tracking is set up (any conversions or revenue recorded)
+        this.hasConversionData = data.totals.total_conversions > 0 || data.totals.total_revenue > 0;
         this.isLoading = false;
       },
       error: () => {
@@ -36,19 +39,24 @@ export class AnalyticsComponent implements OnInit {
   }
 
   loadSnippet(): void {
+    console.log('loadSnippet called');
+
     if (this.snippet) {
+      console.log('Using cached snippet');
       this.showSnippet = true;
       return;
     }
 
+    console.log('Fetching snippet from API...');
     this.attributionService.getSnippet().subscribe({
       next: (data) => {
+        console.log('Snippet loaded:', data);
         this.snippet = data;
         this.showSnippet = true;
       },
       error: (err) => {
         console.error('Failed to load tracking snippet:', err);
-        alert('Failed to load tracking snippet. Please try again.');
+        alert('Failed to load tracking snippet: ' + (err.message || err.statusText || 'Unknown error'));
       }
     });
   }
