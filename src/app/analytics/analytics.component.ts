@@ -45,6 +45,10 @@ export class AnalyticsComponent implements OnInit {
       next: (data) => {
         this.snippet = data;
         this.showSnippet = true;
+      },
+      error: (err) => {
+        console.error('Failed to load tracking snippet:', err);
+        alert('Failed to load tracking snippet. Please try again.');
       }
     });
   }
