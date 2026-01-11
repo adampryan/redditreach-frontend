@@ -41,8 +41,8 @@ export class AuthenticationService {
   private userSubject: BehaviorSubject<User | null>;
   public user$: Observable<User | null>;
 
-  private readonly TOKEN_KEY = 'redditreach_tokens';
-  private readonly USER_KEY = 'redditreach_user';
+  private readonly TOKEN_KEY = 'threadcatch_tokens';
+  private readonly USER_KEY = 'threadcatch_user';
 
   constructor(private http: HttpClient) {
     const storedUser = localStorage.getItem(this.USER_KEY);

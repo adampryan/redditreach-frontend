@@ -157,7 +157,7 @@ export class OnboardingComponent implements OnInit {
         // Reload user profile to update is_onboarded flag
         this.authService.loadUserProfile().subscribe({
           next: () => {
-            this.toastr.success('Setup complete! Welcome to RedditReach.');
+            this.toastr.success('Setup complete! Welcome to ThreadCatch.');
             this.router.navigate(['/dashboard']);
           },
           error: () => {

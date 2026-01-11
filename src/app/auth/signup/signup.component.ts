@@ -68,12 +68,12 @@ export class SignupComponent implements OnInit {
         // Load user profile after successful registration
         this.authService.loadUserProfile().subscribe({
           next: () => {
-            this.toastr.success('Welcome to RedditReach! Let\'s get you set up.');
+            this.toastr.success('Welcome to ThreadCatch! Let\'s get you set up.');
             this.router.navigate(['/dashboard'], { queryParams: { welcome: 'true' } });
           },
           error: () => {
             // Still navigate even if profile load fails - tokens are stored
-            this.toastr.success('Account created! Welcome to RedditReach.');
+            this.toastr.success('Account created! Welcome to ThreadCatch.');
             this.router.navigate(['/dashboard']);
           }
         });

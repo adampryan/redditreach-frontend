@@ -3,19 +3,19 @@
 
 @include mat.core();
 
-$redditreach-primary: mat.m2-define-palette(mat.$m2-indigo-palette);
-$redditreach-accent: mat.m2-define-palette(mat.$m2-deep-orange-palette);
+$threadcatch-primary: mat.m2-define-palette(mat.$m2-indigo-palette);
+$threadcatch-accent: mat.m2-define-palette(mat.$m2-deep-orange-palette);
 
-$redditreach-theme: mat.m2-define-light-theme((
+$threadcatch-theme: mat.m2-define-light-theme((
   color: (
-    primary: $redditreach-primary,
-    accent: $redditreach-accent,
+    primary: $threadcatch-primary,
+    accent: $threadcatch-accent,
   )
 ));
 
-@include mat.all-component-themes($redditreach-theme);
+@include mat.all-component-themes($threadcatch-theme);
 
-// Global Styles for RedditReach
+// Global Styles for ThreadCatch
 
 // Reset
 * {
