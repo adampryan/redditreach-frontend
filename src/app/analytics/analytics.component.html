@@ -32,18 +32,18 @@
         <div class="stat-value">{{ totals.total_clicks }}</div>
         <div class="stat-label">Link Clicks</div>
       </mat-card>
-      <mat-card class="stat-card" *ngIf="hasConversionData">
+      <mat-card class="stat-card" *ngIf="hasTrackingInstalled">
         <div class="stat-value">{{ totals.total_conversions }}</div>
         <div class="stat-label">Conversions</div>
       </mat-card>
-      <mat-card class="stat-card highlight" *ngIf="hasConversionData">
+      <mat-card class="stat-card highlight" *ngIf="hasTrackingInstalled">
         <div class="stat-value">${{ totals.total_revenue | number:'1.0-0' }}</div>
         <div class="stat-label">Revenue</div>
       </mat-card>
     </div>
 
     <!-- Conversion Tracking CTA (if not set up) -->
-    <mat-card class="setup-tracking-card" *ngIf="!hasConversionData && totals && totals.total_responses > 0">
+    <mat-card class="setup-tracking-card" *ngIf="!hasTrackingInstalled && totals && totals.total_responses > 0">
       <mat-card-content>
         <div class="setup-tracking-content">
           <mat-icon>trending_up</mat-icon>
@@ -59,7 +59,7 @@
     <!-- Funnel Metrics -->
     <mat-card class="funnel-card" *ngIf="totals">
       <mat-card-header>
-        <mat-card-title>{{ hasConversionData ? 'Conversion Funnel' : 'Click Performance' }}</mat-card-title>
+        <mat-card-title>{{ hasTrackingInstalled ? 'Conversion Funnel' : 'Click Performance' }}</mat-card-title>
       </mat-card-header>
       <mat-card-content>
         <div class="funnel-metrics">
@@ -73,7 +73,7 @@
             <div class="funnel-label">Clicks</div>
             <div class="funnel-rate">{{ totals.click_rate }}%</div>
           </div>
-          <ng-container *ngIf="hasConversionData">
+          <ng-container *ngIf="hasTrackingInstalled">
             <mat-icon class="funnel-arrow">arrow_forward</mat-icon>
             <div class="funnel-step">
               <div class="funnel-count">{{ totals.total_conversions }}</div>
@@ -89,7 +89,7 @@
     <mat-card class="table-card">
       <mat-card-header>
         <mat-card-title>Subreddit Performance</mat-card-title>
-        <mat-card-subtitle>{{ hasConversionData ? 'Ranked by expected value (Bayesian scoring)' : 'Click performance by subreddit' }}</mat-card-subtitle>
+        <mat-card-subtitle>{{ hasTrackingInstalled ? 'Ranked by expected value (Bayesian scoring)' : 'Click performance by subreddit' }}</mat-card-subtitle>
       </mat-card-header>
       <mat-card-content>
         <div class="table-container" *ngIf="subreddits.length > 0">
@@ -100,7 +100,7 @@
                 <th>Responses</th>
                 <th>Clicks</th>
                 <th>Click Rate</th>
-                <ng-container *ngIf="hasConversionData">
+                <ng-container *ngIf="hasTrackingInstalled">
                   <th>Conversions</th>
                   <th>Revenue</th>
                   <th>Conv. Rate</th>
@@ -114,7 +114,7 @@
                 <td>{{ sub.total_responses }}</td>
                 <td>{{ sub.total_clicks }}</td>
                 <td>{{ sub.click_rate }}%</td>
-                <ng-container *ngIf="hasConversionData">
+                <ng-container *ngIf="hasTrackingInstalled">
                   <td>{{ sub.total_conversions }}</td>
                   <td>${{ sub.total_revenue | number:'1.0-0' }}</td>
                   <td>{{ sub.posterior_conversion_rate }}%</td>

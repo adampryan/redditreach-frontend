@@ -14,7 +14,7 @@ export class AnalyticsComponent implements OnInit {
   snippet: TrackingSnippetResponse | null = null;
   showSnippet = false;
   snippetCopied = false;
-  hasConversionData = false;
+  hasTrackingInstalled = false;
 
   constructor(private attributionService: AttributionService) {}
 
@@ -28,8 +28,8 @@ export class AnalyticsComponent implements OnInit {
       next: (data) => {
         this.subreddits = data.subreddits;
         this.totals = data.totals;
-        // Check if conversion tracking is set up (any conversions or revenue recorded)
-        this.hasConversionData = data.totals.total_conversions > 0 || data.totals.total_revenue > 0;
+        // Tracking is installed if we have any clicks (snippet is working)
+        this.hasTrackingInstalled = data.totals.total_clicks > 0;
         this.isLoading = false;
       },
       error: () => {
