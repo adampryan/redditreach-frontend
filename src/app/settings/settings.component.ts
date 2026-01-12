@@ -14,6 +14,7 @@ export class SettingsComponent implements OnInit {
   isSaving = false;
   saveSuccess = false;
   saveError = '';
+  apiKeyCopied = false;
 
   // Form fields
   form = {
@@ -116,5 +117,13 @@ export class SettingsComponent implements OnInit {
       agency: 'Agency'
     };
     return names[tier] || tier;
+  }
+
+  copyApiKey(inputElement: HTMLInputElement): void {
+    inputElement.select();
+    navigator.clipboard.writeText(inputElement.value).then(() => {
+      this.apiKeyCopied = true;
+      setTimeout(() => this.apiKeyCopied = false, 2000);
+    });
   }
 }

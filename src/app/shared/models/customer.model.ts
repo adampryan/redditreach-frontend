@@ -25,6 +25,8 @@ export interface Customer {
   notify_on_opportunities: boolean;
   notify_on_responses_ready: boolean;
   notification_frequency: 'instant' | 'daily' | 'weekly';
+  // Extension API key for Chrome extension
+  extension_api_key: string;
   is_active: boolean;
   is_onboarded: boolean;
   created_at: string;

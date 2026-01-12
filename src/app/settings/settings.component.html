@@ -35,18 +35,47 @@
       </mat-card-content>
     </mat-card>
 
+    <!-- Chrome Extension -->
+    <mat-card class="settings-card extension-card">
+      <mat-card-header>
+        <mat-card-title>Chrome Extension</mat-card-title>
+        <mat-card-subtitle>Post directly from your browser with the ThreadCatch extension</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="extension-info">
+          <p>Use the Chrome extension to review and post opportunities directly from your browser. This gives you full control over when and how responses are posted.</p>
+        </div>
+        <div class="api-key-section">
+          <label class="api-key-label">Your API Key</label>
+          <div class="api-key-container">
+            <input type="text" class="api-key-input" [value]="customer.extension_api_key" readonly #apiKeyInput>
+            <button mat-icon-button (click)="copyApiKey(apiKeyInput)" [matTooltip]="apiKeyCopied ? 'Copied!' : 'Copy to clipboard'">
+              <mat-icon>{{ apiKeyCopied ? 'check' : 'content_copy' }}</mat-icon>
+            </button>
+          </div>
+          <p class="api-key-hint">Paste this key into the Chrome extension to connect your account.</p>
+        </div>
+        <div class="extension-download">
+          <a mat-stroked-button color="primary" href="https://chrome.google.com/webstore" target="_blank">
+            <mat-icon>extension</mat-icon>
+            Get the Extension
+          </a>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
     <!-- Reddit Posting Info -->
     <mat-card class="settings-card reddit-card">
       <mat-card-header>
-        <mat-card-title>Reddit Posting</mat-card-title>
-        <mat-card-subtitle>How your approved responses get posted</mat-card-subtitle>
+        <mat-card-title>Managed Posting</mat-card-title>
+        <mat-card-subtitle>Alternative: Let us post for you automatically</mat-card-subtitle>
       </mat-card-header>
       <mat-card-content>
         <div class="reddit-status connected">
           <div class="status-info">
-            <mat-icon class="reddit-icon">check_circle</mat-icon>
+            <mat-icon class="reddit-icon">schedule</mat-icon>
             <div class="status-text">
-              <span class="status-label">Managed Posting</span>
+              <span class="status-label">Automatic Posting</span>
               <span class="status-hint">Your approved responses are posted by our service within 1-2 hours</span>
             </div>
           </div>
