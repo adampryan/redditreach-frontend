@@ -35,11 +35,45 @@
         <div class="info-row support-row">
           <span class="label">Need help?</span>
           <span class="value">
-            <a href="mailto:support@threadcatch.com" class="support-link">
-              <mat-icon>mail</mat-icon>
-              support@threadcatch.com
-            </a>
+            <button mat-button color="primary" (click)="toggleSupportForm()" class="support-btn">
+              <mat-icon>{{ showSupportForm ? 'close' : 'help_outline' }}</mat-icon>
+              {{ showSupportForm ? 'Cancel' : 'Contact Support' }}
+            </button>
           </span>
+        </div>
+
+        <!-- Support Form (expandable) -->
+        <div class="support-form-container" *ngIf="showSupportForm">
+          <div class="support-form" *ngIf="!supportSubmitted">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Subject</mat-label>
+              <input matInput [(ngModel)]="supportForm.subject" placeholder="What do you need help with?">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Message</mat-label>
+              <textarea matInput [(ngModel)]="supportForm.message" rows="4"
+                placeholder="Please describe your issue or question in detail..."></textarea>
+            </mat-form-field>
+
+            <div class="support-form-error" *ngIf="supportError">
+              <mat-icon>error</mat-icon>
+              {{ supportError }}
+            </div>
+
+            <div class="support-form-actions">
+              <button mat-raised-button color="primary" (click)="submitSupportRequest()"
+                [disabled]="isSubmittingSupport">
+                <mat-spinner *ngIf="isSubmittingSupport" diameter="18"></mat-spinner>
+                <span *ngIf="!isSubmittingSupport">Send Message</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="support-success" *ngIf="supportSubmitted">
+            <mat-icon>check_circle</mat-icon>
+            <span>Your message has been sent! We'll get back to you soon.</span>
+          </div>
         </div>
       </mat-card-content>
     </mat-card>

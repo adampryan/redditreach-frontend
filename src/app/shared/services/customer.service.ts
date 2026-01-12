@@ -37,4 +37,12 @@ export class CustomerService {
   completeOnboarding(): Observable<{ success: boolean }> {
     return this.http.post<{ success: boolean }>(`${this.apiUrl}/onboarding/complete/`, {});
   }
+
+  // Support
+  submitSupportRequest(subject: string, message: string): Observable<{ success: boolean; ticket_id: string; message: string }> {
+    return this.http.post<{ success: boolean; ticket_id: string; message: string }>(
+      `${this.apiUrl}/support/submit/`,
+      { subject, message }
+    );
+  }
 }

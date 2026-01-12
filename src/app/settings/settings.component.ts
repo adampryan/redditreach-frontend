@@ -16,6 +16,16 @@ export class SettingsComponent implements OnInit {
   saveError = '';
   apiKeyCopied = false;
 
+  // Support form
+  showSupportForm = false;
+  supportForm = {
+    subject: '',
+    message: ''
+  };
+  isSubmittingSupport = false;
+  supportSubmitted = false;
+  supportError = '';
+
   // Form fields
   form = {
     name: '',
@@ -124,6 +134,48 @@ export class SettingsComponent implements OnInit {
     navigator.clipboard.writeText(inputElement.value).then(() => {
       this.apiKeyCopied = true;
       setTimeout(() => this.apiKeyCopied = false, 2000);
+    });
+  }
+
+  toggleSupportForm(): void {
+    this.showSupportForm = !this.showSupportForm;
+    if (!this.showSupportForm) {
+      this.resetSupportForm();
+    }
+  }
+
+  resetSupportForm(): void {
+    this.supportForm = { subject: '', message: '' };
+    this.supportError = '';
+    this.supportSubmitted = false;
+  }
+
+  submitSupportRequest(): void {
+    if (!this.supportForm.subject.trim() || !this.supportForm.message.trim()) {
+      this.supportError = 'Please fill in both subject and message';
+      return;
+    }
+
+    this.isSubmittingSupport = true;
+    this.supportError = '';
+
+    this.customerService.submitSupportRequest(
+      this.supportForm.subject.trim(),
+      this.supportForm.message.trim()
+    ).subscribe({
+      next: () => {
+        this.isSubmittingSupport = false;
+        this.supportSubmitted = true;
+        this.supportForm = { subject: '', message: '' };
+        setTimeout(() => {
+          this.showSupportForm = false;
+          this.supportSubmitted = false;
+        }, 3000);
+      },
+      error: (error) => {
+        this.isSubmittingSupport = false;
+        this.supportError = error.error?.error || 'Failed to submit request. Please try again.';
+      }
     });
   }
 }
