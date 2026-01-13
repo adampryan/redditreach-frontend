@@ -27,6 +27,14 @@
     align-items: center;
     gap: 16px;
 
+    .notification-btn {
+      color: #666;
+
+      &:hover {
+        color: #667eea;
+      }
+    }
+
     .user-name {
       color: #666;
       font-weight: 500;

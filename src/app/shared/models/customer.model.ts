@@ -53,6 +53,7 @@ export interface CustomerStats {
   rejected: number;
   subscription_tier: string;
   tier_limits: TierLimits;
+  unread_support_count: number;
 }
 
 export interface User {
