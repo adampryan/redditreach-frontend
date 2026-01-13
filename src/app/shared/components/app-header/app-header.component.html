@@ -5,8 +5,9 @@
 
   <nav class="main-nav">
     <a mat-button routerLink="/opportunities" routerLinkActive="active"
-       [matBadge]="stats?.pending_approval" [matBadgeHidden]="!stats?.pending_approval"
-       matBadgeColor="accent" matBadgeSize="small">
+       [matBadge]="stats?.pending_approval"
+       [matBadgeHidden]="!stats?.pending_approval"
+       matBadgeColor="warn">
       <mat-icon>inbox</mat-icon>
       Opportunities
     </a>
@@ -31,7 +32,6 @@
             [matBadge]="stats?.unread_support_count"
             [matBadgeHidden]="!stats?.unread_support_count"
             matBadgeColor="warn"
-            matBadgeSize="small"
             matTooltip="Support Messages">
       <mat-icon>mail</mat-icon>
     </button>
