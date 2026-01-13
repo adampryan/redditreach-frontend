@@ -1,0 +1,37 @@
+<h2 mat-dialog-title>Generate New Response</h2>
+
+<mat-dialog-content>
+  <p class="dialog-description">
+    Choose a tone/strategy for the new response variation.
+  </p>
+
+  <div class="strategy-options">
+    <div
+      class="strategy-card"
+      *ngFor="let s of strategies"
+      [class.selected]="strategy === s.value"
+      (click)="strategy = s.value">
+      <div class="strategy-header">
+        <mat-icon>{{ s.icon }}</mat-icon>
+        <span class="strategy-label">{{ s.label }}</span>
+        <mat-icon class="check-icon" *ngIf="strategy === s.value">check_circle</mat-icon>
+      </div>
+      <p class="strategy-description">{{ s.description }}</p>
+    </div>
+  </div>
+
+  <div class="utm-option" *ngIf="showUtmOption">
+    <mat-checkbox [(ngModel)]="includeUtm">
+      Include UTM tracking link
+    </mat-checkbox>
+    <p class="utm-hint">Adds tracking parameters to measure conversions from this response.</p>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Cancel</button>
+  <button mat-raised-button color="primary" (click)="onRegenerate()">
+    <mat-icon>autorenew</mat-icon>
+    Generate
+  </button>
+</mat-dialog-actions>

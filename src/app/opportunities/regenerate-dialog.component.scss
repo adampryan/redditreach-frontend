@@ -1,0 +1,84 @@
+.dialog-description {
+  color: #666;
+  margin-bottom: 20px;
+}
+
+.strategy-options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.strategy-card {
+  padding: 16px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: #667eea;
+    background: #f8f9ff;
+  }
+
+  &.selected {
+    border-color: #667eea;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+  }
+
+  .strategy-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+
+    mat-icon {
+      color: #667eea;
+    }
+
+    .strategy-label {
+      font-weight: 600;
+      font-size: 15px;
+      flex: 1;
+    }
+
+    .check-icon {
+      color: #667eea;
+    }
+  }
+
+  .strategy-description {
+    margin: 0;
+    font-size: 13px;
+    color: #666;
+    line-height: 1.4;
+  }
+}
+
+.utm-option {
+  margin-top: 20px;
+  padding: 16px;
+  background: #f5f5f5;
+  border-radius: 8px;
+
+  mat-checkbox {
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  .utm-hint {
+    margin: 0;
+    font-size: 12px;
+    color: #888;
+  }
+}
+
+mat-dialog-actions {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #eee;
+
+  button mat-icon {
+    margin-right: 8px;
+  }
+}

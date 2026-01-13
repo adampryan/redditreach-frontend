@@ -4,6 +4,7 @@ import { SharedModule } from '../shared/shared.module';
 
 import { OpportunitiesListComponent } from './opportunities-list.component';
 import { OpportunityDetailComponent } from './opportunity-detail.component';
+import { RegenerateDialogComponent } from './regenerate-dialog.component';
 
 const routes: Routes = [
   { path: '', component: OpportunitiesListComponent },
@@ -13,7 +14,8 @@ const routes: Routes = [
 @NgModule({
   declarations: [
     OpportunitiesListComponent,
-    OpportunityDetailComponent
+    OpportunityDetailComponent,
+    RegenerateDialogComponent
   ],
   imports: [
     SharedModule,

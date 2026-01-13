@@ -161,6 +161,26 @@
   }
 }
 
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 24px 0 16px;
+
+  .section-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1a1a2e;
+    margin: 0;
+  }
+
+  button {
+    mat-icon, mat-spinner {
+      margin-right: 8px;
+    }
+  }
+}
+
 .section-title {
   font-size: 18px;
   font-weight: 600;
@@ -283,5 +303,16 @@
 
   p {
     color: #666;
+    margin-bottom: 16px;
+  }
+
+  button {
+    mat-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+      margin-right: 8px;
+      margin-bottom: 0;
+    }
   }
 }

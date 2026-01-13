@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
+import { MatDialog } from '@angular/material/dialog';
 import { OpportunityService } from '../shared/services';
 import { Opportunity, ResponseDraft } from '../shared/models';
+import { RegenerateDialogComponent, RegenerateDialogResult } from './regenerate-dialog.component';
 
 @Component({
   selector: 'app-opportunity-detail',
@@ -13,6 +15,7 @@ export class OpportunityDetailComponent implements OnInit {
   opportunity: Opportunity | null = null;
   isLoading = true;
   isSubmitting = false;
+  isRegenerating = false;
   selectedDraft: ResponseDraft | null = null;
   editedText = '';
   showEditMode = false;
@@ -20,7 +23,8 @@ export class OpportunityDetailComponent implements OnInit {
   constructor(
     private opportunityService: OpportunityService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
@@ -116,5 +120,57 @@ export class OpportunityDetailComponent implements OnInit {
       expired: 'status-expired'
     };
     return statusClasses[status] || '';
+  }
+
+  openRegenerateDialog(): void {
+    if (!this.opportunity) return;
+
+    const dialogRef = this.dialog.open(RegenerateDialogComponent, {
+      width: '480px',
+      data: {
+        opportunityId: this.opportunity.id,
+        postTitle: this.opportunity.post_title
+      }
+    });
+
+    dialogRef.afterClosed().subscribe((result: RegenerateDialogResult | undefined) => {
+      if (result) {
+        this.regenerateResponse(result);
+      }
+    });
+  }
+
+  private regenerateResponse(options: RegenerateDialogResult): void {
+    if (!this.opportunity) return;
+
+    this.isRegenerating = true;
+    this.opportunityService.regenerate(
+      this.opportunity.id,
+      options.strategy,
+      options.includeUtm
+    ).subscribe({
+      next: (response) => {
+        this.isRegenerating = false;
+        if (response.success && response.draft) {
+          // Add the new draft to the list
+          const newDraft: ResponseDraft = {
+            id: response.draft.id,
+            variation_number: response.draft.variation_number,
+            variation_label: response.draft.variation_label,
+            response_text: response.draft.response_text,
+            edited_text: '',
+            final_text: response.draft.response_text,
+            is_selected: false,
+            created_at: response.draft.created_at
+          };
+          this.opportunity!.drafts.push(newDraft);
+          // Automatically select the new draft
+          this.selectDraft(newDraft);
+        }
+      },
+      error: () => {
+        this.isRegenerating = false;
+      }
+    });
   }
 }

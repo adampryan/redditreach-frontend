@@ -82,7 +82,18 @@
 
     <!-- Draft Selection (if pending approval) -->
     <ng-container *ngIf="opportunity.is_respondable && opportunity.drafts.length > 0">
-      <h2 class="section-title">Select a Response</h2>
+      <div class="section-header">
+        <h2 class="section-title">Select a Response</h2>
+        <button
+          mat-stroked-button
+          color="primary"
+          (click)="openRegenerateDialog()"
+          [disabled]="isRegenerating">
+          <mat-spinner *ngIf="isRegenerating" diameter="18"></mat-spinner>
+          <mat-icon *ngIf="!isRegenerating">autorenew</mat-icon>
+          {{ isRegenerating ? 'Generating...' : 'Generate New' }}
+        </button>
+      </div>
 
       <div class="drafts-list">
         <mat-card
@@ -145,8 +156,18 @@
     <!-- No Drafts Message -->
     <mat-card *ngIf="opportunity.is_respondable && opportunity.drafts.length === 0" class="no-drafts">
       <mat-card-content>
-        <mat-icon>hourglass_empty</mat-icon>
-        <p>Response drafts are being generated. Check back shortly.</p>
+        <mat-icon>{{ isRegenerating ? 'autorenew' : 'hourglass_empty' }}</mat-icon>
+        <p *ngIf="!isRegenerating">Response drafts are being generated. Check back shortly.</p>
+        <p *ngIf="isRegenerating">Generating response...</p>
+        <button
+          mat-raised-button
+          color="primary"
+          (click)="openRegenerateDialog()"
+          [disabled]="isRegenerating"
+          *ngIf="!isRegenerating">
+          <mat-icon>autorenew</mat-icon>
+          Generate Now
+        </button>
       </mat-card-content>
     </mat-card>
   </ng-container>

@@ -62,4 +62,18 @@ export class OpportunityService {
       {}
     );
   }
+
+  regenerate(
+    id: string,
+    strategy: 'engage_only' | 'soft_mention' | 'with_link',
+    includeUtm: boolean = true
+  ): Observable<{ success: boolean; draft: any }> {
+    return this.http.post<{ success: boolean; draft: any }>(
+      `${this.apiUrl}/opportunities/${id}/regenerate/`,
+      {
+        strategy,
+        include_utm: includeUtm
+      }
+    );
+  }
 }
