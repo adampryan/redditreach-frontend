@@ -23,10 +23,14 @@
     font-size: 10px;
     font-weight: 600;
     min-width: 18px;
+    width: auto !important;
+    max-width: none !important;
     height: 18px;
     line-height: 18px;
-    padding: 0 4px;
+    padding: 0 5px;
     border-radius: 9px;
+    overflow: visible !important;
+    text-overflow: clip !important;
   }
 
   .main-nav {
