@@ -168,8 +168,10 @@ export class OpportunityDetailComponent implements OnInit {
           this.selectDraft(newDraft);
         }
       },
-      error: () => {
+      error: (err) => {
         this.isRegenerating = false;
+        const errorMsg = err?.error?.error || 'Failed to generate response. Please try again.';
+        alert(errorMsg);
       }
     });
   }
