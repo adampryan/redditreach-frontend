@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { ReplyService } from '../shared/services';
 import { CommentReplyDetail, ReplyDraft } from '../shared/models';
 import { GenerateReplyDialogComponent, GenerateReplyDialogResult } from './generate-reply-dialog.component';
@@ -26,7 +27,9 @@ export class ReplyDetailComponent implements OnInit {
     private replyService: ReplyService,
     private router: Router,
     private route: ActivatedRoute,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private snackBar: MatSnackBar,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -102,6 +105,8 @@ export class ReplyDetailComponent implements OnInit {
     if (!this.reply) return;
 
     this.isGenerating = true;
+    this.cdr.detectChanges();
+
     this.replyService.generateDraft(
       this.reply.id,
       options.strategy,
@@ -117,12 +122,15 @@ export class ReplyDetailComponent implements OnInit {
           }
           this.reply!.drafts.push(newDraft);
           this.selectDraft(newDraft);
+          this.cdr.detectChanges();
+          this.snackBar.open('AI reply generated!', 'Dismiss', { duration: 3000 });
         }
       },
       error: (err) => {
         this.isGenerating = false;
+        this.cdr.detectChanges();
         const errorMsg = err?.error?.error || 'Failed to generate reply. Please try again.';
-        alert(errorMsg);
+        this.snackBar.open(errorMsg, 'Dismiss', { duration: 5000 });
       }
     });
   }
@@ -142,10 +150,13 @@ export class ReplyDetailComponent implements OnInit {
           this.selectDraft(response.draft);
           this.showManualDraft = false;
           this.manualDraftText = '';
+          this.cdr.detectChanges();
+          this.snackBar.open('Draft saved!', 'Dismiss', { duration: 3000 });
         }
       },
       error: () => {
         this.isSubmitting = false;
+        this.snackBar.open('Failed to save draft', 'Dismiss', { duration: 5000 });
       }
     });
   }
@@ -165,10 +176,13 @@ export class ReplyDetailComponent implements OnInit {
           }
           this.selectedDraft = response.draft;
           this.showEditMode = false;
+          this.cdr.detectChanges();
+          this.snackBar.open('Draft updated!', 'Dismiss', { duration: 3000 });
         }
       },
       error: () => {
         this.isSubmitting = false;
+        this.snackBar.open('Failed to update draft', 'Dismiss', { duration: 5000 });
       }
     });
   }
@@ -180,10 +194,13 @@ export class ReplyDetailComponent implements OnInit {
     this.replyService.approveDraft(this.selectedDraft.id).subscribe({
       next: () => {
         this.isSubmitting = false;
+        this.snackBar.open('Reply approved and queued for posting!', 'Dismiss', { duration: 4000 });
         this.router.navigate(['/replies'], { queryParams: { filter: '' } });
       },
-      error: () => {
+      error: (err) => {
         this.isSubmitting = false;
+        const errorMsg = err?.error?.error || 'Failed to approve reply. Please try again.';
+        this.snackBar.open(errorMsg, 'Dismiss', { duration: 5000 });
       }
     });
   }
