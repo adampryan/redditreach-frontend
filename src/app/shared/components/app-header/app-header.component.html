@@ -2,6 +2,28 @@
   <a routerLink="/dashboard" class="logo">
     <img src="assets/threadcatch-logo.png" alt="ThreadCatch" class="logo-img">
   </a>
+
+  <nav class="main-nav">
+    <a mat-button routerLink="/opportunities" routerLinkActive="active"
+       [matBadge]="stats?.pending_approval" [matBadgeHidden]="!stats?.pending_approval"
+       matBadgeColor="accent" matBadgeSize="small">
+      <mat-icon>inbox</mat-icon>
+      Opportunities
+    </a>
+    <a mat-button routerLink="/subreddits" routerLinkActive="active">
+      <mat-icon>forum</mat-icon>
+      Subreddits
+    </a>
+    <a mat-button routerLink="/analytics" routerLinkActive="active">
+      <mat-icon>analytics</mat-icon>
+      Analytics
+    </a>
+    <a mat-button routerLink="/settings" routerLinkActive="active">
+      <mat-icon>settings</mat-icon>
+      Settings
+    </a>
+  </nav>
+
   <div class="header-right">
     <button mat-icon-button routerLink="/support"
             class="notification-btn"
