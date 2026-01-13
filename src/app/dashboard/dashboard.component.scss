@@ -33,6 +33,26 @@
       &:hover {
         color: #667eea;
       }
+
+      &.has-unread {
+        color: #e53935;
+        animation: pulse-notification 1.5s ease-in-out infinite;
+
+        mat-icon {
+          color: #e53935;
+        }
+      }
+    }
+
+    @keyframes pulse-notification {
+      0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+      50% {
+        transform: scale(1.15);
+        opacity: 0.8;
+      }
     }
 
     .user-name {

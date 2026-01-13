@@ -5,7 +5,9 @@
       <img src="assets/threadcatch-logo.png" alt="ThreadCatch" class="logo-img">
     </div>
     <div class="header-right">
-      <button mat-icon-button routerLink="/support" class="notification-btn"
+      <button mat-icon-button routerLink="/support"
+              class="notification-btn"
+              [class.has-unread]="stats?.unread_support_count"
               [matBadge]="stats?.unread_support_count"
               [matBadgeHidden]="!stats?.unread_support_count"
               matBadgeColor="warn"
