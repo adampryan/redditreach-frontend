@@ -30,6 +30,9 @@ import { TooltipModule } from 'ngx-bootstrap/tooltip';
 // Toast
 import { ToastrModule } from 'ngx-toastr';
 
+// Components
+import { AppHeaderComponent } from './components/app-header/app-header.component';
+
 const MATERIAL_MODULES = [
   MatButtonModule,
   MatCardModule,
@@ -51,7 +54,9 @@ const MATERIAL_MODULES = [
 ];
 
 @NgModule({
-  declarations: [],
+  declarations: [
+    AppHeaderComponent,
+  ],
   imports: [
     CommonModule,
     FormsModule,
@@ -76,6 +81,7 @@ const MATERIAL_MODULES = [
     BsDropdownModule,
     TooltipModule,
     ToastrModule,
+    AppHeaderComponent,
   ]
 })
 export class SharedModule { }

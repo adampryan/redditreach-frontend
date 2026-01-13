@@ -1,0 +1,22 @@
+<header class="app-header">
+  <a routerLink="/dashboard" class="logo">
+    <img src="assets/threadcatch-logo.png" alt="ThreadCatch" class="logo-img">
+  </a>
+  <div class="header-right">
+    <button mat-icon-button routerLink="/support"
+            class="notification-btn"
+            [class.has-unread]="stats?.unread_support_count"
+            [matBadge]="stats?.unread_support_count"
+            [matBadgeHidden]="!stats?.unread_support_count"
+            matBadgeColor="warn"
+            matBadgeSize="small"
+            matTooltip="Support Messages">
+      <mat-icon>mail</mat-icon>
+    </button>
+    <span class="user-name" *ngIf="customer">{{ customer.name }}</span>
+    <button mat-button (click)="logout()">
+      <mat-icon>logout</mat-icon>
+      Logout
+    </button>
+  </div>
+</header>

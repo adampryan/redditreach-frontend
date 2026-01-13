@@ -1,0 +1,59 @@
+.app-header {
+  background: #fff;
+  padding: 8px 48px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #eee;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+
+  .logo {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+  }
+
+  .logo-img {
+    height: 200px;
+    width: auto;
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+
+    .notification-btn {
+      color: #666;
+
+      &:hover {
+        color: #667eea;
+      }
+
+      &.has-unread {
+        color: #e53935;
+        animation: pulse-notification 1.5s ease-in-out infinite;
+
+        mat-icon {
+          color: #e53935;
+        }
+      }
+    }
+
+    @keyframes pulse-notification {
+      0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+      50% {
+        transform: scale(1.15);
+        opacity: 0.8;
+      }
+    }
+
+    .user-name {
+      color: #666;
+      font-weight: 500;
+    }
+  }
+}
