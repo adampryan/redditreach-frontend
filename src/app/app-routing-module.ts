@@ -16,6 +16,10 @@ const routes: Routes = [
     component: LandingLiveComponent
   },
   {
+    path: 'privacy',
+    loadComponent: () => import('./privacy/privacy.component').then(m => m.PrivacyComponent)
+  },
+  {
     path: 'auth',
     loadChildren: () => import('./auth/auth.module').then(m => m.AuthModule),
     canActivate: [AnonymousGuard]
