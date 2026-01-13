@@ -14,8 +14,19 @@
   }
 
   .logo-img {
-    height: 80px;
+    height: 100px;
     width: auto;
+  }
+
+  // Badge styling
+  ::ng-deep .mat-badge-content {
+    font-size: 10px;
+    font-weight: 600;
+    min-width: 18px;
+    height: 18px;
+    line-height: 18px;
+    padding: 0 4px;
+    border-radius: 9px;
   }
 
   .main-nav {
