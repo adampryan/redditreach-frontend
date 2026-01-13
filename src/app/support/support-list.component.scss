@@ -9,8 +9,15 @@
   justify-content: space-between;
   align-items: flex-start;
   margin-bottom: 24px;
+  gap: 12px;
+
+  .back-button {
+    margin-top: 4px;
+    color: #667eea;
+  }
 
   .header-left {
+    flex: 1;
     h1 {
       font-size: 28px;
       font-weight: 600;
