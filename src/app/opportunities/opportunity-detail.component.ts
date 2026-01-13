@@ -75,13 +75,23 @@ export class OpportunityDetailComponent implements OnInit {
   approve(): void {
     if (!this.opportunity || !this.selectedDraft) return;
 
+    // Validate schedule inputs if scheduling is enabled
+    if (this.schedulePost && (!this.scheduledDate || !this.scheduledTime)) {
+      alert('Please select both a date and time for scheduling.');
+      return;
+    }
+
     this.isSubmitting = true;
     const editedText = this.editedText !== this.selectedDraft.response_text ? this.editedText : undefined;
 
     // Build scheduled_for datetime if scheduling is enabled
     let scheduledFor: string | undefined;
     if (this.schedulePost && this.scheduledDate && this.scheduledTime) {
-      scheduledFor = `${this.scheduledDate}T${this.scheduledTime}:00`;
+      // Create a proper Date object and convert to ISO string with timezone
+      const localDate = new Date(`${this.scheduledDate}T${this.scheduledTime}`);
+      scheduledFor = localDate.toISOString();
+      console.log('[Schedule] Local date input:', this.scheduledDate, this.scheduledTime);
+      console.log('[Schedule] Sending ISO string:', scheduledFor);
     }
 
     this.opportunityService.approve(this.opportunity.id, this.selectedDraft.id, editedText, scheduledFor).subscribe({
@@ -89,8 +99,9 @@ export class OpportunityDetailComponent implements OnInit {
         this.isSubmitting = false;
         this.router.navigate(['/opportunities'], { queryParams: { status: 'approved' } });
       },
-      error: () => {
+      error: (err) => {
         this.isSubmitting = false;
+        console.error('[Schedule] Approve error:', err);
       }
     });
   }
@@ -136,6 +147,22 @@ export class OpportunityDetailComponent implements OnInit {
       expired: 'status-expired'
     };
     return statusClasses[status] || '';
+  }
+
+  formatScheduledTime(dateStr: string): string {
+    const date = new Date(dateStr);
+    const now = new Date();
+    const diffMs = date.getTime() - now.getTime();
+    const diffHours = Math.round(diffMs / (1000 * 60 * 60));
+
+    if (diffHours < 0) {
+      return 'Ready to post';
+    } else if (diffHours < 24) {
+      return `in ${diffHours}h`;
+    } else {
+      const options: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' };
+      return date.toLocaleDateString('en-US', options);
+    }
   }
 
   openRegenerateDialog(): void {

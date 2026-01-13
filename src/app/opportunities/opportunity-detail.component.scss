@@ -60,6 +60,64 @@
         color: #6c757d;
       }
     }
+
+    .scheduled-badge {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      color: #667eea;
+      background: #f0f2ff;
+      padding: 4px 10px;
+      border-radius: 12px;
+
+      mat-icon {
+        font-size: 14px;
+        width: 14px;
+        height: 14px;
+      }
+    }
+  }
+}
+
+.scheduled-card {
+  margin-bottom: 24px;
+  border-left: 4px solid #667eea;
+  background: #f8f9ff;
+
+  mat-card-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 16px !important;
+
+    > mat-icon {
+      font-size: 32px;
+      width: 32px;
+      height: 32px;
+      color: #667eea;
+    }
+
+    .scheduled-info {
+      flex: 1;
+
+      strong {
+        font-size: 16px;
+        color: #1a1a2e;
+      }
+
+      p {
+        margin: 8px 0;
+        color: #666;
+        font-size: 14px;
+      }
+
+      .scheduled-datetime {
+        font-size: 13px;
+        color: #667eea;
+        font-weight: 500;
+      }
+    }
   }
 }
 

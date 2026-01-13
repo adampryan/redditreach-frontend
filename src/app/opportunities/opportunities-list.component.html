@@ -63,9 +63,15 @@
         </div>
       </div>
       <div class="card-footer">
-        <span class="status" [ngClass]="getStatusClass(opp.status)">
-          {{ formatStatus(opp.status) }}
-        </span>
+        <div class="status-area">
+          <span class="status" [ngClass]="getStatusClass(opp.status)">
+            {{ formatStatus(opp.status) }}
+          </span>
+          <span class="scheduled-badge" *ngIf="opp.scheduled_for">
+            <mat-icon>schedule</mat-icon>
+            {{ formatScheduledTime(opp.scheduled_for) }}
+          </span>
+        </div>
         <mat-icon class="action-arrow">chevron_right</mat-icon>
       </div>
     </mat-card>

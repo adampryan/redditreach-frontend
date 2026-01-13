@@ -102,4 +102,20 @@ export class OpportunitiesListComponent implements OnInit {
     const days = Math.floor(hours / 24);
     return `${days}d ago`;
   }
+
+  formatScheduledTime(dateStr: string): string {
+    const date = new Date(dateStr);
+    const now = new Date();
+    const diffMs = date.getTime() - now.getTime();
+    const diffHours = Math.round(diffMs / (1000 * 60 * 60));
+
+    if (diffHours < 0) {
+      return 'Ready to post';
+    } else if (diffHours < 24) {
+      return `In ${diffHours}h`;
+    } else {
+      const options: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' };
+      return date.toLocaleDateString('en-US', options);
+    }
+  }
 }

@@ -16,8 +16,24 @@
         <span class="status" [ngClass]="getStatusClass(opportunity.status)">
           {{ formatStatus(opportunity.status) }}
         </span>
+        <span class="scheduled-badge" *ngIf="opportunity.scheduled_for && opportunity.status === 'approved'">
+          <mat-icon>schedule</mat-icon>
+          {{ formatScheduledTime(opportunity.scheduled_for) }}
+        </span>
       </div>
     </header>
+
+    <!-- Scheduled Post Info -->
+    <mat-card class="scheduled-card" *ngIf="opportunity.scheduled_for && opportunity.status === 'approved'">
+      <mat-card-content>
+        <mat-icon>schedule</mat-icon>
+        <div class="scheduled-info">
+          <strong>Scheduled to Post</strong>
+          <p>This response will be automatically posted {{ formatScheduledTime(opportunity.scheduled_for) }}.</p>
+          <span class="scheduled-datetime">{{ opportunity.scheduled_for | date:'medium' }}</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
 
     <!-- Reddit Post -->
     <mat-card class="post-card">

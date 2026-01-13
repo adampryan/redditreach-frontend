@@ -12,6 +12,7 @@ export interface OpportunityListItem {
   discovered_at: string;
   age_hours: number;
   has_drafts: boolean;
+  scheduled_for: string | null;
 }
 
 export interface Opportunity {
@@ -32,6 +33,7 @@ export interface Opportunity {
   status: OpportunityStatus;
   discovered_at: string;
   reviewed_at: string | null;
+  scheduled_for: string | null;
   age_hours: number;
   is_respondable: boolean;
   drafts: ResponseDraft[];
