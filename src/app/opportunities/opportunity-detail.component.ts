@@ -20,6 +20,12 @@ export class OpportunityDetailComponent implements OnInit {
   editedText = '';
   showEditMode = false;
 
+  // Scheduling
+  schedulePost = false;
+  scheduledDate = '';
+  scheduledTime = '';
+  minDate = '';
+
   constructor(
     private opportunityService: OpportunityService,
     private router: Router,
@@ -28,6 +34,10 @@ export class OpportunityDetailComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    // Set minimum date to today
+    const today = new Date();
+    this.minDate = today.toISOString().split('T')[0];
+
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.loadOpportunity(id);
@@ -68,7 +78,13 @@ export class OpportunityDetailComponent implements OnInit {
     this.isSubmitting = true;
     const editedText = this.editedText !== this.selectedDraft.response_text ? this.editedText : undefined;
 
-    this.opportunityService.approve(this.opportunity.id, this.selectedDraft.id, editedText).subscribe({
+    // Build scheduled_for datetime if scheduling is enabled
+    let scheduledFor: string | undefined;
+    if (this.schedulePost && this.scheduledDate && this.scheduledTime) {
+      scheduledFor = `${this.scheduledDate}T${this.scheduledTime}:00`;
+    }
+
+    this.opportunityService.approve(this.opportunity.id, this.selectedDraft.id, editedText, scheduledFor).subscribe({
       next: () => {
         this.isSubmitting = false;
         this.router.navigate(['/opportunities'], { queryParams: { status: 'approved' } });

@@ -132,6 +132,21 @@
         </div>
       </div>
 
+      <!-- Scheduling -->
+      <div class="schedule-section">
+        <mat-checkbox [(ngModel)]="schedulePost">Schedule for later</mat-checkbox>
+        <div class="schedule-inputs" *ngIf="schedulePost">
+          <mat-form-field appearance="outline">
+            <mat-label>Date</mat-label>
+            <input matInput type="date" [(ngModel)]="scheduledDate" [min]="minDate">
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Time</mat-label>
+            <input matInput type="time" [(ngModel)]="scheduledTime">
+          </mat-form-field>
+        </div>
+      </div>
+
       <!-- Action Buttons -->
       <div class="action-buttons">
         <button
@@ -139,8 +154,8 @@
           color="primary"
           (click)="approve()"
           [disabled]="isSubmitting || !selectedDraft">
-          <mat-icon>check</mat-icon>
-          Approve & Post
+          <mat-icon>{{ schedulePost ? 'schedule' : 'check' }}</mat-icon>
+          {{ schedulePost ? 'Schedule Post' : 'Approve & Post' }}
         </button>
         <button
           mat-stroked-button

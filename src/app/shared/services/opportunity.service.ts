@@ -45,10 +45,13 @@ export class OpportunityService {
     return this.http.get<Opportunity>(`${this.apiUrl}/opportunities/${id}/`);
   }
 
-  approve(id: string, draftId: number, editedText?: string): Observable<{ success: boolean; status: string }> {
+  approve(id: string, draftId: number, editedText?: string, scheduledFor?: string): Observable<{ success: boolean; status: string }> {
     const payload: any = { draft_id: draftId };
     if (editedText) {
       payload.edited_text = editedText;
+    }
+    if (scheduledFor) {
+      payload.scheduled_for = scheduledFor;
     }
     return this.http.post<{ success: boolean; status: string }>(
       `${this.apiUrl}/opportunities/${id}/approve/`,

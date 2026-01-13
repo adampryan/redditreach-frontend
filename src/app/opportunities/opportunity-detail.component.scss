@@ -276,6 +276,28 @@
   }
 }
 
+.schedule-section {
+  margin-bottom: 24px;
+  padding: 16px;
+  background: #f9f9f9;
+  border-radius: 8px;
+
+  mat-checkbox {
+    display: block;
+    margin-bottom: 12px;
+  }
+
+  .schedule-inputs {
+    display: flex;
+    gap: 16px;
+    margin-top: 12px;
+
+    mat-form-field {
+      flex: 1;
+    }
+  }
+}
+
 .action-buttons {
   display: flex;
   gap: 16px;
