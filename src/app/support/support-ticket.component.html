@@ -53,7 +53,7 @@
           placeholder="Type your message..."
           rows="3"
           [disabled]="isSending"
-          (keydown.enter)="$event.ctrlKey && sendReply()"
+          (keydown.enter)="$any($event).ctrlKey && sendReply()"
         ></textarea>
         <button mat-fab color="primary" (click)="sendReply()"
           [disabled]="isSending || !replyMessage.trim()">
