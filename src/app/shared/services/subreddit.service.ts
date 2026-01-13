@@ -4,6 +4,14 @@ import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { CustomerSubreddit, SubredditCreate } from '../models';
 
+export interface KeywordSuggestion {
+  subreddit: string;
+  suggestions: string[];
+  reasoning: string;
+  fit_score: number;
+  warning: string | null;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -30,5 +38,12 @@ export class SubredditService {
 
   delete(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/subreddits/${id}/`);
+  }
+
+  suggestKeywords(subredditName: string): Observable<KeywordSuggestion> {
+    return this.http.post<KeywordSuggestion>(
+      `${this.apiUrl}/subreddits/suggest-keywords/`,
+      { subreddit_name: subredditName }
+    );
   }
 }

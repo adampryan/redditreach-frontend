@@ -27,13 +27,59 @@
       <div class="form-row">
         <mat-form-field appearance="outline">
           <mat-label>Subreddit Name</mat-label>
-          <input matInput [(ngModel)]="newSubredditName" placeholder="e.g., baseballcards">
+          <input matInput [(ngModel)]="newSubredditName" (input)="onSubredditNameChange()" placeholder="e.g., baseballcards">
           <span matPrefix>r/</span>
+          <mat-hint>Enter a subreddit name to get AI keyword suggestions</mat-hint>
         </mat-form-field>
       </div>
+
+      <!-- Keyword Suggestions -->
+      <div class="keyword-suggestions" *ngIf="isLoadingSuggestions || suggestedKeywords.length > 0 || suggestionWarning">
+        <div class="suggestions-header">
+          <span class="suggestions-label">
+            <mat-icon>auto_awesome</mat-icon>
+            AI Suggested Keywords
+          </span>
+          <div class="suggestions-actions" *ngIf="suggestedKeywords.length > 0">
+            <button mat-button type="button" (click)="selectAllSuggestions()" [disabled]="selectedSuggestions.size === suggestedKeywords.length">
+              Select All
+            </button>
+            <button mat-button type="button" (click)="clearSuggestions()" [disabled]="selectedSuggestions.size === 0">
+              Clear
+            </button>
+          </div>
+        </div>
+
+        <div class="suggestions-loading" *ngIf="isLoadingSuggestions">
+          <mat-spinner diameter="20"></mat-spinner>
+          <span>Analyzing subreddit...</span>
+        </div>
+
+        <div class="suggestions-warning" *ngIf="suggestionWarning && !isLoadingSuggestions">
+          <mat-icon>warning</mat-icon>
+          {{ suggestionWarning }}
+        </div>
+
+        <div class="suggestions-chips" *ngIf="suggestedKeywords.length > 0 && !isLoadingSuggestions">
+          <mat-chip-listbox multiple>
+            <mat-chip-option
+              *ngFor="let kw of suggestedKeywords"
+              [selected]="selectedSuggestions.has(kw)"
+              (click)="toggleSuggestion(kw)">
+              {{ kw }}
+            </mat-chip-option>
+          </mat-chip-listbox>
+        </div>
+
+        <div class="suggestions-reasoning" *ngIf="suggestionReasoning && !isLoadingSuggestions">
+          <mat-icon>lightbulb</mat-icon>
+          {{ suggestionReasoning }}
+        </div>
+      </div>
+
       <div class="form-row">
         <mat-form-field appearance="outline">
-          <mat-label>Keywords (optional)</mat-label>
+          <mat-label>Keywords</mat-label>
           <input matInput [(ngModel)]="newKeywords" placeholder="e.g., grading, PSA, vintage">
           <mat-hint>Comma-separated keywords to match relevant posts</mat-hint>
         </mat-form-field>

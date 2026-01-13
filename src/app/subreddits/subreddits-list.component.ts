@@ -1,5 +1,8 @@
 import { Component, OnInit } from '@angular/core';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged, switchMap, filter } from 'rxjs/operators';
 import { SubredditService, CustomerService } from '../shared/services';
+import { KeywordSuggestion } from '../shared/services/subreddit.service';
 import { CustomerSubreddit, SubredditCreate, CustomerStats } from '../shared/models';
 
 @Component({
@@ -20,6 +23,14 @@ export class SubredditsListComponent implements OnInit {
   isSubmitting = false;
   addError = '';
 
+  // Keyword suggestions
+  suggestedKeywords: string[] = [];
+  selectedSuggestions: Set<string> = new Set();
+  isLoadingSuggestions = false;
+  suggestionReasoning = '';
+  suggestionWarning: string | null = null;
+  private subredditNameSubject = new Subject<string>();
+
   // Edit form
   editingSubreddit: CustomerSubreddit | null = null;
   editKeywords = '';
@@ -35,6 +46,71 @@ export class SubredditsListComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadData();
+    this.setupKeywordSuggestions();
+  }
+
+  setupKeywordSuggestions(): void {
+    this.subredditNameSubject.pipe(
+      debounceTime(500),
+      distinctUntilChanged(),
+      filter(name => name.length >= 3),
+      switchMap(name => {
+        this.isLoadingSuggestions = true;
+        this.suggestedKeywords = [];
+        this.suggestionReasoning = '';
+        this.suggestionWarning = null;
+        return this.subredditService.suggestKeywords(name);
+      })
+    ).subscribe({
+      next: (result) => {
+        this.isLoadingSuggestions = false;
+        this.suggestedKeywords = result.suggestions || [];
+        this.suggestionReasoning = result.reasoning || '';
+        this.suggestionWarning = result.warning;
+        this.selectedSuggestions.clear();
+      },
+      error: () => {
+        this.isLoadingSuggestions = false;
+        this.suggestedKeywords = [];
+      }
+    });
+  }
+
+  onSubredditNameChange(): void {
+    let name = this.newSubredditName.trim();
+    if (name.toLowerCase().startsWith('r/')) {
+      name = name.substring(2);
+    }
+    this.subredditNameSubject.next(name);
+  }
+
+  toggleSuggestion(keyword: string): void {
+    if (this.selectedSuggestions.has(keyword)) {
+      this.selectedSuggestions.delete(keyword);
+    } else {
+      this.selectedSuggestions.add(keyword);
+    }
+    this.updateKeywordsFromSuggestions();
+  }
+
+  selectAllSuggestions(): void {
+    this.suggestedKeywords.forEach(kw => this.selectedSuggestions.add(kw));
+    this.updateKeywordsFromSuggestions();
+  }
+
+  clearSuggestions(): void {
+    this.selectedSuggestions.clear();
+    this.updateKeywordsFromSuggestions();
+  }
+
+  private updateKeywordsFromSuggestions(): void {
+    // Merge selected suggestions with any manually entered keywords
+    const manual = this.newKeywords
+      .split(',')
+      .map(k => k.trim())
+      .filter(k => k && !this.suggestedKeywords.includes(k));
+    const selected = Array.from(this.selectedSuggestions);
+    this.newKeywords = [...manual, ...selected].join(', ');
   }
 
   loadData(): void {
@@ -62,6 +138,10 @@ export class SubredditsListComponent implements OnInit {
     if (!this.showAddForm) {
       this.newSubredditName = '';
       this.newKeywords = '';
+      this.suggestedKeywords = [];
+      this.selectedSuggestions.clear();
+      this.suggestionReasoning = '';
+      this.suggestionWarning = null;
     }
   }
 
