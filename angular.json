@@ -58,6 +58,10 @@
                 "glob": "_redirects",
                 "input": "src"
               },
+              {
+                "glob": "privacy.html",
+                "input": "src"
+              },
               "src/favicon.png",
               "src/assets"
             ],
