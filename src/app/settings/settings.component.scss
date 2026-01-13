@@ -339,6 +339,11 @@
 }
 
 // Support Form
+.support-actions {
+  display: flex;
+  gap: 8px;
+}
+
 .support-btn {
   mat-icon {
     margin-right: 4px;

@@ -45,4 +45,56 @@ export class CustomerService {
       { subject, message }
     );
   }
+
+  getSupportTickets(): Observable<{ tickets: SupportTicket[]; count: number }> {
+    return this.http.get<{ tickets: SupportTicket[]; count: number }>(
+      `${this.apiUrl}/support/tickets/`
+    );
+  }
+
+  getSupportTicket(ticketId: string): Observable<SupportTicketDetail> {
+    return this.http.get<SupportTicketDetail>(
+      `${this.apiUrl}/support/tickets/${ticketId}/`
+    );
+  }
+
+  replySupportTicket(ticketId: string, message: string): Observable<{ success: boolean; message_id: string }> {
+    return this.http.post<{ success: boolean; message_id: string }>(
+      `${this.apiUrl}/support/tickets/${ticketId}/reply/`,
+      { message }
+    );
+  }
+}
+
+// Support ticket interfaces
+export interface SupportTicket {
+  id: string;
+  subject: string;
+  status: 'open' | 'pending' | 'resolved' | 'closed';
+  created_at: string;
+  updated_at: string;
+  message_count: number;
+  last_message: {
+    direction: 'inbound' | 'outbound';
+    preview: string;
+    created_at: string;
+  } | null;
+  has_unread: boolean;
+}
+
+export interface SupportMessage {
+  id: string;
+  direction: 'inbound' | 'outbound';
+  from_name: string;
+  body_text: string;
+  created_at: string;
+}
+
+export interface SupportTicketDetail {
+  id: string;
+  subject: string;
+  status: 'open' | 'pending' | 'resolved' | 'closed';
+  created_at: string;
+  updated_at: string;
+  messages: SupportMessage[];
 }

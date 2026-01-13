@@ -34,10 +34,14 @@
         </div>
         <div class="info-row support-row">
           <span class="label">Need help?</span>
-          <span class="value">
+          <span class="value support-actions">
+            <a mat-button color="primary" routerLink="/support" class="support-btn">
+              <mat-icon>forum</mat-icon>
+              View Tickets
+            </a>
             <button mat-button color="primary" (click)="toggleSupportForm()" class="support-btn">
-              <mat-icon>{{ showSupportForm ? 'close' : 'help_outline' }}</mat-icon>
-              {{ showSupportForm ? 'Cancel' : 'Contact Support' }}
+              <mat-icon>{{ showSupportForm ? 'close' : 'add' }}</mat-icon>
+              {{ showSupportForm ? 'Cancel' : 'New Request' }}
             </button>
           </span>
         </div>

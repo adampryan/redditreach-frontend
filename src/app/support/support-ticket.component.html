@@ -1,0 +1,67 @@
+<div class="ticket-container">
+  <!-- Header -->
+  <header class="page-header">
+    <button mat-icon-button (click)="goBack()" class="back-button">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <div class="header-content" *ngIf="ticket">
+      <h1>{{ ticket.subject }}</h1>
+      <div class="header-meta">
+        <span class="status-badge" [ngClass]="getStatusClass(ticket.status)">
+          {{ getStatusLabel(ticket.status) }}
+        </span>
+        <span class="created-date">Created {{ formatDate(ticket.created_at) }}</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Loading -->
+  <div class="loading-spinner" *ngIf="isLoading">
+    <mat-spinner diameter="40"></mat-spinner>
+  </div>
+
+  <!-- Error -->
+  <div class="error-message" *ngIf="error">
+    <mat-icon>error</mat-icon>
+    {{ error }}
+  </div>
+
+  <!-- Conversation -->
+  <div class="conversation-wrapper" *ngIf="!isLoading && ticket">
+    <div class="messages-container" #messagesContainer>
+      <div class="message" *ngFor="let message of ticket.messages"
+        [ngClass]="message.direction === 'inbound' ? 'message-outgoing' : 'message-incoming'">
+        <div class="message-bubble">
+          <div class="message-header">
+            <span class="sender-name">{{ message.from_name }}</span>
+            <span class="message-time">{{ formatMessageDate(message.created_at) }}</span>
+          </div>
+          <div class="message-body">{{ message.body_text }}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Reply Form -->
+    <div class="reply-form">
+      <div class="reply-error" *ngIf="sendError">
+        <mat-icon>error</mat-icon>
+        {{ sendError }}
+      </div>
+      <div class="reply-input-container">
+        <textarea
+          [(ngModel)]="replyMessage"
+          placeholder="Type your message..."
+          rows="3"
+          [disabled]="isSending"
+          (keydown.enter)="$event.ctrlKey && sendReply()"
+        ></textarea>
+        <button mat-fab color="primary" (click)="sendReply()"
+          [disabled]="isSending || !replyMessage.trim()">
+          <mat-spinner *ngIf="isSending" diameter="24"></mat-spinner>
+          <mat-icon *ngIf="!isSending">send</mat-icon>
+        </button>
+      </div>
+      <div class="reply-hint">Press Ctrl+Enter to send</div>
+    </div>
+  </div>
+</div>

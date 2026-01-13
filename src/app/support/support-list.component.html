@@ -1,0 +1,101 @@
+<div class="support-container">
+  <header class="page-header">
+    <div class="header-left">
+      <h1>Support</h1>
+      <p class="subtitle">View and manage your support requests</p>
+    </div>
+    <button mat-raised-button color="primary" (click)="toggleNewTicketForm()">
+      <mat-icon>{{ showNewTicketForm ? 'close' : 'add' }}</mat-icon>
+      {{ showNewTicketForm ? 'Cancel' : 'New Request' }}
+    </button>
+  </header>
+
+  <!-- New Ticket Form -->
+  <mat-card class="new-ticket-card" *ngIf="showNewTicketForm">
+    <mat-card-header>
+      <mat-card-title>New Support Request</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="form-content" *ngIf="!submitSuccess">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Subject</mat-label>
+          <input matInput [(ngModel)]="newTicket.subject" placeholder="What do you need help with?">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Message</mat-label>
+          <textarea matInput [(ngModel)]="newTicket.message" rows="5"
+            placeholder="Please describe your issue or question in detail..."></textarea>
+        </mat-form-field>
+
+        <div class="form-actions">
+          <button mat-raised-button color="primary" (click)="submitNewTicket()"
+            [disabled]="isSubmitting || !newTicket.subject.trim() || !newTicket.message.trim()">
+            <mat-spinner *ngIf="isSubmitting" diameter="18"></mat-spinner>
+            <span *ngIf="!isSubmitting">Submit Request</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="submit-success" *ngIf="submitSuccess">
+        <mat-icon>check_circle</mat-icon>
+        <span>Your request has been submitted. We'll get back to you soon!</span>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Loading -->
+  <div class="loading-spinner" *ngIf="isLoading">
+    <mat-spinner diameter="40"></mat-spinner>
+  </div>
+
+  <!-- Error -->
+  <div class="error-message" *ngIf="error">
+    <mat-icon>error</mat-icon>
+    {{ error }}
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-state" *ngIf="!isLoading && !error && tickets.length === 0">
+    <mat-icon>support_agent</mat-icon>
+    <h3>No support requests yet</h3>
+    <p>When you contact support, your conversations will appear here.</p>
+    <button mat-raised-button color="primary" (click)="toggleNewTicketForm()" *ngIf="!showNewTicketForm">
+      <mat-icon>add</mat-icon>
+      New Request
+    </button>
+  </div>
+
+  <!-- Tickets List -->
+  <div class="tickets-list" *ngIf="!isLoading && tickets.length > 0">
+    <mat-card class="ticket-card" *ngFor="let ticket of tickets" (click)="openTicket(ticket)">
+      <div class="ticket-content">
+        <div class="ticket-main">
+          <div class="ticket-header">
+            <span class="ticket-subject">{{ ticket.subject }}</span>
+            <span class="status-badge" [ngClass]="getStatusClass(ticket.status)">
+              {{ getStatusLabel(ticket.status) }}
+            </span>
+          </div>
+          <div class="ticket-preview" *ngIf="ticket.last_message">
+            <span class="message-direction" *ngIf="ticket.last_message.direction === 'outbound'">
+              Support:
+            </span>
+            {{ ticket.last_message.preview }}
+          </div>
+        </div>
+        <div class="ticket-meta">
+          <span class="ticket-date">{{ formatDate(ticket.updated_at) }}</span>
+          <span class="message-count">
+            <mat-icon>chat_bubble_outline</mat-icon>
+            {{ ticket.message_count }}
+          </span>
+          <span class="unread-indicator" *ngIf="ticket.has_unread">
+            <mat-icon>fiber_manual_record</mat-icon>
+          </span>
+        </div>
+      </div>
+      <mat-icon class="chevron">chevron_right</mat-icon>
+    </mat-card>
+  </div>
+</div>
