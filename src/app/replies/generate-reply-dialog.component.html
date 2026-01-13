@@ -1,0 +1,61 @@
+<h2 mat-dialog-title>Generate AI Reply</h2>
+
+<mat-dialog-content>
+  <div *ngIf="isLoading" class="loading">
+    <mat-spinner diameter="24"></mat-spinner>
+    <span>Loading options...</span>
+  </div>
+
+  <ng-container *ngIf="!isLoading">
+    <!-- Reply Preview -->
+    <div class="reply-preview">
+      <div class="preview-label">Replying to:</div>
+      <div class="preview-text">"{{ data.replyBody }}"</div>
+    </div>
+
+    <!-- Strategy Selection -->
+    <div class="option-section">
+      <h3>Response Strategy</h3>
+      <mat-radio-group [(ngModel)]="strategy" class="strategy-group">
+        <mat-radio-button
+          *ngFor="let s of strategies"
+          [value]="s.value"
+          class="strategy-option">
+          <div class="option-content">
+            <mat-icon>{{ s.icon }}</mat-icon>
+            <div class="option-text">
+              <div class="option-label">{{ s.label }}</div>
+              <div class="option-desc">{{ s.description }}</div>
+            </div>
+          </div>
+        </mat-radio-button>
+      </mat-radio-group>
+    </div>
+
+    <!-- Tone Selection -->
+    <div class="option-section">
+      <h3>Tone</h3>
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Select tone</mat-label>
+        <mat-select [(ngModel)]="tone">
+          <mat-option *ngFor="let t of tones" [value]="t.value">
+            <span class="tone-label">{{ t.label }}</span>
+            <span class="tone-desc"> - {{ t.description }}</span>
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+  </ng-container>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Cancel</button>
+  <button
+    mat-raised-button
+    color="primary"
+    (click)="onGenerate()"
+    [disabled]="isLoading">
+    <mat-icon>auto_awesome</mat-icon>
+    Generate Reply
+  </button>
+</mat-dialog-actions>

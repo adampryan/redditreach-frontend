@@ -1,0 +1,94 @@
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 24px;
+  color: #666;
+}
+
+.reply-preview {
+  padding: 12px 16px;
+  background: #fff3e0;
+  border-radius: 8px;
+  margin-bottom: 24px;
+  border-left: 3px solid #ff9800;
+
+  .preview-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+  }
+
+  .preview-text {
+    font-size: 14px;
+    color: #333;
+    font-style: italic;
+    line-height: 1.5;
+  }
+}
+
+.option-section {
+  margin-bottom: 24px;
+
+  h3 {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1a1a2e;
+    margin-bottom: 12px;
+  }
+}
+
+.strategy-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.strategy-option {
+  padding: 8px 0;
+
+  ::ng-deep .mdc-form-field {
+    align-items: flex-start;
+  }
+
+  .option-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+
+    mat-icon {
+      color: #667eea;
+      margin-top: 2px;
+    }
+
+    .option-text {
+      .option-label {
+        font-weight: 500;
+        color: #1a1a2e;
+      }
+
+      .option-desc {
+        font-size: 12px;
+        color: #666;
+        margin-top: 2px;
+      }
+    }
+  }
+}
+
+.full-width {
+  width: 100%;
+}
+
+.tone-label {
+  font-weight: 500;
+}
+
+.tone-desc {
+  font-size: 12px;
+  color: #666;
+}

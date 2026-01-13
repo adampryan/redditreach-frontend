@@ -5,3 +5,4 @@ export * from './subreddit.service';
 export * from './activity.service';
 export * from './attribution.service';
 export * from './billing.service';
+export * from './reply.service';

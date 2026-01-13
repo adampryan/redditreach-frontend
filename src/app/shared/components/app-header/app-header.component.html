@@ -16,6 +16,14 @@
       <mat-icon>forum</mat-icon>
       Subreddits
     </a>
+    <a mat-button routerLink="/replies" routerLinkActive="active"
+       [matBadge]="stats?.unread_replies"
+       [matBadgeHidden]="!stats?.unread_replies"
+       matBadgeColor="accent"
+       matBadgePosition="above before">
+      <mat-icon>chat_bubble</mat-icon>
+      Replies
+    </a>
     <a mat-button routerLink="/analytics" routerLinkActive="active">
       <mat-icon>analytics</mat-icon>
       Analytics

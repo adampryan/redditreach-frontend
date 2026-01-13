@@ -65,6 +65,11 @@ const routes: Routes = [
     canActivate: [AuthGuard]
   },
   {
+    path: 'replies',
+    loadChildren: () => import('./replies/replies.module').then(m => m.RepliesModule),
+    canActivate: [AuthGuard]
+  },
+  {
     path: '**',
     redirectTo: ''
   }

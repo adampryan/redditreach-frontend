@@ -1,0 +1,113 @@
+import { Component, OnInit } from '@angular/core';
+import { Router, ActivatedRoute } from '@angular/router';
+import { ReplyService } from '../shared/services';
+import { CommentReply, ReplyStats } from '../shared/models';
+
+@Component({
+  selector: 'app-replies-list',
+  standalone: false,
+  templateUrl: './replies-list.component.html',
+  styleUrls: ['./replies-list.component.scss']
+})
+export class RepliesListComponent implements OnInit {
+  replies: CommentReply[] = [];
+  stats: ReplyStats | null = null;
+  isLoading = true;
+  currentFilter: string = '';
+  totalCount = 0;
+  currentPage = 1;
+  pageSize = 20;
+
+  filters: { value: string; label: string; icon: string }[] = [
+    { value: '', label: 'All', icon: 'inbox' },
+    { value: 'unread', label: 'Unread', icon: 'mark_email_unread' },
+    { value: 'needs_response', label: 'Needs Response', icon: 'reply' }
+  ];
+
+  constructor(
+    private replyService: ReplyService,
+    private router: Router,
+    private route: ActivatedRoute
+  ) {}
+
+  ngOnInit(): void {
+    this.loadStats();
+    this.route.queryParams.subscribe(params => {
+      this.currentFilter = params['filter'] || '';
+      this.currentPage = parseInt(params['page'], 10) || 1;
+      this.loadReplies();
+    });
+  }
+
+  loadStats(): void {
+    this.replyService.getStats().subscribe({
+      next: (stats) => {
+        this.stats = stats;
+      }
+    });
+  }
+
+  loadReplies(): void {
+    this.isLoading = true;
+
+    const filters: any = {
+      page: this.currentPage,
+      page_size: this.pageSize
+    };
+
+    if (this.currentFilter === 'unread') {
+      filters.is_read = false;
+    } else if (this.currentFilter === 'needs_response') {
+      filters.requires_response = true;
+    }
+
+    this.replyService.list(filters).subscribe({
+      next: (response) => {
+        this.replies = response.results;
+        this.totalCount = response.count;
+        this.isLoading = false;
+      },
+      error: () => {
+        this.isLoading = false;
+      }
+    });
+  }
+
+  filterBy(filter: string): void {
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { filter: filter || null, page: 1 },
+      queryParamsHandling: 'merge'
+    });
+  }
+
+  viewReply(id: number): void {
+    this.router.navigate(['/replies', id]);
+  }
+
+  getTimeAgo(dateStr: string): string {
+    const date = new Date(dateStr);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+
+    if (diffHours < 1) return 'Just now';
+    if (diffHours < 24) return `${diffHours}h ago`;
+    const days = Math.floor(diffHours / 24);
+    if (days === 1) return '1 day ago';
+    return `${days} days ago`;
+  }
+
+  truncate(text: string, length: number = 100): string {
+    if (text.length <= length) return text;
+    return text.substring(0, length).trim() + '...';
+  }
+
+  onPageChange(event: any): void {
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { page: event.pageIndex + 1 },
+      queryParamsHandling: 'merge'
+    });
+  }
+}

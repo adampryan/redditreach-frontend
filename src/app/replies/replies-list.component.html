@@ -1,0 +1,116 @@
+<app-header></app-header>
+<div class="replies-container">
+  <header class="page-header">
+    <h1>Replies to Your Comments</h1>
+    <a mat-button routerLink="/dashboard">
+      <mat-icon>arrow_back</mat-icon>
+      Back to Dashboard
+    </a>
+  </header>
+
+  <!-- Stats Cards -->
+  <div class="stats-row" *ngIf="stats">
+    <mat-card class="stat-card">
+      <div class="stat-value">{{ stats.total_replies }}</div>
+      <div class="stat-label">Total Replies</div>
+    </mat-card>
+    <mat-card class="stat-card unread" [class.active]="stats.unread_replies > 0">
+      <div class="stat-value">{{ stats.unread_replies }}</div>
+      <div class="stat-label">Unread</div>
+    </mat-card>
+    <mat-card class="stat-card needs-response" [class.active]="stats.needs_response > 0">
+      <div class="stat-value">{{ stats.needs_response }}</div>
+      <div class="stat-label">Needs Response</div>
+    </mat-card>
+    <mat-card class="stat-card drafts" [class.active]="stats.pending_drafts > 0">
+      <div class="stat-value">{{ stats.pending_drafts }}</div>
+      <div class="stat-label">Pending Drafts</div>
+    </mat-card>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters">
+    <mat-chip-listbox>
+      <mat-chip-option
+        *ngFor="let filter of filters"
+        [selected]="currentFilter === filter.value"
+        (click)="filterBy(filter.value)">
+        <mat-icon matChipAvatar>{{ filter.icon }}</mat-icon>
+        {{ filter.label }}
+      </mat-chip-option>
+    </mat-chip-listbox>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="loading-spinner">
+    <mat-spinner diameter="40"></mat-spinner>
+  </div>
+
+  <!-- Empty State -->
+  <mat-card *ngIf="!isLoading && replies.length === 0" class="empty-state">
+    <mat-card-content>
+      <mat-icon>forum</mat-icon>
+      <h2>No replies yet</h2>
+      <p *ngIf="currentFilter">Try removing the filter to see all replies.</p>
+      <p *ngIf="!currentFilter">When people reply to your posted comments, they'll appear here.</p>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Replies List -->
+  <div class="replies-list" *ngIf="!isLoading && replies.length > 0">
+    <mat-card
+      class="reply-card"
+      *ngFor="let reply of replies"
+      [class.unread]="!reply.is_read"
+      (click)="viewReply(reply.id)">
+      <div class="card-header">
+        <div class="header-left">
+          <span class="unread-dot" *ngIf="!reply.is_read"></span>
+          <span class="subreddit">r/{{ reply.subreddit_name }}</span>
+        </div>
+        <span class="age">{{ getTimeAgo(reply.reply_created_at) }}</span>
+      </div>
+
+      <div class="reply-content">
+        <div class="reply-author">
+          <mat-icon>person</mat-icon>
+          u/{{ reply.reply_author }}
+        </div>
+        <div class="reply-body">"{{ truncate(reply.reply_body, 150) }}"</div>
+      </div>
+
+      <div class="context">
+        <mat-icon>reply</mat-icon>
+        <span class="context-text">Replying to: {{ truncate(reply.our_response_preview, 80) }}</span>
+      </div>
+
+      <div class="card-footer">
+        <div class="badges">
+          <span class="score" [class.positive]="reply.reply_score > 0" [class.negative]="reply.reply_score < 0">
+            <mat-icon>{{ reply.reply_score >= 0 ? 'arrow_upward' : 'arrow_downward' }}</mat-icon>
+            {{ reply.reply_score }}
+          </span>
+          <span class="badge needs-response" *ngIf="reply.requires_response">
+            <mat-icon>priority_high</mat-icon>
+            Needs Response
+          </span>
+          <span class="badge has-draft" *ngIf="reply.has_draft">
+            <mat-icon>description</mat-icon>
+            Has Draft
+          </span>
+        </div>
+        <mat-icon class="action-arrow">chevron_right</mat-icon>
+      </div>
+    </mat-card>
+  </div>
+
+  <!-- Pagination -->
+  <mat-paginator
+    *ngIf="totalCount > pageSize"
+    [length]="totalCount"
+    [pageSize]="pageSize"
+    [pageIndex]="currentPage - 1"
+    (page)="onPageChange($event)"
+    showFirstLastButtons>
+  </mat-paginator>
+</div>

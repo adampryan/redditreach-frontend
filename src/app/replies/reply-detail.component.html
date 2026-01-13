@@ -1,0 +1,195 @@
+<app-header></app-header>
+<div class="reply-detail-container">
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="loading-spinner">
+    <mat-spinner diameter="40"></mat-spinner>
+  </div>
+
+  <ng-container *ngIf="!isLoading && reply">
+    <!-- Header -->
+    <header class="page-header">
+      <button mat-button (click)="goBack()">
+        <mat-icon>arrow_back</mat-icon>
+        Back to Replies
+      </button>
+      <div class="header-actions">
+        <button
+          mat-stroked-button
+          [color]="reply.requires_response ? 'warn' : 'primary'"
+          (click)="toggleNeedsResponse()">
+          <mat-icon>{{ reply.requires_response ? 'flag' : 'outlined_flag' }}</mat-icon>
+          {{ reply.requires_response ? 'Flagged for Response' : 'Flag for Response' }}
+        </button>
+      </div>
+    </header>
+
+    <!-- Context Section -->
+    <mat-card class="context-card">
+      <mat-card-header>
+        <mat-card-title>Conversation Context</mat-card-title>
+        <div class="context-meta">
+          <span class="subreddit">r/{{ reply.subreddit_name }}</span>
+          <span class="score">
+            <mat-icon>{{ reply.reply_score >= 0 ? 'arrow_upward' : 'arrow_downward' }}</mat-icon>
+            {{ reply.reply_score }}
+          </span>
+          <span class="time">{{ getTimeAgo(reply.reply_created_at) }}</span>
+        </div>
+      </mat-card-header>
+
+      <mat-card-content>
+        <!-- Original Post -->
+        <div class="context-block post">
+          <div class="context-label">Original Post</div>
+          <div class="context-title">{{ reply.original_post_title }}</div>
+          <button mat-stroked-button class="view-btn" (click)="openRedditPost()">
+            <mat-icon>open_in_new</mat-icon>
+            View on Reddit
+          </button>
+        </div>
+
+        <!-- Our Response -->
+        <div class="context-block response">
+          <div class="context-label">Your Comment</div>
+          <div class="context-text">{{ reply.our_response_text }}</div>
+        </div>
+
+        <!-- Their Reply -->
+        <div class="context-block reply">
+          <div class="context-label">
+            <mat-icon>person</mat-icon>
+            u/{{ reply.reply_author }}'s Reply
+          </div>
+          <div class="context-text highlight">"{{ reply.reply_body }}"</div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Actions Section -->
+    <div class="actions-section">
+      <button
+        mat-raised-button
+        color="primary"
+        (click)="openGenerateDialog()"
+        [disabled]="isGenerating">
+        <mat-icon>auto_awesome</mat-icon>
+        Generate AI Reply
+        <mat-spinner *ngIf="isGenerating" diameter="18"></mat-spinner>
+      </button>
+      <button
+        mat-stroked-button
+        (click)="toggleManualDraft()"
+        [class.active]="showManualDraft">
+        <mat-icon>edit</mat-icon>
+        Write Manual Reply
+      </button>
+    </div>
+
+    <!-- Manual Draft Input -->
+    <mat-card *ngIf="showManualDraft" class="manual-draft-card">
+      <mat-card-header>
+        <mat-card-title>Write Your Reply</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Your reply</mat-label>
+          <textarea
+            matInput
+            [(ngModel)]="manualDraftText"
+            rows="5"
+            placeholder="Type your reply here..."></textarea>
+        </mat-form-field>
+      </mat-card-content>
+      <mat-card-actions align="end">
+        <button mat-button (click)="toggleManualDraft()">Cancel</button>
+        <button
+          mat-raised-button
+          color="primary"
+          (click)="saveManualDraft()"
+          [disabled]="!manualDraftText.trim() || isSubmitting">
+          Save Draft
+        </button>
+      </mat-card-actions>
+    </mat-card>
+
+    <!-- Drafts Section -->
+    <mat-card class="drafts-card" *ngIf="reply.drafts && reply.drafts.length > 0">
+      <mat-card-header>
+        <mat-card-title>Reply Drafts</mat-card-title>
+      </mat-card-header>
+
+      <mat-card-content>
+        <!-- Draft Tabs -->
+        <div class="draft-tabs">
+          <button
+            *ngFor="let draft of reply.drafts; let i = index"
+            mat-stroked-button
+            class="draft-tab"
+            [class.selected]="selectedDraft?.id === draft.id"
+            (click)="selectDraft(draft)">
+            <span class="draft-label">Draft {{ i + 1 }}</span>
+            <span class="draft-meta" *ngIf="draft.strategy || draft.tone">
+              {{ draft.strategy }} / {{ draft.tone }}
+            </span>
+            <span class="draft-status" [ngClass]="getDraftStatusClass(draft.status)">
+              {{ formatDraftStatus(draft.status) }}
+            </span>
+          </button>
+        </div>
+
+        <!-- Selected Draft Preview -->
+        <div class="draft-preview" *ngIf="selectedDraft && !showEditMode">
+          <div class="draft-text">{{ selectedDraft.response_text }}</div>
+          <div class="draft-actions">
+            <button mat-button (click)="toggleEditMode()">
+              <mat-icon>edit</mat-icon>
+              Edit
+            </button>
+          </div>
+        </div>
+
+        <!-- Edit Mode -->
+        <div class="edit-mode" *ngIf="showEditMode && selectedDraft">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Edit reply</mat-label>
+            <textarea
+              matInput
+              [(ngModel)]="editedText"
+              rows="5"></textarea>
+          </mat-form-field>
+          <div class="edit-actions">
+            <button mat-button (click)="toggleEditMode()">Cancel</button>
+            <button
+              mat-raised-button
+              color="primary"
+              (click)="updateDraft()"
+              [disabled]="!editedText.trim() || isSubmitting">
+              Save Changes
+            </button>
+          </div>
+        </div>
+      </mat-card-content>
+
+      <!-- Approve/Reject Actions -->
+      <mat-card-actions align="end" *ngIf="selectedDraft && selectedDraft.status !== 'posted' && selectedDraft.status !== 'approved'">
+        <button
+          mat-raised-button
+          color="primary"
+          (click)="approve()"
+          [disabled]="isSubmitting">
+          <mat-icon>check</mat-icon>
+          Approve & Queue for Posting
+        </button>
+      </mat-card-actions>
+    </mat-card>
+
+    <!-- Empty Drafts State -->
+    <mat-card class="empty-drafts" *ngIf="!reply.drafts || reply.drafts.length === 0">
+      <mat-card-content>
+        <mat-icon>description</mat-icon>
+        <h3>No drafts yet</h3>
+        <p>Generate an AI reply or write one manually to respond to this comment.</p>
+      </mat-card-content>
+    </mat-card>
+  </ng-container>
+</div>

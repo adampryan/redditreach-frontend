@@ -54,6 +54,7 @@ export interface CustomerStats {
   subscription_tier: string;
   tier_limits: TierLimits;
   unread_support_count: number;
+  unread_replies: number;
 }
 
 export interface User {
