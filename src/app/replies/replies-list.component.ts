@@ -14,7 +14,8 @@ export class RepliesListComponent implements OnInit {
   replies: CommentReply[] = [];
   stats: ReplyStats | null = null;
   isLoading = true;
-  currentFilter: string = '';
+  currentFilter: string = 'unread';
+  currentSort: string = 'time';
   totalCount = 0;
   currentPage = 1;
   pageSize = 20;
@@ -24,6 +25,15 @@ export class RepliesListComponent implements OnInit {
     { value: 'unread', label: 'Unread', icon: 'mark_email_unread' },
     { value: 'needs_response', label: 'Needs Response', icon: 'reply' },
     { value: 'pending_drafts', label: 'Pending Drafts', icon: 'edit_note' }
+  ];
+
+  sortOptions: { value: string; label: string }[] = [
+    { value: 'time', label: 'Newest First' },
+    { value: '-time', label: 'Oldest First' },
+    { value: 'subreddit', label: 'Subreddit A-Z' },
+    { value: '-subreddit', label: 'Subreddit Z-A' },
+    { value: '-score', label: 'Highest Score' },
+    { value: 'score', label: 'Lowest Score' }
   ];
 
   constructor(
@@ -36,7 +46,9 @@ export class RepliesListComponent implements OnInit {
   ngOnInit(): void {
     this.loadStats();
     this.route.queryParams.subscribe(params => {
-      this.currentFilter = params['filter'] || '';
+      // Default to 'unread' if no filter specified
+      this.currentFilter = params['filter'] !== undefined ? params['filter'] : 'unread';
+      this.currentSort = params['sort'] || 'time';
       this.currentPage = parseInt(params['page'], 10) || 1;
       this.loadReplies();
     });
@@ -55,7 +67,8 @@ export class RepliesListComponent implements OnInit {
 
     const filters: any = {
       page: this.currentPage,
-      page_size: this.pageSize
+      page_size: this.pageSize,
+      sort: this.currentSort
     };
 
     if (this.currentFilter === 'unread') {
@@ -82,6 +95,14 @@ export class RepliesListComponent implements OnInit {
     this.router.navigate([], {
       relativeTo: this.route,
       queryParams: { filter: filter || null, page: 1 },
+      queryParamsHandling: 'merge'
+    });
+  }
+
+  sortBy(sort: string): void {
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { sort: sort || null, page: 1 },
       queryParamsHandling: 'merge'
     });
   }

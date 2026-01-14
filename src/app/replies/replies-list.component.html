@@ -28,17 +28,27 @@
     </mat-card>
   </div>
 
-  <!-- Filters -->
-  <div class="filters">
-    <mat-chip-listbox>
-      <mat-chip-option
-        *ngFor="let filter of filters"
-        [selected]="currentFilter === filter.value"
-        (click)="filterBy(filter.value)">
-        <mat-icon matChipAvatar>{{ filter.icon }}</mat-icon>
-        {{ filter.label }}
-      </mat-chip-option>
-    </mat-chip-listbox>
+  <!-- Filters and Sort -->
+  <div class="filters-row">
+    <div class="filters">
+      <mat-chip-listbox>
+        <mat-chip-option
+          *ngFor="let filter of filters"
+          [selected]="currentFilter === filter.value"
+          (click)="filterBy(filter.value)">
+          <mat-icon matChipAvatar>{{ filter.icon }}</mat-icon>
+          {{ filter.label }}
+        </mat-chip-option>
+      </mat-chip-listbox>
+    </div>
+    <mat-form-field appearance="outline" class="sort-select">
+      <mat-label>Sort by</mat-label>
+      <mat-select [value]="currentSort" (selectionChange)="sortBy($event.value)">
+        <mat-option *ngFor="let option of sortOptions" [value]="option.value">
+          {{ option.label }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
   </div>
 
   <!-- Loading -->
