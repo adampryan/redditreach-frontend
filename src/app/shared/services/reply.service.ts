@@ -14,6 +14,9 @@ import {
 export interface ReplyFilters {
   is_read?: boolean;
   requires_response?: boolean;
+  has_pending_draft?: boolean;
+  subreddits?: string;
+  sort?: string;
   page?: number;
   page_size?: number;
 }
@@ -37,6 +40,15 @@ export class ReplyService {
     }
     if (filters.requires_response !== undefined) {
       params = params.set('requires_response', filters.requires_response.toString());
+    }
+    if (filters.has_pending_draft !== undefined) {
+      params = params.set('has_pending_draft', filters.has_pending_draft.toString());
+    }
+    if (filters.subreddits) {
+      params = params.set('subreddits', filters.subreddits);
+    }
+    if (filters.sort) {
+      params = params.set('sort', filters.sort);
     }
     if (filters.page) {
       params = params.set('page', filters.page.toString());
