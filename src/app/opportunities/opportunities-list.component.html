@@ -8,16 +8,80 @@
     </a>
   </header>
 
-  <!-- Filters -->
-  <div class="filters">
-    <mat-chip-listbox>
-      <mat-chip-option
-        *ngFor="let filter of statusFilters"
-        [selected]="currentStatus === filter.value"
-        (click)="filterByStatus(filter.value)">
-        {{ filter.label }}
-      </mat-chip-option>
-    </mat-chip-listbox>
+  <!-- Stats Cards -->
+  <div class="stats-row" *ngIf="stats">
+    <mat-card class="stat-card" [class.active]="stats.total > 0">
+      <div class="stat-value">{{ stats.total }}</div>
+      <div class="stat-label">Total</div>
+    </mat-card>
+    <mat-card class="stat-card unread" [class.active]="stats.unread > 0">
+      <div class="stat-value">{{ stats.unread }}</div>
+      <div class="stat-label">Unread</div>
+    </mat-card>
+    <mat-card class="stat-card pending" [class.active]="stats.pending_approval > 0">
+      <div class="stat-value">{{ stats.pending_approval }}</div>
+      <div class="stat-label">Ready to Review</div>
+    </mat-card>
+    <mat-card class="stat-card posted" [class.active]="stats.posted > 0">
+      <div class="stat-value">{{ stats.posted }}</div>
+      <div class="stat-label">Posted</div>
+    </mat-card>
+  </div>
+
+  <!-- Filters Row -->
+  <div class="filters-row">
+    <mat-form-field appearance="outline" class="filter-select">
+      <mat-label>Filter</mat-label>
+      <mat-select [(value)]="currentStatus" (selectionChange)="filterByStatus(currentStatus)">
+        <mat-option *ngFor="let filter of statusFilters" [value]="filter.value">
+          {{ filter.label }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="subreddit-select" *ngIf="stats && stats.subreddits && stats.subreddits.length > 0">
+      <mat-label>Subreddits</mat-label>
+      <mat-select [(value)]="currentSubreddits" (selectionChange)="onSubredditsChange()" multiple>
+        <mat-option *ngFor="let sub of stats!.subreddits" [value]="sub">
+          r/{{ sub }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="sort-select">
+      <mat-label>Sort</mat-label>
+      <mat-select [(value)]="currentSort" (selectionChange)="onSortChange()">
+        <mat-option *ngFor="let option of sortOptions" [value]="option.value">
+          {{ option.label }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+
+  <!-- Bulk Actions Bar -->
+  <div class="bulk-actions-bar" *ngIf="opportunities.length > 0">
+    <mat-checkbox
+      [checked]="selectAll"
+      [indeterminate]="selectedIds.size > 0 && selectedIds.size < opportunities.length"
+      (change)="toggleSelectAll()">
+      <span *ngIf="selectedIds.size > 0">{{ selectedIds.size }} selected</span>
+      <span *ngIf="selectedIds.size === 0">Select all</span>
+    </mat-checkbox>
+
+    <div class="bulk-buttons" *ngIf="hasSelections">
+      <button mat-stroked-button (click)="bulkMarkRead()">
+        <mat-icon>done</mat-icon>
+        Mark Read
+      </button>
+      <button mat-stroked-button color="warn" (click)="bulkReject()">
+        <mat-icon>close</mat-icon>
+        Reject
+      </button>
+      <button mat-stroked-button (click)="bulkRestore()" *ngIf="currentStatus === 'rejected'">
+        <mat-icon>restore</mat-icon>
+        Restore
+      </button>
+    </div>
   </div>
 
   <!-- Loading -->
@@ -30,8 +94,8 @@
     <mat-card-content>
       <mat-icon>search_off</mat-icon>
       <h2>No opportunities found</h2>
-      <p *ngIf="currentStatus">Try removing the status filter to see all opportunities.</p>
-      <p *ngIf="!currentStatus">Opportunities will appear here once we find relevant Reddit posts.</p>
+      <p *ngIf="currentStatus && currentStatus !== 'all'">Try changing the filter to see more opportunities.</p>
+      <p *ngIf="!currentStatus || currentStatus === 'all'">Opportunities will appear here once we find relevant Reddit posts.</p>
     </mat-card-content>
   </mat-card>
 
@@ -40,39 +104,66 @@
     <mat-card
       class="opportunity-card"
       *ngFor="let opp of opportunities"
-      (click)="viewOpportunity(opp.id)">
-      <div class="card-header">
-        <span class="subreddit">r/{{ opp.subreddit_name }}</span>
-        <span class="age">{{ getTimeAgo(opp.age_hours) }}</span>
-      </div>
-      <div class="card-title">{{ opp.post_title }}</div>
-      <div class="card-meta">
-        <span class="author">by u/{{ opp.post_author }}</span>
-        <div class="stats">
-          <span class="score">
-            <mat-icon>arrow_upward</mat-icon>
-            {{ opp.post_score }}
-          </span>
-          <span class="comments">
-            <mat-icon>chat_bubble_outline</mat-icon>
-            {{ opp.post_num_comments }}
-          </span>
-          <span class="relevance" *ngIf="opp.relevance_score">
-            {{ (opp.relevance_score * 100).toFixed(0) }}% match
-          </span>
+      [class.unread]="!opp.is_read"
+      [class.selected]="isSelected(opp.id)"
+      (click)="viewOpportunity(opp)">
+
+      <div class="card-content">
+        <mat-checkbox
+          class="row-checkbox"
+          [checked]="isSelected(opp.id)"
+          (click)="toggleSelection(opp.id, $event)">
+        </mat-checkbox>
+
+        <div class="card-main">
+          <div class="card-header">
+            <div class="header-left">
+              <span class="unread-dot" *ngIf="!opp.is_read"></span>
+              <span class="subreddit">r/{{ opp.subreddit_name }}</span>
+            </div>
+            <span class="age">{{ getTimeAgo(opp.age_hours) }}</span>
+          </div>
+
+          <div class="card-title">{{ opp.post_title }}</div>
+
+          <div class="card-body" *ngIf="opp.post_body_preview">
+            {{ truncateText(opp.post_body_preview, 150) }}
+          </div>
+
+          <div class="card-meta">
+            <span class="author">u/{{ opp.post_author }}</span>
+            <div class="stats">
+              <span class="score" [class.positive]="opp.post_score > 0" [class.negative]="opp.post_score < 0">
+                <mat-icon>arrow_upward</mat-icon>
+                {{ opp.post_score }}
+              </span>
+              <span class="comments">
+                <mat-icon>chat_bubble_outline</mat-icon>
+                {{ opp.post_num_comments }}
+              </span>
+              <span class="relevance" *ngIf="opp.relevance_score">
+                {{ (opp.relevance_score * 100).toFixed(0) }}% match
+              </span>
+            </div>
+          </div>
+
+          <div class="card-footer">
+            <div class="badges">
+              <span class="status" [ngClass]="getStatusClass(opp.status)">
+                {{ formatStatus(opp.status) }}
+              </span>
+              <span class="badge drafts" *ngIf="opp.has_drafts">
+                <mat-icon>description</mat-icon>
+                Has Drafts
+              </span>
+              <span class="badge scheduled" *ngIf="opp.scheduled_for">
+                <mat-icon>schedule</mat-icon>
+                {{ formatScheduledTime(opp.scheduled_for) }}
+              </span>
+            </div>
+            <mat-icon class="action-arrow">chevron_right</mat-icon>
+          </div>
         </div>
-      </div>
-      <div class="card-footer">
-        <div class="status-area">
-          <span class="status" [ngClass]="getStatusClass(opp.status)">
-            {{ formatStatus(opp.status) }}
-          </span>
-          <span class="scheduled-badge" *ngIf="opp.scheduled_for">
-            <mat-icon>schedule</mat-icon>
-            {{ formatScheduledTime(opp.scheduled_for) }}
-          </span>
-        </div>
-        <mat-icon class="action-arrow">chevron_right</mat-icon>
       </div>
     </mat-card>
   </div>

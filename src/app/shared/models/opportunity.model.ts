@@ -2,6 +2,7 @@ export interface OpportunityListItem {
   id: string;
   subreddit_name: string;
   post_title: string;
+  post_body_preview: string;
   post_author: string;
   post_score: number;
   post_num_comments: number;
@@ -9,10 +10,22 @@ export interface OpportunityListItem {
   post_flair: string;
   relevance_score: number;
   status: OpportunityStatus;
+  is_read: boolean;
   discovered_at: string;
   age_hours: number;
   has_drafts: boolean;
   scheduled_for: string | null;
+}
+
+export interface OpportunityStats {
+  total: number;
+  unread: number;
+  pending_review: number;
+  pending_approval: number;
+  approved: number;
+  posted: number;
+  rejected: number;
+  subreddits: string[];
 }
 
 export interface Opportunity {

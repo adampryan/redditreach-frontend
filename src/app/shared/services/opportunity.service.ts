@@ -2,11 +2,13 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { Opportunity, OpportunityListItem, PaginatedResponse } from '../models';
+import { Opportunity, OpportunityListItem, OpportunityStats, PaginatedResponse } from '../models';
 
 export interface OpportunityFilters {
   status?: string;
-  subreddit?: string;
+  is_read?: boolean;
+  subreddits?: string;
+  sort?: string;
   page?: number;
   page_size?: number;
 }
@@ -25,8 +27,14 @@ export class OpportunityService {
     if (filters.status) {
       params = params.set('status', filters.status);
     }
-    if (filters.subreddit) {
-      params = params.set('subreddit', filters.subreddit);
+    if (filters.is_read !== undefined) {
+      params = params.set('is_read', filters.is_read.toString());
+    }
+    if (filters.subreddits) {
+      params = params.set('subreddits', filters.subreddits);
+    }
+    if (filters.sort) {
+      params = params.set('sort', filters.sort);
     }
     if (filters.page) {
       params = params.set('page', filters.page.toString());
@@ -38,6 +46,31 @@ export class OpportunityService {
     return this.http.get<PaginatedResponse<OpportunityListItem>>(
       `${this.apiUrl}/opportunities/`,
       { params }
+    );
+  }
+
+  getStats(): Observable<OpportunityStats> {
+    return this.http.get<OpportunityStats>(`${this.apiUrl}/opportunities/stats/`);
+  }
+
+  markRead(id: string): Observable<{ success: boolean; is_read: boolean }> {
+    return this.http.post<{ success: boolean; is_read: boolean }>(
+      `${this.apiUrl}/opportunities/${id}/read/`,
+      {}
+    );
+  }
+
+  bulkStatus(opportunityIds: string[], status: string): Observable<{ success: boolean; updated_count: number; status: string }> {
+    return this.http.post<{ success: boolean; updated_count: number; status: string }>(
+      `${this.apiUrl}/opportunities/bulk-status/`,
+      { opportunity_ids: opportunityIds, status }
+    );
+  }
+
+  bulkRead(opportunityIds: string[]): Observable<{ success: boolean; updated_count: number; is_read: boolean }> {
+    return this.http.post<{ success: boolean; updated_count: number; is_read: boolean }>(
+      `${this.apiUrl}/opportunities/bulk-read/`,
+      { opportunity_ids: opportunityIds }
     );
   }
 
