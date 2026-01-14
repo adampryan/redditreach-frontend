@@ -205,6 +205,41 @@ export class ReplyDetailComponent implements OnInit {
     });
   }
 
+  deleteDraft(): void {
+    if (!this.selectedDraft) return;
+
+    if (!confirm('Are you sure you want to delete this draft?')) {
+      return;
+    }
+
+    this.isSubmitting = true;
+    this.replyService.deleteDraft(this.selectedDraft.id).subscribe({
+      next: () => {
+        this.isSubmitting = false;
+        // Remove from local array
+        if (this.reply) {
+          this.reply.drafts = this.reply.drafts.filter(d => d.id !== this.selectedDraft!.id);
+        }
+        this.selectedDraft = null;
+        this.editedText = '';
+        this.showEditMode = false;
+
+        // Select next draft if available
+        if (this.reply?.drafts && this.reply.drafts.length > 0) {
+          this.selectDraft(this.reply.drafts[0]);
+        }
+
+        this.cdr.detectChanges();
+        this.snackBar.open('Draft deleted', 'Dismiss', { duration: 3000 });
+      },
+      error: (err) => {
+        this.isSubmitting = false;
+        const errorMsg = err?.error?.error || 'Failed to delete draft. Please try again.';
+        this.snackBar.open(errorMsg, 'Dismiss', { duration: 5000 });
+      }
+    });
+  }
+
   toggleNeedsResponse(): void {
     if (!this.reply) return;
 

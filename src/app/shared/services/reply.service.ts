@@ -130,6 +130,15 @@ export class ReplyService {
   }
 
   /**
+   * Delete a draft.
+   */
+  deleteDraft(draftId: number): Observable<{ success: boolean; deleted_draft_id: number }> {
+    return this.http.delete<{ success: boolean; deleted_draft_id: number }>(
+      `${this.apiUrl}/reply-drafts/${draftId}/delete/`
+    );
+  }
+
+  /**
    * Get available strategy and tone options.
    */
   getGenerationOptions(): Observable<GenerationOptions> {
