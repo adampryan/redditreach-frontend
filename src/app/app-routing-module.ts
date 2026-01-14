@@ -70,6 +70,11 @@ const routes: Routes = [
     canActivate: [AuthGuard]
   },
   {
+    path: 'elite',
+    loadChildren: () => import('./elite/elite.module').then(m => m.EliteModule),
+    canActivate: [AuthGuard]
+  },
+  {
     path: '**',
     redirectTo: ''
   }
