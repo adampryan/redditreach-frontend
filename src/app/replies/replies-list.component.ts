@@ -22,7 +22,8 @@ export class RepliesListComponent implements OnInit {
   filters: { value: string; label: string; icon: string }[] = [
     { value: '', label: 'All', icon: 'inbox' },
     { value: 'unread', label: 'Unread', icon: 'mark_email_unread' },
-    { value: 'needs_response', label: 'Needs Response', icon: 'reply' }
+    { value: 'needs_response', label: 'Needs Response', icon: 'reply' },
+    { value: 'pending_drafts', label: 'Pending Drafts', icon: 'edit_note' }
   ];
 
   constructor(
@@ -61,6 +62,8 @@ export class RepliesListComponent implements OnInit {
       filters.is_read = false;
     } else if (this.currentFilter === 'needs_response') {
       filters.requires_response = true;
+    } else if (this.currentFilter === 'pending_drafts') {
+      filters.has_pending_draft = true;
     }
 
     this.replyService.list(filters).subscribe({
