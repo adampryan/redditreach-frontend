@@ -41,14 +41,25 @@
         </mat-chip-option>
       </mat-chip-listbox>
     </div>
-    <mat-form-field appearance="outline" class="sort-select">
-      <mat-label>Sort by</mat-label>
-      <mat-select [value]="currentSort" (selectionChange)="sortBy($event.value)">
-        <mat-option *ngFor="let option of sortOptions" [value]="option.value">
-          {{ option.label }}
-        </mat-option>
-      </mat-select>
-    </mat-form-field>
+    <div class="dropdowns">
+      <mat-form-field appearance="outline" class="subreddit-select" *ngIf="stats && stats.subreddits && stats.subreddits.length">
+        <mat-label>Subreddit</mat-label>
+        <mat-select [value]="currentSubreddit" (selectionChange)="filterBySubreddit($event.value)">
+          <mat-option value="">All Subreddits</mat-option>
+          <mat-option *ngFor="let sub of stats!.subreddits" [value]="sub">
+            r/{{ sub }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="sort-select">
+        <mat-label>Sort by</mat-label>
+        <mat-select [value]="currentSort" (selectionChange)="sortBy($event.value)">
+          <mat-option *ngFor="let option of sortOptions" [value]="option.value">
+            {{ option.label }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
   </div>
 
   <!-- Loading -->

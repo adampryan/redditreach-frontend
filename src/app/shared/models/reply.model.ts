@@ -40,6 +40,7 @@ export interface ReplyStats {
   unread_replies: number;
   needs_response: number;
   pending_drafts: number;
+  subreddits: string[];
 }
 
 export interface GenerationOptions {

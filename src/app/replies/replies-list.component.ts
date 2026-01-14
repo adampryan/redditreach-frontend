@@ -16,6 +16,7 @@ export class RepliesListComponent implements OnInit {
   isLoading = true;
   currentFilter: string = 'unread';
   currentSort: string = 'time';
+  currentSubreddit: string = '';
   totalCount = 0;
   currentPage = 1;
   pageSize = 20;
@@ -49,6 +50,7 @@ export class RepliesListComponent implements OnInit {
       // Default to 'unread' if no filter specified
       this.currentFilter = params['filter'] !== undefined ? params['filter'] : 'unread';
       this.currentSort = params['sort'] || 'time';
+      this.currentSubreddit = params['subreddit'] || '';
       this.currentPage = parseInt(params['page'], 10) || 1;
       this.loadReplies();
     });
@@ -79,6 +81,10 @@ export class RepliesListComponent implements OnInit {
       filters.has_pending_draft = true;
     }
 
+    if (this.currentSubreddit) {
+      filters.subreddit = this.currentSubreddit;
+    }
+
     this.replyService.list(filters).subscribe({
       next: (response) => {
         this.replies = response.results;
@@ -103,6 +109,14 @@ export class RepliesListComponent implements OnInit {
     this.router.navigate([], {
       relativeTo: this.route,
       queryParams: { sort: sort || null, page: 1 },
+      queryParamsHandling: 'merge'
+    });
+  }
+
+  filterBySubreddit(subreddit: string): void {
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { subreddit: subreddit || null, page: 1 },
       queryParamsHandling: 'merge'
     });
   }
