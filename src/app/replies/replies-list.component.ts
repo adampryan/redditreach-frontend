@@ -16,16 +16,16 @@ export class RepliesListComponent implements OnInit {
   isLoading = true;
   currentFilter: string = 'unread';
   currentSort: string = 'time';
-  currentSubreddit: string = '';
+  currentSubreddits: string[] = [];
   totalCount = 0;
   currentPage = 1;
   pageSize = 20;
 
-  filters: { value: string; label: string; icon: string }[] = [
-    { value: '', label: 'All', icon: 'inbox' },
-    { value: 'unread', label: 'Unread', icon: 'mark_email_unread' },
-    { value: 'needs_response', label: 'Needs Response', icon: 'reply' },
-    { value: 'pending_drafts', label: 'Pending Drafts', icon: 'edit_note' }
+  filterOptions: { value: string; label: string }[] = [
+    { value: 'all', label: 'All' },
+    { value: 'unread', label: 'Unread' },
+    { value: 'needs_response', label: 'Needs Response' },
+    { value: 'pending_drafts', label: 'Pending Drafts' }
   ];
 
   sortOptions: { value: string; label: string }[] = [
@@ -48,9 +48,11 @@ export class RepliesListComponent implements OnInit {
     this.loadStats();
     this.route.queryParams.subscribe(params => {
       // Default to 'unread' if no filter specified
-      this.currentFilter = params['filter'] !== undefined ? params['filter'] : 'unread';
+      this.currentFilter = params['filter'] || 'unread';
       this.currentSort = params['sort'] || 'time';
-      this.currentSubreddit = params['subreddit'] || '';
+      // Parse subreddits - can be comma-separated string
+      const subParam = params['subreddits'] || '';
+      this.currentSubreddits = subParam ? subParam.split(',') : [];
       this.currentPage = parseInt(params['page'], 10) || 1;
       this.loadReplies();
     });
@@ -73,6 +75,7 @@ export class RepliesListComponent implements OnInit {
       sort: this.currentSort
     };
 
+    // Apply status filter (skip for 'all')
     if (this.currentFilter === 'unread') {
       filters.is_read = false;
     } else if (this.currentFilter === 'needs_response') {
@@ -81,8 +84,9 @@ export class RepliesListComponent implements OnInit {
       filters.has_pending_draft = true;
     }
 
-    if (this.currentSubreddit) {
-      filters.subreddit = this.currentSubreddit;
+    // Apply subreddit filter (comma-separated for multiple)
+    if (this.currentSubreddits.length > 0) {
+      filters.subreddits = this.currentSubreddits.join(',');
     }
 
     this.replyService.list(filters).subscribe({
@@ -100,7 +104,7 @@ export class RepliesListComponent implements OnInit {
   filterBy(filter: string): void {
     this.router.navigate([], {
       relativeTo: this.route,
-      queryParams: { filter: filter || null, page: 1 },
+      queryParams: { filter: filter, page: 1 },
       queryParamsHandling: 'merge'
     });
   }
@@ -113,10 +117,10 @@ export class RepliesListComponent implements OnInit {
     });
   }
 
-  filterBySubreddit(subreddit: string): void {
+  filterBySubreddits(subreddits: string[]): void {
     this.router.navigate([], {
       relativeTo: this.route,
-      queryParams: { subreddit: subreddit || null, page: 1 },
+      queryParams: { subreddits: subreddits.length > 0 ? subreddits.join(',') : null, page: 1 },
       queryParamsHandling: 'merge'
     });
   }

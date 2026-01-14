@@ -28,38 +28,34 @@
     </mat-card>
   </div>
 
-  <!-- Filters and Sort -->
+  <!-- Filters Row -->
   <div class="filters-row">
-    <div class="filters">
-      <mat-chip-listbox>
-        <mat-chip-option
-          *ngFor="let filter of filters"
-          [selected]="currentFilter === filter.value"
-          (click)="filterBy(filter.value)">
-          <mat-icon matChipAvatar>{{ filter.icon }}</mat-icon>
-          {{ filter.label }}
-        </mat-chip-option>
-      </mat-chip-listbox>
-    </div>
-    <div class="dropdowns">
-      <mat-form-field appearance="outline" class="subreddit-select" *ngIf="stats && stats.subreddits && stats.subreddits.length">
-        <mat-label>Subreddit</mat-label>
-        <mat-select [value]="currentSubreddit" (selectionChange)="filterBySubreddit($event.value)">
-          <mat-option value="">All Subreddits</mat-option>
-          <mat-option *ngFor="let sub of stats!.subreddits" [value]="sub">
-            r/{{ sub }}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-      <mat-form-field appearance="outline" class="sort-select">
-        <mat-label>Sort by</mat-label>
-        <mat-select [value]="currentSort" (selectionChange)="sortBy($event.value)">
-          <mat-option *ngFor="let option of sortOptions" [value]="option.value">
-            {{ option.label }}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-    </div>
+    <mat-form-field appearance="outline" class="filter-select">
+      <mat-label>Status</mat-label>
+      <mat-select [value]="currentFilter" (selectionChange)="filterBy($event.value)">
+        <mat-option *ngFor="let option of filterOptions" [value]="option.value">
+          {{ option.label }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="subreddit-select" *ngIf="stats && stats.subreddits && stats.subreddits.length">
+      <mat-label>Subreddits</mat-label>
+      <mat-select [value]="currentSubreddits" (selectionChange)="filterBySubreddits($event.value)" multiple>
+        <mat-option *ngFor="let sub of stats!.subreddits" [value]="sub">
+          r/{{ sub }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="sort-select">
+      <mat-label>Sort by</mat-label>
+      <mat-select [value]="currentSort" (selectionChange)="sortBy($event.value)">
+        <mat-option *ngFor="let option of sortOptions" [value]="option.value">
+          {{ option.label }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
   </div>
 
   <!-- Loading -->
@@ -72,8 +68,8 @@
     <mat-card-content>
       <mat-icon>forum</mat-icon>
       <h2>No replies yet</h2>
-      <p *ngIf="currentFilter">Try removing the filter to see all replies.</p>
-      <p *ngIf="!currentFilter">When people reply to your posted comments, they'll appear here.</p>
+      <p *ngIf="currentFilter !== 'all'">Try changing the filter to see more replies.</p>
+      <p *ngIf="currentFilter === 'all'">When people reply to your posted comments, they'll appear here.</p>
     </mat-card-content>
   </mat-card>
 
@@ -84,27 +80,54 @@
       *ngFor="let reply of replies"
       [class.unread]="!reply.is_read"
       (click)="viewReply(reply.id)">
+
+      <!-- Header -->
       <div class="card-header">
         <div class="header-left">
           <span class="unread-dot" *ngIf="!reply.is_read"></span>
           <span class="subreddit">r/{{ reply.subreddit_name }}</span>
+          <span class="nested-badge" *ngIf="reply.is_nested">
+            <mat-icon>subdirectory_arrow_right</mat-icon>
+            Nested
+          </span>
         </div>
         <span class="age">{{ getTimeAgo(reply.reply_created_at) }}</span>
       </div>
 
-      <div class="reply-content">
-        <div class="reply-author">
-          <mat-icon>person</mat-icon>
-          u/{{ reply.reply_author }}
+      <!-- Conversation Thread -->
+      <div class="conversation-thread">
+        <!-- Original Post Context -->
+        <div class="thread-item post-context" *ngIf="reply.original_post_title">
+          <div class="thread-line"></div>
+          <div class="thread-content">
+            <span class="thread-label">Post:</span>
+            <span class="thread-text">{{ truncate(reply.original_post_title, 60) }}</span>
+          </div>
         </div>
-        <div class="reply-body">"{{ truncate(reply.reply_body, 150) }}"</div>
+
+        <!-- Our Comment -->
+        <div class="thread-item our-comment">
+          <div class="thread-line"></div>
+          <div class="thread-content">
+            <span class="thread-label">You:</span>
+            <span class="thread-text">{{ truncate(reply.our_response_preview, 80) }}</span>
+          </div>
+        </div>
+
+        <!-- Their Reply (highlighted) -->
+        <div class="thread-item their-reply">
+          <div class="thread-line last"></div>
+          <div class="thread-content highlight">
+            <span class="thread-label">
+              <mat-icon>person</mat-icon>
+              u/{{ reply.reply_author }}:
+            </span>
+            <span class="thread-text">"{{ truncate(reply.reply_body, 120) }}"</span>
+          </div>
+        </div>
       </div>
 
-      <div class="context">
-        <mat-icon>reply</mat-icon>
-        <span class="context-text">Replying to: {{ truncate(reply.our_response_preview, 80) }}</span>
-      </div>
-
+      <!-- Footer -->
       <div class="card-footer">
         <div class="badges">
           <span class="score" [class.positive]="reply.reply_score > 0" [class.negative]="reply.reply_score < 0">
