@@ -44,6 +44,7 @@
           "options": {
             "outputPath": "dist/redditreach-frontend",
             "browser": "src/main.ts",
+            "baseHref": "/",
             "polyfills": [
               "zone.js"
             ],
@@ -53,10 +54,6 @@
               {
                 "glob": "**/*",
                 "input": "public"
-              },
-              {
-                "glob": "_redirects",
-                "input": "src"
               },
               {
                 "glob": "privacy.html",
