@@ -96,15 +96,27 @@
       </mat-card-actions>
     </mat-card>
 
-    <!-- Draft Selection (if pending approval) -->
-    <ng-container *ngIf="opportunity.is_respondable && opportunity.drafts.length > 0">
+    <!-- Draft Selection (if has drafts) -->
+    <ng-container *ngIf="opportunity.drafts.length > 0">
+      <!-- Expired Post Warning -->
+      <mat-card class="expired-warning" *ngIf="!opportunity.is_respondable && opportunity.status !== 'posted'">
+        <mat-card-content>
+          <mat-icon>schedule</mat-icon>
+          <div>
+            <strong>Post Too Old</strong>
+            <p>This Reddit post is over 7 days old and can no longer receive responses. The drafts below are for reference only.</p>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
       <div class="section-header">
-        <h2 class="section-title">Select a Response</h2>
+        <h2 class="section-title">{{ opportunity.is_respondable ? 'Select a Response' : 'Generated Responses (Expired)' }}</h2>
         <button
           mat-stroked-button
           color="primary"
           (click)="openRegenerateDialog()"
-          [disabled]="isRegenerating">
+          [disabled]="isRegenerating || !opportunity.is_respondable"
+          *ngIf="opportunity.is_respondable">
           <mat-spinner *ngIf="isRegenerating" diameter="18"></mat-spinner>
           <mat-icon *ngIf="!isRegenerating">autorenew</mat-icon>
           {{ isRegenerating ? 'Generating...' : 'Generate New' }}
@@ -116,17 +128,18 @@
           *ngFor="let draft of opportunity.drafts"
           class="draft-card"
           [class.selected]="selectedDraft?.id === draft.id"
-          (click)="selectDraft(draft)">
+          [class.disabled]="!opportunity.is_respondable"
+          (click)="opportunity.is_respondable && selectDraft(draft)">
           <div class="draft-header">
             <span class="draft-label">{{ draft.variation_label }}</span>
-            <mat-icon *ngIf="selectedDraft?.id === draft.id">check_circle</mat-icon>
+            <mat-icon *ngIf="selectedDraft?.id === draft.id && opportunity.is_respondable">check_circle</mat-icon>
           </div>
           <div class="draft-text">{{ draft.response_text }}</div>
         </mat-card>
       </div>
 
-      <!-- Edit Mode -->
-      <div class="edit-section" *ngIf="selectedDraft">
+      <!-- Edit Mode (only if respondable) -->
+      <div class="edit-section" *ngIf="selectedDraft && opportunity.is_respondable">
         <div class="edit-header">
           <h3>Your Response</h3>
           <button mat-button (click)="toggleEditMode()">
@@ -148,8 +161,8 @@
         </div>
       </div>
 
-      <!-- Scheduling -->
-      <div class="schedule-section">
+      <!-- Scheduling (only if respondable) -->
+      <div class="schedule-section" *ngIf="opportunity.is_respondable">
         <mat-checkbox [(ngModel)]="schedulePost">Schedule for later</mat-checkbox>
         <div class="schedule-inputs" *ngIf="schedulePost">
           <mat-form-field appearance="outline">
@@ -163,8 +176,8 @@
         </div>
       </div>
 
-      <!-- Action Buttons -->
-      <div class="action-buttons">
+      <!-- Action Buttons (only if respondable) -->
+      <div class="action-buttons" *ngIf="opportunity.is_respondable">
         <button
           mat-raised-button
           color="primary"
