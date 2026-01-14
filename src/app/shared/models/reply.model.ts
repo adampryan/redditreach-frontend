@@ -14,6 +14,8 @@ export interface CommentReply {
   original_post_url: string;
   our_response_preview: string;
   has_draft: boolean;
+  draft_status: 'draft' | 'approved' | 'posted' | null;
+  is_nested: boolean;
 }
 
 export interface CommentReplyDetail extends CommentReply {

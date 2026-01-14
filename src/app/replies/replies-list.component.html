@@ -94,9 +94,17 @@
             <mat-icon>priority_high</mat-icon>
             Needs Response
           </span>
-          <span class="badge has-draft" *ngIf="reply.has_draft">
-            <mat-icon>description</mat-icon>
-            Has Draft
+          <span class="badge draft" *ngIf="reply.draft_status === 'draft'">
+            <mat-icon>edit_note</mat-icon>
+            Draft
+          </span>
+          <span class="badge approved" *ngIf="reply.draft_status === 'approved'">
+            <mat-icon>schedule_send</mat-icon>
+            Approved
+          </span>
+          <span class="badge posted" *ngIf="reply.draft_status === 'posted'">
+            <mat-icon>check_circle</mat-icon>
+            Posted
           </span>
         </div>
         <div class="card-actions">

@@ -264,7 +264,17 @@
         color: #92400e;
       }
 
-      &.has-draft {
+      &.draft {
+        background: #e0e7ff;
+        color: #3730a3;
+      }
+
+      &.approved {
+        background: #dbeafe;
+        color: #1e40af;
+      }
+
+      &.posted {
         background: #d1fae5;
         color: #065f46;
       }
