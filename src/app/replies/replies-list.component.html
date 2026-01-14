@@ -99,7 +99,15 @@
             Has Draft
           </span>
         </div>
-        <mat-icon class="action-arrow">chevron_right</mat-icon>
+        <div class="card-actions">
+          <button
+            mat-icon-button
+            matTooltip="Dismiss reply"
+            (click)="dismissReply(reply, $event)">
+            <mat-icon>close</mat-icon>
+          </button>
+          <mat-icon class="action-arrow">chevron_right</mat-icon>
+        </div>
       </div>
     </mat-card>
   </div>

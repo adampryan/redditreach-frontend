@@ -270,6 +270,21 @@
       }
     }
 
+    .card-actions {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+
+      button {
+        opacity: 0.5;
+        transition: opacity 0.2s;
+
+        &:hover {
+          opacity: 1;
+        }
+      }
+    }
+
     .action-arrow {
       color: #ccc;
     }

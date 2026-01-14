@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { ReplyService } from '../shared/services';
 import { CommentReply, ReplyStats } from '../shared/models';
 
@@ -27,7 +28,8 @@ export class RepliesListComponent implements OnInit {
   constructor(
     private replyService: ReplyService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private snackBar: MatSnackBar
   ) {}
 
   ngOnInit(): void {
@@ -108,6 +110,36 @@ export class RepliesListComponent implements OnInit {
       relativeTo: this.route,
       queryParams: { page: event.pageIndex + 1 },
       queryParamsHandling: 'merge'
+    });
+  }
+
+  dismissReply(reply: CommentReply, event: Event): void {
+    event.stopPropagation(); // Prevent navigation to detail page
+
+    if (!confirm('Dismiss this reply? It will be removed from your list.')) {
+      return;
+    }
+
+    this.replyService.dismiss(reply.id).subscribe({
+      next: () => {
+        // Remove from local array
+        this.replies = this.replies.filter(r => r.id !== reply.id);
+        this.totalCount--;
+        // Update stats
+        if (this.stats) {
+          this.stats.total_replies--;
+          if (!reply.is_read) {
+            this.stats.unread_replies--;
+          }
+          if (reply.requires_response) {
+            this.stats.needs_response--;
+          }
+        }
+        this.snackBar.open('Reply dismissed', 'Dismiss', { duration: 3000 });
+      },
+      error: () => {
+        this.snackBar.open('Failed to dismiss reply', 'Dismiss', { duration: 5000 });
+      }
     });
   }
 }

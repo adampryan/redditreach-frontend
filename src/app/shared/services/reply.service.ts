@@ -139,6 +139,16 @@ export class ReplyService {
   }
 
   /**
+   * Dismiss a reply (remove from list, no intention to respond).
+   */
+  dismiss(replyId: number): Observable<{ success: boolean; reply_id: number }> {
+    return this.http.post<{ success: boolean; reply_id: number }>(
+      `${this.apiUrl}/replies/${replyId}/dismiss/`,
+      {}
+    );
+  }
+
+  /**
    * Get available strategy and tone options.
    */
   getGenerationOptions(): Observable<GenerationOptions> {

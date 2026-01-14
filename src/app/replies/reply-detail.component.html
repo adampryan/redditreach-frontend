@@ -20,6 +20,14 @@
           <mat-icon>{{ reply.requires_response ? 'flag' : 'outlined_flag' }}</mat-icon>
           {{ reply.requires_response ? 'Flagged for Response' : 'Flag for Response' }}
         </button>
+        <button
+          mat-stroked-button
+          color="warn"
+          (click)="dismissReply()"
+          [disabled]="isSubmitting">
+          <mat-icon>close</mat-icon>
+          Dismiss
+        </button>
       </div>
     </header>
 

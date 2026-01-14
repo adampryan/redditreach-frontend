@@ -253,6 +253,27 @@ export class ReplyDetailComponent implements OnInit {
     });
   }
 
+  dismissReply(): void {
+    if (!this.reply) return;
+
+    if (!confirm('Dismiss this reply? It will be removed from your list.')) {
+      return;
+    }
+
+    this.isSubmitting = true;
+    this.replyService.dismiss(this.reply.id).subscribe({
+      next: () => {
+        this.isSubmitting = false;
+        this.snackBar.open('Reply dismissed', 'Dismiss', { duration: 3000 });
+        this.router.navigate(['/replies']);
+      },
+      error: () => {
+        this.isSubmitting = false;
+        this.snackBar.open('Failed to dismiss reply', 'Dismiss', { duration: 5000 });
+      }
+    });
+  }
+
   openRedditPost(): void {
     if (this.reply?.original_post_url) {
       window.open(this.reply.original_post_url, '_blank');
