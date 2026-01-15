@@ -26,7 +26,7 @@ interface PaginatedResponse<T> {
   providedIn: 'root'
 })
 export class EliteService {
-  private readonly baseUrl = `${environment.apiUrl}/redditreach/api`;
+  private readonly baseUrl = environment.API_BASE_URL;
 
   constructor(private http: HttpClient) {}
 
