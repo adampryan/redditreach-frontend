@@ -65,6 +65,29 @@
           color: #fff;
         }
       }
+
+      &.elite-nav {
+        mat-icon {
+          color: #a855f7;
+        }
+
+        &:hover {
+          background: #faf5ff;
+          color: #7c3aed;
+
+          mat-icon {
+            color: #7c3aed;
+          }
+        }
+
+        &.active {
+          background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%);
+
+          mat-icon {
+            color: #fff;
+          }
+        }
+      }
     }
   }
 
