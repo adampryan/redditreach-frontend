@@ -14,7 +14,7 @@ export class RepliesListComponent implements OnInit {
   replies: CommentReply[] = [];
   stats: ReplyStats | null = null;
   isLoading = true;
-  currentFilter: string = 'unread';
+  currentFilter: string = 'all';  // Default to 'all' so users see all replies
   currentSort: string = 'time';
   currentSubreddits: string[] = [];
   totalCount = 0;
@@ -47,8 +47,8 @@ export class RepliesListComponent implements OnInit {
   ngOnInit(): void {
     this.loadStats();
     this.route.queryParams.subscribe(params => {
-      // Default to 'unread' if no filter specified
-      this.currentFilter = params['filter'] || 'unread';
+      // Default to 'all' if no filter specified
+      this.currentFilter = params['filter'] || 'all';
       this.currentSort = params['sort'] || 'time';
       // Parse subreddits - can be comma-separated string
       const subParam = params['subreddits'] || '';
