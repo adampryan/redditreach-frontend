@@ -1,10 +1,20 @@
 <h2 mat-dialog-title>Generate New Response</h2>
 
 <mat-dialog-content>
+  <!-- AI Recommendation Banner -->
+  <div class="ai-recommendation" *ngIf="hasAiRecommendation">
+    <mat-icon>psychology</mat-icon>
+    <div class="recommendation-content">
+      <span class="recommendation-label">AI Suggestion:</span>
+      <span class="recommendation-text">{{ data.strategyReasoning }}</span>
+    </div>
+  </div>
+
   <p class="dialog-description">
-    Choose a tone/strategy for the new response variation.
+    Choose a strategy and tone for the new response.
   </p>
 
+  <h3 class="section-title">Strategy</h3>
   <div class="strategy-options">
     <div
       class="strategy-card"
@@ -26,6 +36,17 @@
     </mat-checkbox>
     <p class="utm-hint">Adds tracking parameters to measure conversions from this response.</p>
   </div>
+
+  <h3 class="section-title">Tone</h3>
+  <mat-form-field appearance="outline" class="tone-select">
+    <mat-label>Response Tone</mat-label>
+    <mat-select [(value)]="tone">
+      <mat-option *ngFor="let t of tones" [value]="t.value">
+        {{ t.label }}
+        <span class="tone-description"> - {{ t.description }}</span>
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">

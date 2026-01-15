@@ -171,6 +171,89 @@
     }
   }
 
+  .ai-recommendation {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.08) 100%);
+    border: 1px solid rgba(102, 126, 234, 0.2);
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+
+    .ai-recommendation-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+
+      mat-icon {
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+        color: #667eea;
+      }
+
+      span {
+        font-weight: 600;
+        font-size: 13px;
+        color: #667eea;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+    }
+
+    .ai-recommendation-content {
+      .intent-tier {
+        margin-bottom: 8px;
+
+        .tier-label {
+          font-size: 13px;
+          color: #666;
+          margin-right: 8px;
+        }
+
+        .tier-value {
+          font-size: 13px;
+          font-weight: 600;
+          padding: 2px 8px;
+          border-radius: 4px;
+
+          &.tier-tier_1 {
+            background: #d4edda;
+            color: #155724;
+          }
+
+          &.tier-tier_2 {
+            background: #cce5ff;
+            color: #004085;
+          }
+
+          &.tier-tier_3 {
+            background: #fff3cd;
+            color: #856404;
+          }
+
+          &.tier-tier_4 {
+            background: #e9ecef;
+            color: #6c757d;
+          }
+        }
+      }
+
+      .strategy-suggestion {
+        .strategy-label {
+          font-size: 13px;
+          color: #666;
+          margin-right: 4px;
+        }
+
+        .strategy-text {
+          font-size: 13px;
+          color: #333;
+          line-height: 1.4;
+        }
+      }
+    }
+  }
+
   .keywords {
     display: flex;
     flex-wrap: wrap;

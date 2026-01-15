@@ -145,6 +145,16 @@ export class OpportunityDetailComponent implements OnInit {
     return status.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
   }
 
+  formatIntentTier(tier: string): string {
+    const tierLabels: Record<string, string> = {
+      'tier_1': 'High Intent - Actively Seeking',
+      'tier_2': 'Medium Intent - Pain Expression',
+      'tier_3': 'Low Intent - Implicit Need',
+      'tier_4': 'Engagement Only'
+    };
+    return tierLabels[tier] || tier;
+  }
+
   getStatusClass(status: string): string {
     const statusClasses: Record<string, string> = {
       pending_review: 'status-pending',
@@ -182,7 +192,9 @@ export class OpportunityDetailComponent implements OnInit {
       width: '480px',
       data: {
         opportunityId: this.opportunity.id,
-        postTitle: this.opportunity.post_title
+        postTitle: this.opportunity.post_title,
+        recommendedStrategy: this.opportunity.recommended_strategy,
+        strategyReasoning: this.opportunity.strategy_reasoning
       }
     });
 
@@ -200,7 +212,8 @@ export class OpportunityDetailComponent implements OnInit {
     this.opportunityService.regenerate(
       this.opportunity.id,
       options.strategy,
-      options.includeUtm
+      options.includeUtm,
+      options.tone
     ).subscribe({
       next: (response) => {
         this.isRegenerating = false;

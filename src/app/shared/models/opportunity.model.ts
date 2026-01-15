@@ -44,6 +44,10 @@ export interface Opportunity {
   relevance_score: number;
   relevance_reasoning: string;
   detected_keywords: string[];
+  // Elite conversion system - AI recommendations
+  intent_tier: IntentTier;
+  recommended_strategy: ResponseStrategy;
+  strategy_reasoning: string;
   status: OpportunityStatus;
   discovered_at: string;
   reviewed_at: string | null;
@@ -53,6 +57,9 @@ export interface Opportunity {
   drafts: ResponseDraft[];
   posted_response: PostedResponse | null;
 }
+
+export type IntentTier = 'tier_1' | 'tier_2' | 'tier_3' | 'tier_4';
+export type ResponseStrategy = 'direct_solution' | 'empathy_with_solution' | 'soft_mention' | 'pure_engagement' | 'skip';
 
 export interface ResponseDraft {
   id: number;

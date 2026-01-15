@@ -102,14 +102,19 @@ export class OpportunityService {
   regenerate(
     id: string,
     strategy: 'engage_only' | 'soft_mention' | 'with_link',
-    includeUtm: boolean = true
+    includeUtm: boolean = true,
+    tone?: string
   ): Observable<{ success: boolean; draft: any }> {
+    const payload: any = {
+      strategy,
+      include_utm: includeUtm
+    };
+    if (tone) {
+      payload.tone = tone;
+    }
     return this.http.post<{ success: boolean; draft: any }>(
       `${this.apiUrl}/opportunities/${id}/regenerate/`,
-      {
-        strategy,
-        include_utm: includeUtm
-      }
+      payload
     );
   }
 }

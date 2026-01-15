@@ -57,6 +57,27 @@
             - {{ opportunity.relevance_reasoning }}
           </span>
         </div>
+
+        <!-- AI Strategy Recommendation -->
+        <div class="ai-recommendation" *ngIf="opportunity.intent_tier || opportunity.strategy_reasoning">
+          <div class="ai-recommendation-header">
+            <mat-icon>psychology</mat-icon>
+            <span>AI Analysis</span>
+          </div>
+          <div class="ai-recommendation-content">
+            <div class="intent-tier" *ngIf="opportunity.intent_tier">
+              <span class="tier-label">Intent:</span>
+              <span class="tier-value" [ngClass]="'tier-' + opportunity.intent_tier">
+                {{ formatIntentTier(opportunity.intent_tier) }}
+              </span>
+            </div>
+            <div class="strategy-suggestion" *ngIf="opportunity.strategy_reasoning">
+              <span class="strategy-label">Suggested approach:</span>
+              <span class="strategy-text">{{ opportunity.strategy_reasoning }}</span>
+            </div>
+          </div>
+        </div>
+
         <div class="keywords" *ngIf="opportunity.detected_keywords?.length">
           <mat-chip *ngFor="let keyword of opportunity.detected_keywords">{{ keyword }}</mat-chip>
         </div>
