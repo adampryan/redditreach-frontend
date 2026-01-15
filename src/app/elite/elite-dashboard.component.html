@@ -255,9 +255,10 @@
           </thead>
           <tbody>
             <tr *ngFor="let outcome of dashboardData.recent_outcomes">
-              <td>
-                <a [routerLink]="['/opportunities', outcome.opportunity_id]">
-                  {{ outcome.opportunity_id.slice(0, 8) }}...
+              <td class="opportunity-cell">
+                <a [routerLink]="['/opportunities', outcome.opportunity_id]" class="opportunity-link">
+                  <span class="subreddit-name">r/{{ outcome.subreddit }}</span>
+                  <span class="post-title">{{ outcome.post_title | slice:0:50 }}{{ (outcome.post_title?.length || 0) > 50 ? '...' : '' }}</span>
                 </a>
               </td>
               <td>

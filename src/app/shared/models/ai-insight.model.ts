@@ -102,6 +102,8 @@ export interface EliteDashboardData {
   }[];
   recent_outcomes: {
     opportunity_id: string;
+    subreddit: string;
+    post_title: string;
     success_type: string;
     clicks: number;
     reply_sentiment: string;
