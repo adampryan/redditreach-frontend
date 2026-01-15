@@ -1,0 +1,189 @@
+<div class="ab-tests-page">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1>A/B Testing</h1>
+      <p>Systematically test response variations to optimize conversions</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn-secondary" [matMenuTriggerFor]="quickTestMenu">
+        <mat-icon>flash_on</mat-icon>
+        Quick Test
+      </button>
+      <button class="btn-primary" (click)="openCreateDialog()">
+        <mat-icon>add</mat-icon>
+        Create Test
+      </button>
+    </div>
+  </div>
+
+  <!-- Quick Test Menu -->
+  <mat-menu #quickTestMenu="matMenu" class="dark-menu">
+    <button mat-menu-item (click)="createQuickTest('strategy')">
+      <mat-icon>alt_route</mat-icon>
+      <span>Strategy Test (Direct vs Soft)</span>
+    </button>
+    <button mat-menu-item (click)="createQuickTest('tone')">
+      <mat-icon>record_voice_over</mat-icon>
+      <span>Tone Test (Casual vs Enthusiast)</span>
+    </button>
+    <button mat-menu-item (click)="createQuickTest('link')">
+      <mat-icon>link</mat-icon>
+      <span>Link Test (With vs Without)</span>
+    </button>
+  </mat-menu>
+
+  <!-- Stats Overview -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-label">Active Tests</div>
+      <div class="stat-value green">{{ activeCount }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Completed</div>
+      <div class="stat-value blue">{{ completedCount }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Total Samples</div>
+      <div class="stat-value default">{{ totalSamples }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Avg Lift</div>
+      <div class="stat-value" [ngClass]="avgLift >= 0 ? 'green' : 'red'">
+        {{ avgLift >= 0 ? '+' : '' }}{{ avgLift | number:'1.1-1' }}%
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="loading-container">
+    <div class="spinner"></div>
+    <p>Loading A/B Tests...</p>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs-container" *ngIf="!isLoading">
+    <div class="tabs-header">
+      <button class="tab-btn" [class.active]="activeTab === 'active'" (click)="activeTab = 'active'">
+        <mat-icon>play_circle</mat-icon>
+        Active ({{ activeCount }})
+      </button>
+      <button class="tab-btn" [class.active]="activeTab === 'completed'" (click)="activeTab = 'completed'">
+        <mat-icon>check_circle</mat-icon>
+        Completed ({{ completedCount }})
+      </button>
+      <button class="tab-btn" [class.active]="activeTab === 'all'" (click)="activeTab = 'all'">
+        <mat-icon>list</mat-icon>
+        All ({{ tests.length }})
+      </button>
+    </div>
+
+    <!-- Test List -->
+    <div class="tests-list">
+      <ng-container *ngIf="getFilteredTests().length > 0; else emptyState">
+        <div *ngFor="let test of getFilteredTests()"
+             class="test-card"
+             [routerLink]="['/elite/ab-tests', test.id]">
+          <div class="test-content">
+            <!-- Test Info -->
+            <div class="test-info">
+              <div class="test-header">
+                <div class="test-icon" [ngClass]="test.test_type">
+                  <mat-icon>{{ eliteService.getABTestTypeIcon(test.test_type) }}</mat-icon>
+                </div>
+                <h3 class="test-name">{{ test.name }}</h3>
+                <span class="status-badge" [ngClass]="test.status">
+                  {{ test.status | titlecase }}
+                </span>
+              </div>
+
+              <!-- Variants -->
+              <div class="variants-list">
+                <div *ngFor="let variant of test.variants" class="variant-chip">
+                  <mat-icon *ngIf="variant.is_control" class="control-icon">verified</mat-icon>
+                  <span>{{ variant.name }}</span>
+                  <span class="variant-samples">(n={{ variant.sample_size }})</span>
+                </div>
+              </div>
+
+              <!-- Performance Bars -->
+              <div class="performance-bars">
+                <div *ngFor="let variant of test.variants" class="bar-row">
+                  <span class="bar-label">{{ variant.name }}</span>
+                  <div class="bar-container">
+                    <div class="bar-fill"
+                         [ngClass]="variant.is_control ? 'control' : 'treatment'"
+                         [style.width.%]="variant.approval_rate * 100">
+                    </div>
+                  </div>
+                  <span class="bar-value">
+                    {{ variant.approval_rate * 100 | number:'1.0-0' }}%
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Winner Badge -->
+            <div *ngIf="test.status === 'completed' && test.winning_variant" class="winner-badge">
+              <mat-icon>emoji_events</mat-icon>
+              <div class="winner-lift">
+                Winner: +{{ test.winning_lift | number:'1.1-1' }}%
+              </div>
+            </div>
+
+            <!-- Actions Menu -->
+            <button class="actions-btn" [matMenuTriggerFor]="actionMenu" (click)="$event.stopPropagation()">
+              <mat-icon>more_vert</mat-icon>
+            </button>
+            <mat-menu #actionMenu="matMenu" class="dark-menu">
+              <button mat-menu-item [routerLink]="['/elite/ab-tests', test.id]">
+                <mat-icon>visibility</mat-icon>
+                <span>View Details</span>
+              </button>
+              <button mat-menu-item *ngIf="test.status === 'draft'" (click)="startTest(test); $event.stopPropagation()">
+                <mat-icon>play_arrow</mat-icon>
+                <span>Start Test</span>
+              </button>
+              <button mat-menu-item *ngIf="test.status === 'active'" (click)="pauseTest(test); $event.stopPropagation()">
+                <mat-icon>pause</mat-icon>
+                <span>Pause Test</span>
+              </button>
+              <button mat-menu-item *ngIf="test.status === 'paused'" (click)="resumeTest(test); $event.stopPropagation()">
+                <mat-icon>play_arrow</mat-icon>
+                <span>Resume Test</span>
+              </button>
+              <button mat-menu-item *ngIf="['active', 'paused', 'draft'].includes(test.status)"
+                      (click)="cancelTest(test); $event.stopPropagation()" class="danger">
+                <mat-icon>cancel</mat-icon>
+                <span>Cancel Test</span>
+              </button>
+            </mat-menu>
+          </div>
+
+          <!-- Timestamps -->
+          <div class="test-timestamps">
+            <span *ngIf="test.started_at">
+              Started: {{ test.started_at | date:'short' }}
+            </span>
+            <span *ngIf="test.completed_at">
+              Completed: {{ test.completed_at | date:'short' }}
+            </span>
+            <span *ngIf="!test.started_at">
+              Created: {{ test.created_at | date:'short' }}
+            </span>
+          </div>
+        </div>
+      </ng-container>
+
+      <ng-template #emptyState>
+        <div class="empty-state">
+          <mat-icon>science</mat-icon>
+          <p>No tests in this category</p>
+          <button class="btn-primary" (click)="openCreateDialog()">
+            Create Your First Test
+          </button>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+</div>

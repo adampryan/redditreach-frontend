@@ -1,0 +1,299 @@
+<div class="ab-test-detail-page">
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="loading-container">
+    <div class="spinner"></div>
+    <p>Loading test details...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="!isLoading && !test" class="error-container">
+    <mat-icon>error_outline</mat-icon>
+    <p>Test not found</p>
+    <button class="btn-primary" routerLink="/elite/ab-tests">
+      Back to Tests
+    </button>
+  </div>
+
+  <div *ngIf="test">
+    <!-- Header -->
+    <div class="page-header">
+      <div class="header-left">
+        <a routerLink="/elite/ab-tests" class="back-link">
+          <mat-icon>arrow_back</mat-icon>
+          Back to Tests
+        </a>
+        <div class="test-title-row">
+          <div class="test-icon" [ngClass]="test.test_type">
+            <mat-icon>{{ eliteService.getABTestTypeIcon(test.test_type) }}</mat-icon>
+          </div>
+          <div class="test-title">
+            <h1>{{ test.name }}</h1>
+            <div class="test-meta">
+              <span class="status-badge" [ngClass]="test.status">
+                {{ test.status | titlecase }}
+              </span>
+              <span class="test-type">{{ test.test_type | titlecase }} Test</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="header-actions">
+        <button class="btn-secondary" *ngIf="test.status === 'draft'" (click)="startTest()">
+          <mat-icon>play_arrow</mat-icon>
+          Start Test
+        </button>
+        <button class="btn-secondary" *ngIf="test.status === 'active'" (click)="pauseTest()">
+          <mat-icon>pause</mat-icon>
+          Pause
+        </button>
+        <button class="btn-secondary" *ngIf="test.status === 'paused'" (click)="resumeTest()">
+          <mat-icon>play_arrow</mat-icon>
+          Resume
+        </button>
+        <button class="btn-danger"
+                *ngIf="['active', 'paused', 'draft'].includes(test.status)"
+                (click)="cancelTest()">
+          <mat-icon>cancel</mat-icon>
+          Cancel
+        </button>
+      </div>
+    </div>
+
+    <!-- Winner Banner -->
+    <div *ngIf="test.status === 'completed' && test.winning_variant" class="winner-banner">
+      <mat-icon>emoji_events</mat-icon>
+      <div class="winner-content">
+        <h3>Winner: {{ getWinnerName() }}</h3>
+        <p>+{{ test.winning_lift | number:'1.1-1' }}% lift over control with {{ getWinnerConfidence() | number:'1.0-0' }}% confidence</p>
+      </div>
+    </div>
+
+    <!-- Overview Stats -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">Total Samples</div>
+        <div class="stat-value default">{{ getTotalSamples() }}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Traffic %</div>
+        <div class="stat-value blue">{{ test.traffic_percentage }}%</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Min Sample Size</div>
+        <div class="stat-value default">{{ test.min_sample_size }}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Confidence Target</div>
+        <div class="stat-value purple">{{ test.confidence_threshold * 100 | number:'1.0-0' }}%</div>
+      </div>
+    </div>
+
+    <!-- Progress to Significance -->
+    <div class="glass-card progress-card" *ngIf="test.status === 'active'">
+      <h3>Progress to Minimum Sample Size</h3>
+      <div class="progress-bars">
+        <div *ngFor="let variant of test.variants" class="progress-row">
+          <span class="progress-label">{{ variant.name }}</span>
+          <div class="progress-bar-container">
+            <div class="progress-bar-fill"
+                 [ngClass]="variant.is_control ? 'control' : 'treatment'"
+                 [style.width.%]="getProgressPercent(variant)">
+            </div>
+          </div>
+          <span class="progress-value">
+            {{ variant.sample_size }} / {{ test.min_sample_size }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Variant Performance Table -->
+    <div class="glass-card">
+      <div class="card-header">
+        <h2>Variant Performance</h2>
+      </div>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Variant</th>
+              <th class="text-right">Samples</th>
+              <th class="text-right">Approval Rate</th>
+              <th class="text-right">Conversion Rate</th>
+              <th class="text-right">Clicks</th>
+              <th class="text-right">Lift</th>
+              <th class="text-right">Significance</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let variant of test.variants">
+              <td>
+                <div class="variant-name">
+                  <mat-icon *ngIf="variant.is_control" class="control-icon" matTooltip="Control variant">verified</mat-icon>
+                  <mat-icon *ngIf="test.winning_variant === variant.id" class="winner-icon" matTooltip="Winner">emoji_events</mat-icon>
+                  <span>{{ variant.name }}</span>
+                </div>
+              </td>
+              <td class="text-right">{{ variant.sample_size }}</td>
+              <td class="text-right">
+                <span [ngClass]="getApprovalRateClass(variant)">
+                  {{ variant.approval_rate * 100 | number:'1.1-1' }}%
+                </span>
+              </td>
+              <td class="text-right">
+                <span [ngClass]="getConversionRateClass(variant)">
+                  {{ variant.conversion_rate * 100 | number:'1.2-2' }}%
+                </span>
+              </td>
+              <td class="text-right muted">{{ variant.total_clicks || 0 }}</td>
+              <td class="text-right">
+                <span *ngIf="!variant.is_control" [ngClass]="getLiftClass(variant)">
+                  {{ getLift(variant) >= 0 ? '+' : '' }}{{ getLift(variant) | number:'1.1-1' }}%
+                </span>
+                <span *ngIf="variant.is_control" class="baseline">baseline</span>
+              </td>
+              <td class="text-right">
+                <ng-container *ngIf="!variant.is_control && test.statistical_analysis">
+                  <span *ngIf="test.statistical_analysis[variant.id]?.is_significant" class="significant">
+                    Significant
+                  </span>
+                  <span *ngIf="!test.statistical_analysis[variant.id]?.is_significant" class="not-significant">
+                    Not yet
+                  </span>
+                </ng-container>
+                <span *ngIf="variant.is_control" class="baseline">-</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Visual Comparison -->
+    <div class="glass-card">
+      <div class="card-header">
+        <h2>Visual Comparison</h2>
+      </div>
+      <div class="comparison-section">
+        <!-- Approval Rate Bars -->
+        <div class="comparison-group">
+          <h4>Approval Rate</h4>
+          <div class="comparison-bars">
+            <div *ngFor="let variant of test.variants" class="comparison-row">
+              <span class="comparison-label">{{ variant.name }}</span>
+              <div class="comparison-bar-container">
+                <div class="comparison-bar-fill"
+                     [ngClass]="variant.is_control ? 'control' : 'treatment'"
+                     [style.width.%]="variant.approval_rate * 100">
+                </div>
+              </div>
+              <span class="comparison-value">
+                {{ variant.approval_rate * 100 | number:'1.1-1' }}%
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Conversion Rate Bars -->
+        <div class="comparison-group">
+          <h4>Conversion Rate</h4>
+          <div class="comparison-bars">
+            <div *ngFor="let variant of test.variants" class="comparison-row">
+              <span class="comparison-label">{{ variant.name }}</span>
+              <div class="comparison-bar-container">
+                <div class="comparison-bar-fill conversion"
+                     [ngClass]="variant.is_control ? 'control' : 'treatment'"
+                     [style.width.%]="variant.conversion_rate * 100 * 10">
+                </div>
+              </div>
+              <span class="comparison-value">
+                {{ variant.conversion_rate * 100 | number:'1.2-2' }}%
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Statistical Analysis -->
+    <div class="glass-card" *ngIf="test.statistical_analysis && hasStatisticalData()">
+      <div class="card-header">
+        <h2>Statistical Analysis</h2>
+      </div>
+      <div class="stats-analysis-grid">
+        <div *ngFor="let variant of getNonControlVariants()" class="analysis-card">
+          <h4>{{ variant.name }} vs Control</h4>
+          <div class="analysis-stats">
+            <div class="analysis-row">
+              <span class="analysis-label">P-Value:</span>
+              <span class="analysis-value mono">
+                {{ test.statistical_analysis[variant.id]?.p_value | number:'1.4-4' }}
+              </span>
+            </div>
+            <div class="analysis-row">
+              <span class="analysis-label">Confidence:</span>
+              <span class="analysis-value" [ngClass]="getConfidenceClass(test.statistical_analysis[variant.id]?.confidence)">
+                {{ (test.statistical_analysis[variant.id]?.confidence || 0) * 100 | number:'1.1-1' }}%
+              </span>
+            </div>
+            <div class="analysis-row">
+              <span class="analysis-label">Lift:</span>
+              <span class="analysis-value" [ngClass]="getLiftClass(variant)">
+                {{ (test.statistical_analysis[variant.id]?.lift || 0) >= 0 ? '+' : '' }}{{ (test.statistical_analysis[variant.id]?.lift || 0) * 100 | number:'1.1-1' }}%
+              </span>
+            </div>
+            <div class="analysis-row">
+              <span class="analysis-label">Status:</span>
+              <span class="analysis-badge"
+                    [ngClass]="test.statistical_analysis[variant.id]?.is_significant ? 'significant' : 'not-significant'">
+                {{ test.statistical_analysis[variant.id]?.is_significant ? 'Significant' : 'Not Significant' }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Targeting Configuration -->
+    <div class="glass-card">
+      <div class="card-header">
+        <h2>Targeting Configuration</h2>
+      </div>
+      <div class="targeting-grid">
+        <div class="targeting-section">
+          <h4>Target Subreddits</h4>
+          <div *ngIf="test.target_subreddits.length > 0" class="chips-list">
+            <span *ngFor="let sub of test.target_subreddits" class="chip">
+              r/{{ sub }}
+            </span>
+          </div>
+          <span *ngIf="test.target_subreddits.length === 0" class="no-data">
+            All subreddits
+          </span>
+        </div>
+        <div class="targeting-section">
+          <h4>Target Intent Tiers</h4>
+          <div *ngIf="test.target_intent_tiers.length > 0" class="chips-list">
+            <span *ngFor="let tier of test.target_intent_tiers" class="chip tier">
+              {{ eliteService.getIntentTierLabel(tier) }}
+            </span>
+          </div>
+          <span *ngIf="test.target_intent_tiers.length === 0" class="no-data">
+            All tiers
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Timestamps -->
+    <div class="timestamps">
+      Created: {{ test.created_at | date:'medium' }}
+      <span *ngIf="test.started_at"> | Started: {{ test.started_at | date:'medium' }}</span>
+      <span *ngIf="test.completed_at"> | Completed: {{ test.completed_at | date:'medium' }}</span>
+    </div>
+  </div>
+</div>

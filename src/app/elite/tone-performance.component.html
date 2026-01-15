@@ -1,0 +1,211 @@
+<div class="tone-page">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1>Tone Performance</h1>
+      <p>Analyze which response tones work best for each subreddit</p>
+    </div>
+    <button class="btn-secondary" (click)="loadData()">
+      <mat-icon>refresh</mat-icon>
+      Refresh
+    </button>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="loading-container">
+    <div class="spinner"></div>
+    <p>Loading tone analysis...</p>
+  </div>
+
+  <div *ngIf="!isLoading && totalRecords > 0">
+    <!-- Overall Tone Stats -->
+    <div class="tone-stats-grid">
+      <div *ngFor="let stat of toneStats"
+           class="tone-stat-card"
+           [class.selected]="selectedTone === stat.tone"
+           (click)="selectTone(stat.tone)">
+        <div class="tone-indicator" [style.background-color]="eliteService.getToneColor(stat.tone)"></div>
+        <div class="tone-stat-info">
+          <span class="tone-name">{{ eliteService.getToneLabel(stat.tone) }}</span>
+          <div class="tone-rate">{{ stat.avgApprovalRate | number:'1.0-0' }}%</div>
+          <div class="tone-count">{{ stat.totalGenerated }} responses</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters-row">
+      <div class="filter-group">
+        <label>Filter by Subreddit</label>
+        <select [(ngModel)]="selectedSubreddit" (ngModelChange)="onSubredditChange()">
+          <option value="">All Subreddits</option>
+          <option *ngFor="let sub of subreddits" [value]="sub">r/{{ sub }}</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>Filter by Tone</label>
+        <select [(ngModel)]="selectedTone" (ngModelChange)="onToneChange()">
+          <option value="">All Tones</option>
+          <option *ngFor="let tone of allTones" [value]="tone">
+            {{ eliteService.getToneLabel(tone) }}
+          </option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Subreddit-by-Subreddit View -->
+    <div class="glass-card" *ngIf="!selectedSubreddit">
+      <div class="card-header">
+        <h2>Performance by Subreddit</h2>
+        <p class="card-subtitle">Best performing tone for each subreddit</p>
+      </div>
+      <div class="subreddits-list">
+        <div *ngFor="let sub of subreddits" class="subreddit-section">
+          <div class="subreddit-header">
+            <h4>r/{{ sub }}</h4>
+            <span *ngIf="getBestTone(sub)" class="best-tone-badge">
+              <span class="badge-label">Best:</span>
+              <span class="badge-tone"
+                    [style.background-color]="eliteService.getToneColor(getBestTone(sub)!) + '30'"
+                    [style.color]="eliteService.getToneColor(getBestTone(sub)!)">
+                {{ eliteService.getToneLabel(getBestTone(sub)!) }}
+              </span>
+            </span>
+          </div>
+
+          <div class="tone-bars">
+            <div *ngFor="let perf of getSubredditPerformance(sub)" class="tone-bar-row">
+              <div class="tone-bar-label">
+                <div class="tone-dot" [style.background-color]="eliteService.getToneColor(perf.tone)"></div>
+                <span>{{ eliteService.getToneLabel(perf.tone) }}</span>
+              </div>
+              <div class="tone-bar-container">
+                <div class="tone-bar-fill"
+                     [style.background-color]="eliteService.getToneColor(perf.tone)"
+                     [style.width.%]="perf.approval_rate * 100">
+                </div>
+              </div>
+              <span class="tone-bar-value">{{ perf.approval_rate * 100 | number:'1.0-0' }}%</span>
+              <span class="tone-bar-samples">n={{ perf.total_generated }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Single Subreddit Detail View -->
+    <div class="glass-card" *ngIf="selectedSubreddit">
+      <div class="card-header">
+        <h2>r/{{ selectedSubreddit }} - Tone Performance</h2>
+      </div>
+      <div class="detail-grid">
+        <!-- Approval Rate -->
+        <div class="detail-section">
+          <h4>Approval Rate by Tone</h4>
+          <div class="detail-bars">
+            <div *ngFor="let perf of getSubredditPerformance(selectedSubreddit)" class="detail-bar-row">
+              <div class="detail-bar-label">
+                <div class="tone-dot" [style.background-color]="eliteService.getToneColor(perf.tone)"></div>
+                <span>{{ eliteService.getToneLabel(perf.tone) }}</span>
+              </div>
+              <div class="detail-bar-container">
+                <div class="detail-bar-fill"
+                     [style.background-color]="eliteService.getToneColor(perf.tone)"
+                     [style.width.%]="perf.approval_rate * 100">
+                </div>
+              </div>
+              <span class="detail-bar-value">{{ perf.approval_rate * 100 | number:'1.1-1' }}%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Conversion Rate -->
+        <div class="detail-section">
+          <h4>Conversion Rate by Tone</h4>
+          <div class="detail-bars">
+            <div *ngFor="let perf of getSubredditPerformance(selectedSubreddit)" class="detail-bar-row">
+              <div class="detail-bar-label">
+                <div class="tone-dot" [style.background-color]="eliteService.getToneColor(perf.tone)"></div>
+                <span>{{ eliteService.getToneLabel(perf.tone) }}</span>
+              </div>
+              <div class="detail-bar-container">
+                <div class="detail-bar-fill conversion"
+                     [style.background-color]="eliteService.getToneColor(perf.tone)"
+                     [style.width.%]="perf.conversion_rate * 100 * 10">
+                </div>
+              </div>
+              <span class="detail-bar-value">{{ perf.conversion_rate * 100 | number:'1.2-2' }}%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats Table -->
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Tone</th>
+              <th class="text-right">Generated</th>
+              <th class="text-right">Approval %</th>
+              <th class="text-right">Conversion %</th>
+              <th class="text-right">Avg Score</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let perf of getSubredditPerformance(selectedSubreddit)">
+              <td>
+                <div class="tone-cell">
+                  <div class="tone-dot" [style.background-color]="eliteService.getToneColor(perf.tone)"></div>
+                  <span>{{ eliteService.getToneLabel(perf.tone) }}</span>
+                </div>
+              </td>
+              <td class="text-right muted">{{ perf.total_generated }}</td>
+              <td class="text-right">
+                <span [ngClass]="getApprovalClass(perf.approval_rate)">
+                  {{ perf.approval_rate * 100 | number:'1.1-1' }}%
+                </span>
+              </td>
+              <td class="text-right">
+                <span [ngClass]="getConversionClass(perf.conversion_rate)">
+                  {{ perf.conversion_rate * 100 | number:'1.2-2' }}%
+                </span>
+              </td>
+              <td class="text-right muted">{{ perf.avg_score | number:'1.2-2' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Recommendations -->
+    <div class="glass-card">
+      <div class="card-header recommendations-header">
+        <mat-icon>tips_and_updates</mat-icon>
+        <h2>Tone Recommendations</h2>
+      </div>
+      <div class="recommendations-content">
+        <div *ngFor="let rec of getRecommendations()" class="recommendation-item">
+          <mat-icon>lightbulb</mat-icon>
+          <p>{{ rec }}</p>
+        </div>
+        <div *ngIf="getRecommendations().length === 0" class="empty-recommendations">
+          <mat-icon>check_circle</mat-icon>
+          <p>Collect more data to generate recommendations</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Summary -->
+    <div class="summary-text">
+      Total records: {{ totalRecords | number }} across {{ subreddits.length }} subreddits
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!isLoading && totalRecords === 0" class="empty-container">
+    <mat-icon>record_voice_over</mat-icon>
+    <p>No tone performance data yet</p>
+    <span>Tone tracking begins once responses are generated and feedback is collected</span>
+  </div>
+</div>

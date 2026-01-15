@@ -1,0 +1,581 @@
+.feedback-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 50%, #16213e 100%);
+  padding: 24px 48px;
+  color: #fff;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+// Header
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+
+  .header-content {
+    h1 {
+      font-size: 28px;
+      font-weight: 700;
+      margin: 0 0 8px 0;
+      background: linear-gradient(135deg, #a855f7 0%, #6366f1 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    p {
+      color: rgba(255, 255, 255, 0.6);
+      margin: 0;
+      font-size: 14px;
+    }
+  }
+}
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 10px 20px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.15);
+  }
+
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+}
+
+// Loading & Empty States
+.loading-container,
+.empty-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 0;
+
+  mat-icon {
+    font-size: 64px;
+    width: 64px;
+    height: 64px;
+    color: rgba(255, 255, 255, 0.2);
+    margin-bottom: 16px;
+  }
+
+  p {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 16px;
+    margin: 0 0 8px 0;
+  }
+
+  span {
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 13px;
+  }
+
+  .spinner {
+    width: 48px;
+    height: 48px;
+    border: 3px solid rgba(168, 85, 247, 0.2);
+    border-top-color: #a855f7;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 16px;
+  }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+// Stats Grid
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 20px;
+  text-align: center;
+
+  .stat-value {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 4px;
+
+    &.green { color: #10B981; }
+    &.red { color: #EF4444; }
+    &.orange { color: #F59E0B; }
+    &.yellow { color: #F59E0B; }
+    &.default { color: rgba(255, 255, 255, 0.8); }
+  }
+
+  .stat-label {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.5);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+}
+
+// Glass Card
+.glass-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  margin-bottom: 24px;
+  overflow: hidden;
+}
+
+.card-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  h2 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #fff;
+  }
+
+  .card-subtitle {
+    margin: 4px 0 0 0;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.5);
+  }
+}
+
+.card-body {
+  padding: 24px;
+}
+
+// Progress Card
+.progress-card {
+  padding: 24px;
+
+  h3 {
+    margin: 0 0 16px 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.7);
+  }
+}
+
+.progress-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.progress-bar-container {
+  flex: 1;
+  height: 14px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 7px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  border-radius: 7px;
+  transition: width 0.5s ease;
+
+  &.good {
+    background: linear-gradient(90deg, #10B981 0%, #34D399 100%);
+  }
+  &.warn {
+    background: linear-gradient(90deg, #F59E0B 0%, #FBBF24 100%);
+  }
+}
+
+.progress-value {
+  font-size: 20px;
+  font-weight: 700;
+  min-width: 70px;
+  text-align: right;
+}
+
+.progress-note {
+  margin: 12px 0 0 0;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+// Recommendations
+.recommendations-header {
+  background: rgba(168, 85, 247, 0.1);
+
+  mat-icon {
+    color: #a855f7;
+  }
+}
+
+.recommendations-list {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.recommendation-card {
+  display: flex;
+  gap: 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 20px;
+
+  &.high {
+    border-color: rgba(239, 68, 68, 0.3);
+    background: rgba(239, 68, 68, 0.05);
+  }
+  &.medium {
+    border-color: rgba(245, 158, 11, 0.3);
+    background: rgba(245, 158, 11, 0.05);
+  }
+  &.low {
+    border-color: rgba(59, 130, 246, 0.3);
+    background: rgba(59, 130, 246, 0.05);
+  }
+}
+
+.rec-icon {
+  flex-shrink: 0;
+
+  mat-icon {
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+  }
+
+  .high & mat-icon { color: #EF4444; }
+  .medium & mat-icon { color: #F59E0B; }
+  .low & mat-icon { color: #3B82F6; }
+}
+
+.rec-content {
+  flex: 1;
+}
+
+.rec-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+
+  h4 {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 600;
+    color: #fff;
+  }
+}
+
+.rec-priority {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 12px;
+  text-transform: uppercase;
+
+  &.high {
+    background: rgba(239, 68, 68, 0.2);
+    color: #EF4444;
+  }
+  &.medium {
+    background: rgba(245, 158, 11, 0.2);
+    color: #F59E0B;
+  }
+  &.low {
+    background: rgba(59, 130, 246, 0.2);
+    color: #3B82F6;
+  }
+}
+
+.rec-rationale {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0 0 12px 0;
+  line-height: 1.5;
+}
+
+.rec-action {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 12px;
+
+  .action-label {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.4);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .action-text {
+    margin: 6px 0 0 0;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 500;
+  }
+}
+
+// Issues List
+.issues-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.issue-item {
+  display: flex;
+  gap: 16px;
+}
+
+.issue-rank {
+  width: 28px;
+  height: 28px;
+  background: rgba(239, 68, 68, 0.2);
+  color: #EF4444;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.issue-content {
+  flex: 1;
+}
+
+.issue-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.issue-name {
+  font-weight: 600;
+  color: #fff;
+}
+
+.issue-stats {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.issue-bar-container {
+  height: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.issue-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #EF4444 0%, #F87171 100%);
+  border-radius: 4px;
+}
+
+.issue-description {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.4);
+  margin: 0;
+}
+
+// Empty State (inside cards)
+.empty-state {
+  text-align: center;
+  padding: 40px;
+
+  mat-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    color: rgba(255, 255, 255, 0.15);
+    margin-bottom: 12px;
+  }
+
+  p {
+    color: rgba(255, 255, 255, 0.5);
+    margin: 0;
+  }
+}
+
+// Breakdown Grid
+.breakdown-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  padding: 24px;
+}
+
+.breakdown-item {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+
+  .breakdown-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: #EF4444;
+    margin-bottom: 4px;
+  }
+
+  .breakdown-label {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.5);
+  }
+}
+
+// Table
+.table-container {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+
+  th {
+    text-align: left;
+    padding: 12px 16px;
+    font-size: 12px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.5);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+    &.text-right { text-align: right; }
+  }
+
+  td {
+    padding: 16px;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.8);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+
+    &.text-right { text-align: right; }
+    &.muted { color: rgba(255, 255, 255, 0.5); }
+  }
+
+  tr:last-child td {
+    border-bottom: none;
+  }
+}
+
+.subreddit-name {
+  font-weight: 600;
+  color: #fff;
+}
+
+.rate-badge {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 12px;
+
+  &.high {
+    background: rgba(239, 68, 68, 0.2);
+    color: #EF4444;
+  }
+  &.medium {
+    background: rgba(245, 158, 11, 0.2);
+    color: #F59E0B;
+  }
+  &.low {
+    background: rgba(234, 179, 8, 0.2);
+    color: #EAB308;
+  }
+}
+
+.no-data {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+// Strategies Grid
+.strategies-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  padding: 24px;
+}
+
+.strategy-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 12px;
+  padding: 16px 20px;
+
+  .strategy-name {
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  .strategy-rejections {
+    color: #EF4444;
+    font-weight: 600;
+    font-size: 13px;
+  }
+}
+
+// Timestamp
+.analysis-timestamp {
+  text-align: center;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.4);
+  margin-top: 8px;
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .feedback-page {
+    padding: 16px;
+  }
+
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .breakdown-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .strategies-grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,125 @@
+<div class="insight-detail-page">
+  <!-- Back Link -->
+  <a routerLink="/elite/insights" class="back-link">
+    <mat-icon>arrow_back</mat-icon>
+    Back to Insights
+  </a>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="spinner"></div>
+    <p>Loading insight...</p>
+  </div>
+
+  <!-- Insight Content -->
+  <div *ngIf="insight && !loading" class="insight-card">
+    <!-- Header -->
+    <div class="insight-header">
+      <div class="header-content">
+        <div class="insight-icon" [ngClass]="insight.insight_type">
+          <mat-icon>{{ eliteService.getInsightTypeIcon(insight.insight_type) }}</mat-icon>
+        </div>
+        <div class="header-info">
+          <div class="header-badges">
+            <span class="priority-badge" [ngClass]="insight.priority">
+              {{ insight.priority }}
+            </span>
+            <span class="type-label">{{ insight.insight_type }}</span>
+            <span *ngIf="insight.related_subreddit" class="subreddit-label">
+              r/{{ insight.related_subreddit }}
+            </span>
+          </div>
+          <h1>{{ insight.title }}</h1>
+          <p class="summary">{{ insight.summary }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Details -->
+    <div class="insight-section">
+      <h2>Details</h2>
+      <div class="details-content" [innerHTML]="insight.details"></div>
+    </div>
+
+    <!-- Supporting Data -->
+    <div *ngIf="insight.supporting_data && hasData(insight.supporting_data)" class="insight-section">
+      <h2>Supporting Data</h2>
+      <div class="data-container">
+        <pre>{{ insight.supporting_data | json }}</pre>
+      </div>
+    </div>
+
+    <!-- Action Options -->
+    <div *ngIf="insight.action_options && insight.action_options.length > 0 && insight.status !== 'actioned'" class="insight-section action-section">
+      <h2>Take Action</h2>
+      <div class="action-options">
+        <div
+          *ngFor="let option of insight.action_options"
+          class="action-option"
+          [class.selected]="selectedAction === option.action_key"
+          (click)="selectAction(option.action_key)"
+        >
+          <div class="option-content">
+            <span class="option-label">{{ option.label }}</span>
+            <p class="option-description">{{ option.description }}</p>
+          </div>
+          <div class="option-radio" [class.checked]="selectedAction === option.action_key">
+            <mat-icon *ngIf="selectedAction === option.action_key">check</mat-icon>
+          </div>
+        </div>
+      </div>
+
+      <!-- Feedback -->
+      <div class="feedback-section">
+        <label>Your Notes (optional)</label>
+        <textarea
+          [(ngModel)]="feedback"
+          rows="3"
+          placeholder="Add any notes or context..."
+        ></textarea>
+      </div>
+
+      <!-- Submit Actions -->
+      <div class="action-buttons">
+        <button
+          class="btn-primary"
+          (click)="submitAction()"
+          [disabled]="!selectedAction || submitting"
+        >
+          {{ submitting ? 'Submitting...' : 'Submit Response' }}
+        </button>
+        <button class="btn-secondary" (click)="dismiss()">
+          Dismiss
+        </button>
+      </div>
+    </div>
+
+    <!-- Already Actioned -->
+    <div *ngIf="insight.status === 'actioned'" class="actioned-banner">
+      <mat-icon>check_circle</mat-icon>
+      <div class="actioned-content">
+        <span class="actioned-label">Action taken:</span>
+        <span class="actioned-value">{{ insight.selected_action }}</span>
+        <p *ngIf="insight.human_feedback" class="actioned-feedback">
+          "{{ insight.human_feedback }}"
+        </p>
+      </div>
+    </div>
+
+    <!-- Metadata -->
+    <div class="insight-metadata">
+      <div class="meta-item">
+        <span class="meta-label">Created:</span>
+        {{ insight.created_at | date:'medium' }}
+      </div>
+      <div *ngIf="insight.read_at" class="meta-item">
+        <span class="meta-label">Read:</span>
+        {{ insight.read_at | date:'medium' }}
+      </div>
+      <div *ngIf="insight.actioned_at" class="meta-item">
+        <span class="meta-label">Actioned:</span>
+        {{ insight.actioned_at | date:'medium' }}
+      </div>
+    </div>
+  </div>
+</div>

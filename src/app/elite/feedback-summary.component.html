@@ -1,0 +1,209 @@
+<div class="feedback-page">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1>Human Feedback Analysis</h1>
+      <p>Insights from your approval/rejection patterns to improve AI responses</p>
+    </div>
+    <button class="btn-secondary" (click)="loadSummary()">
+      <mat-icon>refresh</mat-icon>
+      Refresh
+    </button>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="loading-container">
+    <div class="spinner"></div>
+    <p>Loading feedback analysis...</p>
+  </div>
+
+  <div *ngIf="!isLoading && summary">
+    <!-- Overview Stats -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-value green">{{ summary.total_approvals | number }}</div>
+        <div class="stat-label">Total Approvals</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value red">{{ summary.total_rejections | number }}</div>
+        <div class="stat-label">Total Rejections</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" [ngClass]="getApprovalRateClass()">
+          {{ summary.approval_rate * 100 | number:'1.1-1' }}%
+        </div>
+        <div class="stat-label">Approval Rate</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value orange">{{ summary.top_issues.length }}</div>
+        <div class="stat-label">Top Issues</div>
+      </div>
+    </div>
+
+    <!-- Approval Rate Progress -->
+    <div class="glass-card progress-card">
+      <h3>Overall Approval Rate</h3>
+      <div class="progress-row">
+        <div class="progress-bar-container">
+          <div class="progress-bar-fill"
+               [ngClass]="summary.approval_rate >= 0.7 ? 'good' : 'warn'"
+               [style.width.%]="summary.approval_rate * 100">
+          </div>
+        </div>
+        <span class="progress-value" [ngClass]="getApprovalRateClass()">
+          {{ summary.approval_rate * 100 | number:'1.1-1' }}%
+        </span>
+      </div>
+      <p class="progress-note">
+        Target: 70%+ approval rate indicates well-tuned AI responses
+      </p>
+    </div>
+
+    <!-- AI Recommendations -->
+    <div class="glass-card" *ngIf="summary.recommendations.length > 0">
+      <div class="card-header recommendations-header">
+        <mat-icon>auto_awesome</mat-icon>
+        <h2>AI Recommendations</h2>
+      </div>
+      <div class="recommendations-list">
+        <div *ngFor="let rec of summary.recommendations"
+             class="recommendation-card"
+             [ngClass]="rec.priority">
+          <div class="rec-icon">
+            <mat-icon>{{ getRecommendationIcon(rec.type) }}</mat-icon>
+          </div>
+          <div class="rec-content">
+            <div class="rec-header">
+              <h4>{{ rec.title }}</h4>
+              <span class="rec-priority" [ngClass]="rec.priority">
+                {{ rec.priority | titlecase }}
+              </span>
+            </div>
+            <p class="rec-rationale">{{ rec.rationale }}</p>
+            <div class="rec-action">
+              <span class="action-label">Suggested Action:</span>
+              <p class="action-text">{{ rec.action }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Top Issues -->
+    <div class="glass-card">
+      <div class="card-header">
+        <h2>Top Rejection Reasons</h2>
+      </div>
+      <div class="card-body">
+        <div *ngIf="summary.top_issues.length === 0" class="empty-state">
+          <mat-icon>sentiment_satisfied</mat-icon>
+          <p>No significant issues detected</p>
+        </div>
+
+        <div *ngIf="summary.top_issues.length > 0" class="issues-list">
+          <div *ngFor="let issue of summary.top_issues; let i = index" class="issue-item">
+            <div class="issue-rank">{{ i + 1 }}</div>
+            <div class="issue-content">
+              <div class="issue-header">
+                <span class="issue-name">
+                  {{ eliteService.getRejectionReasonLabel(issue.reason) }}
+                </span>
+                <span class="issue-stats">
+                  {{ issue.count }} ({{ issue.percentage | number:'1.0-0' }}%)
+                </span>
+              </div>
+              <div class="issue-bar-container">
+                <div class="issue-bar-fill" [style.width.%]="issue.percentage"></div>
+              </div>
+              <p class="issue-description">{{ issue.description }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Rejection Breakdown -->
+    <div class="glass-card">
+      <div class="card-header">
+        <h2>Full Rejection Breakdown</h2>
+      </div>
+      <div class="breakdown-grid">
+        <div *ngFor="let item of getRejectionBreakdownItems()" class="breakdown-item">
+          <div class="breakdown-value">{{ item.count }}</div>
+          <div class="breakdown-label">{{ item.label }}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Problematic Subreddits -->
+    <div class="glass-card">
+      <div class="card-header">
+        <h2>Problematic Subreddits</h2>
+        <p class="card-subtitle">Subreddits with high rejection rates</p>
+      </div>
+      <div class="card-body">
+        <div *ngIf="summary.problematic_subreddits.length === 0" class="empty-state">
+          <mat-icon>check_circle</mat-icon>
+          <p>No problematic subreddits detected</p>
+        </div>
+
+        <div *ngIf="summary.problematic_subreddits.length > 0" class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Subreddit</th>
+                <th class="text-right">Rejection Rate</th>
+                <th class="text-right">Total Rejections</th>
+                <th>Top Reason</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let sub of summary.problematic_subreddits">
+                <td class="subreddit-name">r/{{ sub.subreddit }}</td>
+                <td class="text-right">
+                  <span class="rate-badge" [ngClass]="getRejectionRateClass(sub.rejection_rate)">
+                    {{ sub.rejection_rate * 100 | number:'1.0-0' }}%
+                  </span>
+                </td>
+                <td class="text-right muted">{{ sub.total_rejections }}</td>
+                <td>
+                  <span *ngIf="sub.top_reason" class="muted">
+                    {{ eliteService.getRejectionReasonLabel(sub.top_reason) }}
+                  </span>
+                  <span *ngIf="!sub.top_reason" class="no-data">-</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Problematic Strategies -->
+    <div class="glass-card" *ngIf="summary.problematic_strategies.length > 0">
+      <div class="card-header">
+        <h2>Response Strategies Performance</h2>
+      </div>
+      <div class="strategies-grid">
+        <div *ngFor="let strat of summary.problematic_strategies" class="strategy-item">
+          <span class="strategy-name">
+            {{ eliteService.getStrategyLabel(strat.strategy) }}
+          </span>
+          <span class="strategy-rejections">{{ strat.rejections }} rejections</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Last Analysis -->
+    <div class="analysis-timestamp" *ngIf="summary.last_analysis_at">
+      Last analyzed: {{ summary.last_analysis_at | date:'medium' }}
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!isLoading && !summary" class="empty-container">
+    <mat-icon>analytics</mat-icon>
+    <p>No feedback data available yet</p>
+    <span>Start approving and rejecting responses to build up feedback patterns</span>
+  </div>
+</div>

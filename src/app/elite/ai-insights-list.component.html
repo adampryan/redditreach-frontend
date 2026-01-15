@@ -1,0 +1,123 @@
+<div class="insights-page">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <a routerLink="/elite" class="back-link">
+        <mat-icon>arrow_back</mat-icon>
+        Back to Command Center
+      </a>
+      <h1>AI Insights</h1>
+      <p>Patterns, recommendations, and questions from the AI</p>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div *ngIf="stats" class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-value purple">{{ stats.new }}</div>
+      <div class="stat-label">New</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value orange">{{ stats.high_priority }}</div>
+      <div class="stat-label">High Priority</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value blue">{{ stats.pending_action }}</div>
+      <div class="stat-label">Need Action</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value default">{{ stats.total }}</div>
+      <div class="stat-label">Total</div>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-card">
+    <div class="filters-row">
+      <div class="filter-group">
+        <label>Status</label>
+        <select [(ngModel)]="filters.status" (change)="loadInsights()">
+          <option value="">All</option>
+          <option value="new">New</option>
+          <option value="read">Read</option>
+          <option value="actioned">Actioned</option>
+          <option value="dismissed">Dismissed</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>Type</label>
+        <select [(ngModel)]="filters.type" (change)="loadInsights()">
+          <option value="">All Types</option>
+          <option value="pattern">Pattern</option>
+          <option value="recommendation">Recommendation</option>
+          <option value="question">Question</option>
+          <option value="alert">Alert</option>
+          <option value="performance">Performance</option>
+          <option value="learning">Learning</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>Priority</label>
+        <select [(ngModel)]="filters.priority" (change)="loadInsights()">
+          <option value="">All Priorities</option>
+          <option value="critical">Critical</option>
+          <option value="high">High</option>
+          <option value="medium">Medium</option>
+          <option value="low">Low</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Insights List -->
+  <div class="insights-list">
+    <ng-container *ngIf="insights.length > 0; else noInsights">
+      <div
+        *ngFor="let insight of insights"
+        class="insight-card"
+        [routerLink]="['/elite/insights', insight.id]"
+      >
+        <div class="insight-icon" [ngClass]="insight.insight_type">
+          <mat-icon>{{ eliteService.getInsightTypeIcon(insight.insight_type) }}</mat-icon>
+        </div>
+        <div class="insight-content">
+          <div class="insight-header">
+            <span class="priority-badge" [ngClass]="insight.priority">
+              {{ insight.priority }}
+            </span>
+            <span class="insight-type">{{ insight.insight_type }}</span>
+            <span *ngIf="insight.status === 'new'" class="new-indicator"></span>
+          </div>
+          <h3 class="insight-title">{{ insight.title }}</h3>
+          <p class="insight-summary">{{ insight.summary }}</p>
+          <div class="insight-meta">
+            <span *ngIf="insight.related_subreddit">r/{{ insight.related_subreddit }}</span>
+            <span>{{ insight.created_at | date:'short' }}</span>
+          </div>
+        </div>
+        <button
+          class="dismiss-btn"
+          (click)="dismissInsight($event, insight.id)"
+          title="Dismiss"
+        >
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+    </ng-container>
+
+    <ng-template #noInsights>
+      <div class="empty-state">
+        <mat-icon>lightbulb</mat-icon>
+        <p>No insights match your filters.</p>
+        <span>The AI will create insights as it learns from your activity.</span>
+      </div>
+    </ng-template>
+  </div>
+
+  <!-- Pagination -->
+  <div *ngIf="totalCount > insights.length" class="load-more">
+    <button class="btn-secondary" (click)="loadMore()" [disabled]="loading">
+      {{ loading ? 'Loading...' : 'Load More' }}
+    </button>
+  </div>
+</div>
