@@ -10,12 +10,51 @@
   align-items: center;
   margin-bottom: 24px;
 
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
   h1 {
     font-size: 28px;
     font-weight: 600;
     color: #1a1a2e;
     margin: 0;
   }
+
+  .last-loaded {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+
+    .last-loaded-text {
+      font-size: 13px;
+      color: #666;
+    }
+
+    .refresh-btn {
+      width: 32px;
+      height: 32px;
+
+      mat-icon {
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+        color: #667eea;
+
+        &.spinning {
+          animation: spin 1s linear infinite;
+        }
+      }
+    }
+  }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 .stats-row {

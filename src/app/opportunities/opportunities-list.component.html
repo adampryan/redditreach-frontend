@@ -1,7 +1,15 @@
 <app-header></app-header>
 <div class="opportunities-container">
   <header class="page-header">
-    <h1>Opportunities</h1>
+    <div class="header-left">
+      <h1>Opportunities</h1>
+      <div class="last-loaded" *ngIf="lastLoaded">
+        <span class="last-loaded-text">Last loaded: {{ lastLoaded | date:'shortTime' }}</span>
+        <button mat-icon-button (click)="refresh()" [disabled]="isLoading" class="refresh-btn" title="Refresh">
+          <mat-icon [class.spinning]="isLoading">refresh</mat-icon>
+        </button>
+      </div>
+    </div>
     <a mat-button routerLink="/dashboard">
       <mat-icon>arrow_back</mat-icon>
       Back to Dashboard
