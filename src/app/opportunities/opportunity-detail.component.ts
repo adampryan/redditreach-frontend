@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
+import { Location } from '@angular/common';
 import { MatDialog } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { OpportunityService } from '../shared/services';
 import { EliteService } from '../shared/services/elite.service';
 import { Opportunity, ResponseDraft } from '../shared/models';
@@ -33,7 +35,9 @@ export class OpportunityDetailComponent implements OnInit {
     private eliteService: EliteService,
     private router: Router,
     private route: ActivatedRoute,
-    private dialog: MatDialog
+    private location: Location,
+    private dialog: MatDialog,
+    private snackBar: MatSnackBar
   ) {}
 
   ngOnInit(): void {
@@ -100,11 +104,24 @@ export class OpportunityDetailComponent implements OnInit {
     this.opportunityService.approve(this.opportunity.id, this.selectedDraft.id, editedText, scheduledFor).subscribe({
       next: () => {
         this.isSubmitting = false;
-        this.router.navigate(['/opportunities'], { queryParams: { status: 'approved' } });
+        const message = this.schedulePost ? 'Response scheduled!' : 'Response approved!';
+        this.snackBar.open(message, 'Dismiss', {
+          duration: 3000,
+          horizontalPosition: 'center',
+          verticalPosition: 'top',
+          panelClass: ['success-snackbar']
+        });
+        this.location.back();
       },
       error: (err) => {
         this.isSubmitting = false;
         console.error('[Schedule] Approve error:', err);
+        this.snackBar.open('Failed to approve response', 'Dismiss', {
+          duration: 5000,
+          horizontalPosition: 'center',
+          verticalPosition: 'top',
+          panelClass: ['error-snackbar']
+        });
       }
     });
   }
@@ -124,8 +141,13 @@ export class OpportunityDetailComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result?.success) {
-        // Feedback was submitted successfully, navigate back
-        this.router.navigate(['/opportunities']);
+        // Feedback was submitted successfully, show snackbar and go back
+        this.snackBar.open('Response rejected', 'Dismiss', {
+          duration: 3000,
+          horizontalPosition: 'center',
+          verticalPosition: 'top'
+        });
+        this.location.back();
       }
       // If dialog was cancelled (result is null), do nothing
     });

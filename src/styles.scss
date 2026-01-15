@@ -65,3 +65,16 @@ a {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   }
 }
+
+// Material Snackbar customization
+.success-snackbar {
+  --mdc-snackbar-container-color: #28a745;
+  --mdc-snackbar-supporting-text-color: #fff;
+  --mat-snack-bar-button-color: #fff;
+}
+
+.error-snackbar {
+  --mdc-snackbar-container-color: #dc3545;
+  --mdc-snackbar-supporting-text-color: #fff;
+  --mat-snack-bar-button-color: #fff;
+}
