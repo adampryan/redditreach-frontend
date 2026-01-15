@@ -2,8 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { OpportunityService } from '../shared/services';
+import { EliteService } from '../shared/services/elite.service';
 import { Opportunity, ResponseDraft } from '../shared/models';
 import { RegenerateDialogComponent, RegenerateDialogResult } from './regenerate-dialog.component';
+import { RejectOpportunityDialogComponent, RejectDialogData } from '../elite/reject-opportunity-dialog.component';
 
 @Component({
   selector: 'app-opportunity-detail',
@@ -28,6 +30,7 @@ export class OpportunityDetailComponent implements OnInit {
 
   constructor(
     private opportunityService: OpportunityService,
+    private eliteService: EliteService,
     private router: Router,
     private route: ActivatedRoute,
     private dialog: MatDialog
@@ -109,15 +112,22 @@ export class OpportunityDetailComponent implements OnInit {
   reject(): void {
     if (!this.opportunity) return;
 
-    this.isSubmitting = true;
-    this.opportunityService.reject(this.opportunity.id).subscribe({
-      next: () => {
-        this.isSubmitting = false;
+    // Open the structured feedback dialog
+    const dialogRef = this.dialog.open(RejectOpportunityDialogComponent, {
+      width: '500px',
+      data: {
+        opportunityId: this.opportunity.id,
+        postTitle: this.opportunity.post_title,
+        draftId: this.selectedDraft?.id
+      } as RejectDialogData
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result?.success) {
+        // Feedback was submitted successfully, navigate back
         this.router.navigate(['/opportunities']);
-      },
-      error: () => {
-        this.isSubmitting = false;
       }
+      // If dialog was cancelled (result is null), do nothing
     });
   }
 

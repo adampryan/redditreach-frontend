@@ -108,3 +108,183 @@ export interface EliteDashboardData {
     created_at: string;
   }[];
 }
+
+
+// =============================================================================
+// PHASE 5: Human-AI Collaboration & A/B Testing Models
+// =============================================================================
+
+/**
+ * Structured rejection reasons for learning why responses are rejected.
+ */
+export type RejectionReasonType =
+  | 'tone_mismatch'
+  | 'too_promotional'
+  | 'factually_wrong'
+  | 'off_topic'
+  | 'low_quality'
+  | 'wrong_strategy'
+  | 'timing_bad'
+  | 'duplicate'
+  | 'not_relevant'
+  | 'risky_subreddit'
+  | 'other';
+
+export interface RejectionReasonOption {
+  value: RejectionReasonType;
+  label: string;
+}
+
+export interface RejectionRequest {
+  reason: RejectionReasonType;
+  explanation?: string;
+  confidence?: number; // 1-5
+  improvement_suggestion?: string;
+  draft_id?: string;
+}
+
+export interface RejectionResponse {
+  success: boolean;
+  rejection_id: string;
+  message: string;
+}
+
+/**
+ * A/B Test for systematically testing response variations.
+ */
+export type ABTestStatus = 'draft' | 'active' | 'paused' | 'completed' | 'cancelled';
+export type ABTestType = 'strategy' | 'tone' | 'content' | 'timing' | 'link' | 'custom';
+
+export interface ABTestVariant {
+  id: string;
+  name: string;
+  is_control: boolean;
+  config: Record<string, any>;
+  sample_size: number;
+  approval_rate: number;
+  conversion_rate: number;
+  engagement_rate?: number;
+  total_approved?: number;
+  total_rejected?: number;
+  total_posted?: number;
+  total_clicks?: number;
+  total_conversions?: number;
+}
+
+export interface ABTest {
+  id: string;
+  name: string;
+  test_type: ABTestType;
+  status: ABTestStatus;
+  variants: ABTestVariant[];
+  winning_variant: string | null;
+  winning_lift: number | null;
+  created_at: string;
+  started_at: string | null;
+  completed_at: string | null;
+}
+
+export interface ABTestDetail extends ABTest {
+  description?: string;
+  target_subreddits: string[];
+  target_intent_tiers: string[];
+  min_sample_size: number;
+  confidence_threshold: number;
+  traffic_percentage: number;
+  statistical_analysis?: Record<string, {
+    is_significant: boolean;
+    p_value: number;
+    lift: number;
+    confidence: number;
+  }>;
+}
+
+export interface ABTestCreateRequest {
+  name: string;
+  test_type: ABTestType;
+  variants: {
+    name: string;
+    config: Record<string, any>;
+    is_control?: boolean;
+  }[];
+  target_subreddits?: string[];
+  target_intent_tiers?: string[];
+  min_sample_size?: number;
+  traffic_percentage?: number;
+}
+
+export interface QuickTestRequest {
+  template: 'strategy' | 'tone' | 'link';
+  name?: string;
+  options?: string[];
+  subreddits?: string[];
+}
+
+/**
+ * Tone performance tracking per subreddit.
+ */
+export type ToneType = 'casual' | 'enthusiast' | 'helpful' | 'empathetic' | 'witty' | 'expert';
+
+export interface TonePerformance {
+  tone: ToneType;
+  total_generated: number;
+  approval_rate: number;
+  conversion_rate: number;
+  avg_score: number;
+}
+
+export interface TonePerformanceBySubreddit {
+  [subreddit: string]: TonePerformance[];
+}
+
+export interface TonePerformanceResponse {
+  by_subreddit: TonePerformanceBySubreddit;
+  total_records: number;
+}
+
+/**
+ * Human feedback summary with AI recommendations.
+ */
+export interface FeedbackIssue {
+  reason: RejectionReasonType;
+  count: number;
+  percentage: number;
+  description: string;
+}
+
+export interface ProblematicSubreddit {
+  subreddit: string;
+  rejection_rate: number;
+  total_rejections: number;
+  top_reason: RejectionReasonType | null;
+}
+
+export interface AIRecommendation {
+  type: string;
+  priority: 'low' | 'medium' | 'high';
+  title: string;
+  action: string;
+  rationale: string;
+}
+
+export interface FeedbackSummary {
+  total_approvals: number;
+  total_rejections: number;
+  approval_rate: number;
+  rejection_breakdown: Record<RejectionReasonType, number>;
+  top_issues: FeedbackIssue[];
+  problematic_subreddits: ProblematicSubreddit[];
+  problematic_strategies: { strategy: string; rejections: number }[];
+  recommendations: AIRecommendation[];
+  last_analysis_at: string | null;
+}
+
+/**
+ * Phase 5 Dashboard aggregate data.
+ */
+export interface Phase5DashboardData {
+  feedback_summary: FeedbackSummary;
+  active_tests: ABTest[];
+  tone_performance: TonePerformanceBySubreddit;
+  recent_insights: AIInsight[];
+}
