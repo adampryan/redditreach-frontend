@@ -19,7 +19,6 @@ export class OpportunitiesListComponent implements OnInit {
   totalCount = 0;
   currentPage = 1;
   pageSize = 20;
-  lastLoaded: Date | null = null;
 
   // Bulk selection
   selectedIds: Set<string> = new Set();
@@ -101,7 +100,6 @@ export class OpportunitiesListComponent implements OnInit {
         this.opportunities = response.results;
         this.totalCount = response.count;
         this.isLoading = false;
-        this.lastLoaded = new Date();
       },
       error: () => {
         this.isLoading = false;

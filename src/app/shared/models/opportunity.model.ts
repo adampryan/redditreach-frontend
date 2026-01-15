@@ -26,6 +26,7 @@ export interface OpportunityStats {
   posted: number;
   rejected: number;
   subreddits: string[];
+  last_scanned: string | null;
 }
 
 export interface Opportunity {

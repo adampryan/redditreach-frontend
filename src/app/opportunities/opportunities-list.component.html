@@ -3,8 +3,8 @@
   <header class="page-header">
     <div class="header-left">
       <h1>Opportunities</h1>
-      <div class="last-loaded" *ngIf="lastLoaded">
-        <span class="last-loaded-text">Last loaded: {{ lastLoaded | date:'shortTime' }}</span>
+      <div class="last-loaded" *ngIf="stats?.last_scanned">
+        <span class="last-loaded-text">Last scanned: {{ stats!.last_scanned | date:'shortTime' }}</span>
         <button mat-icon-button (click)="refresh()" [disabled]="isLoading" class="refresh-btn" title="Refresh">
           <mat-icon [class.spinning]="isLoading">refresh</mat-icon>
         </button>
