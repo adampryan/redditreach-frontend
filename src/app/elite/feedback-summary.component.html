@@ -207,7 +207,22 @@
   <!-- Empty State -->
   <div *ngIf="!isLoading && !summary" class="empty-container">
     <mat-icon>analytics</mat-icon>
+    <h3>Building Feedback Intelligence</h3>
     <p>No feedback data available yet</p>
-    <span>Start approving and rejecting responses to build up feedback patterns</span>
+    <div class="empty-steps">
+      <div class="step">
+        <span class="step-number">1</span>
+        <span class="step-text">Review AI-generated response drafts</span>
+      </div>
+      <div class="step">
+        <span class="step-number">2</span>
+        <span class="step-text">Approve or reject with reasons</span>
+      </div>
+      <div class="step">
+        <span class="step-number">3</span>
+        <span class="step-text">AI learns your preferences over time</span>
+      </div>
+    </div>
+    <span class="empty-hint">Feedback patterns will appear here after 10+ decisions</span>
   </div>
 </div>

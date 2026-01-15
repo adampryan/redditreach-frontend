@@ -182,7 +182,16 @@
       <ng-template #emptyState>
         <div class="empty-state">
           <mat-icon>science</mat-icon>
-          <p>No tests in this category</p>
+          <p *ngIf="status && status.message; else defaultEmptyMsg">{{ status.message }}</p>
+          <ng-template #defaultEmptyMsg>
+            <p>No tests in this category</p>
+          </ng-template>
+          <div *ngIf="status && status.suggested_tests && status.suggested_tests.length > 0" class="suggested-tests">
+            <span class="suggested-label">Suggested tests:</span>
+            <div class="suggested-list">
+              <span *ngFor="let test of status!.suggested_tests!" class="suggested-item">{{ test }}</span>
+            </div>
+          </div>
           <button class="btn-primary" (click)="openCreateDialog()">
             Create Your First Test
           </button>

@@ -58,6 +58,15 @@
 
   <!-- Dashboard Content -->
   <ng-container *ngIf="!loading && dashboardData">
+    <!-- Learning Status Banner -->
+    <div *ngIf="dashboardData.learning_status" class="status-banner" [ngClass]="dashboardData.learning_status.phase">
+      <mat-icon>psychology</mat-icon>
+      <div class="status-content">
+        <span class="status-phase">{{ dashboardData.learning_status.phase | titlecase }}</span>
+        <span class="status-message">{{ dashboardData.learning_status.message }}</span>
+      </div>
+    </div>
+
     <!-- Key Metrics Row -->
     <div class="metrics-grid">
       <div class="metric-card">
@@ -84,6 +93,11 @@
         <div class="metric-label">Conversions</div>
         <div class="metric-value emerald">{{ dashboardData.metrics.total_conversions }}</div>
       </div>
+    </div>
+    <!-- Metrics Status -->
+    <div *ngIf="dashboardData.metrics_status && !dashboardData.metrics_status.has_conversions" class="section-status info">
+      <mat-icon>info_outline</mat-icon>
+      <span>{{ dashboardData.metrics_status.message }}</span>
     </div>
 
     <!-- Two Column Layout -->
@@ -120,7 +134,12 @@
             <ng-template #noInsights>
               <div class="empty-insights">
                 <mat-icon>check_circle</mat-icon>
-                <p>No pending insights. The AI will notify you when it detects important patterns.</p>
+                <p *ngIf="dashboardData.insights_status; else defaultInsightsMsg">
+                  {{ dashboardData.insights_status.message }}
+                </p>
+                <ng-template #defaultInsightsMsg>
+                  <p>No pending insights. The AI will notify you when it detects important patterns.</p>
+                </ng-template>
               </div>
             </ng-template>
           </div>
@@ -148,6 +167,10 @@
                 <div class="stat-label">Total</div>
               </div>
             </div>
+            <div *ngIf="insightStats.status" class="stats-status">
+              <mat-icon>auto_awesome</mat-icon>
+              <span>{{ insightStats.status.message }}</span>
+            </div>
           </div>
         </div>
       </div>
@@ -158,21 +181,29 @@
         <div class="glass-card">
           <div class="intent-section">
             <h2>Intent Distribution (30 days)</h2>
-            <div class="intent-bars">
-              <div *ngFor="let item of intentChartData" class="intent-bar">
-                <div class="intent-label">{{ item.label }}</div>
-                <div class="bar-container">
-                  <div class="bar-fill"
-                       [style.width.%]="getIntentPercentage(item.count)"
-                       [style.backgroundColor]="item.color">
+            <ng-container *ngIf="getIntentTotal() > 0; else noIntentData">
+              <div class="intent-bars">
+                <div *ngFor="let item of intentChartData" class="intent-bar">
+                  <div class="intent-label">{{ item.label }}</div>
+                  <div class="bar-container">
+                    <div class="bar-fill"
+                         [style.width.%]="getIntentPercentage(item.count)"
+                         [style.backgroundColor]="item.color">
+                    </div>
                   </div>
+                  <div class="intent-count">{{ item.count }}</div>
                 </div>
-                <div class="intent-count">{{ item.count }}</div>
               </div>
-            </div>
-            <p class="intent-note">
-              Tier 1 & 2 opportunities have the highest conversion potential. Focus on increasing these.
-            </p>
+              <p class="intent-note">
+                Tier 1 & 2 opportunities have the highest conversion potential. Focus on increasing these.
+              </p>
+            </ng-container>
+            <ng-template #noIntentData>
+              <div class="section-status-card" *ngIf="dashboardData.intent_distribution_status">
+                <mat-icon>trending_up</mat-icon>
+                <p>{{ dashboardData.intent_distribution_status.message }}</p>
+              </div>
+            </ng-template>
           </div>
         </div>
 
@@ -202,80 +233,148 @@
             </ng-container>
             <ng-template #noSubreddits>
               <div class="empty-subreddits">
-                <p>No subreddit performance data yet.</p>
+                <mat-icon>forum</mat-icon>
+                <p *ngIf="dashboardData.subreddits_status; else defaultSubMsg">
+                  {{ dashboardData.subreddits_status.message }}
+                </p>
+                <ng-template #defaultSubMsg>
+                  <p>No subreddit performance data yet.</p>
+                </ng-template>
               </div>
             </ng-template>
           </div>
         </div>
 
         <!-- Conversion Patterns -->
-        <div class="glass-card" *ngIf="patterns.length > 0">
+        <div class="glass-card">
           <div class="card-header">
             <h2>Learned Patterns</h2>
           </div>
           <div class="card-body">
-            <div class="patterns-list">
-              <div *ngFor="let pattern of patterns.slice(0, 5)" class="pattern-item">
-                <div class="pattern-info">
-                  <div class="pattern-name">{{ pattern.name }}</div>
-                  <p class="pattern-desc">{{ pattern.description }}</p>
-                  <div class="pattern-meta">
-                    <span>{{ pattern.sample_size }} samples</span>
-                    <span>{{ formatPercentage(pattern.confidence) }} confidence</span>
+            <ng-container *ngIf="patterns.length > 0; else noPatterns">
+              <div class="patterns-list">
+                <div *ngFor="let pattern of patterns.slice(0, 5)" class="pattern-item">
+                  <div class="pattern-info">
+                    <div class="pattern-name">{{ pattern.name }}</div>
+                    <p class="pattern-desc">{{ pattern.description }}</p>
+                    <div class="pattern-meta">
+                      <span>{{ pattern.sample_size }} samples</span>
+                      <span>{{ formatPercentage(pattern.confidence) }} confidence</span>
+                    </div>
                   </div>
-                </div>
-                <div class="pattern-lift">
-                  <div class="lift-value" [ngClass]="pattern.lift_vs_baseline >= 1.5 ? 'high' : 'normal'">
-                    {{ pattern.lift_vs_baseline.toFixed(1) }}x
+                  <div class="pattern-lift">
+                    <div class="lift-value" [ngClass]="pattern.lift_vs_baseline >= 1.5 ? 'high' : 'normal'">
+                      {{ pattern.lift_vs_baseline.toFixed(1) }}x
+                    </div>
+                    <div class="lift-label">lift</div>
                   </div>
-                  <div class="lift-label">lift</div>
                 </div>
               </div>
-            </div>
+            </ng-container>
+            <ng-template #noPatterns>
+              <div class="section-status-card">
+                <mat-icon>psychology</mat-icon>
+                <p>Pattern detection begins after posting responses. The AI will identify what works best for your product.</p>
+              </div>
+            </ng-template>
           </div>
         </div>
       </div>
     </div>
 
     <!-- Recent Outcomes -->
-    <div class="glass-card outcomes-card" *ngIf="dashboardData.recent_outcomes.length > 0">
+    <div class="glass-card outcomes-card">
       <div class="card-header">
         <h2>Recent Outcomes</h2>
       </div>
-      <div class="table-container">
-        <table>
-          <thead>
-            <tr>
-              <th>Opportunity</th>
-              <th>Result</th>
-              <th>Clicks</th>
-              <th>Sentiment</th>
-              <th>Date</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let outcome of dashboardData.recent_outcomes">
-              <td class="opportunity-cell">
-                <a [routerLink]="['/opportunities', outcome.opportunity_id]" class="opportunity-link">
-                  <span class="subreddit-name">r/{{ outcome.subreddit }}</span>
-                  <span class="post-title">{{ outcome.post_title | slice:0:50 }}{{ (outcome.post_title?.length || 0) > 50 ? '...' : '' }}</span>
-                </a>
-              </td>
-              <td>
-                <span class="result-badge" [ngClass]="outcome.success_type || 'pending'">
-                  {{ outcome.success_type || 'pending' }}
-                </span>
-              </td>
-              <td class="clicks">{{ outcome.clicks }}</td>
-              <td>
-                <span class="sentiment" [ngClass]="outcome.reply_sentiment">
-                  {{ outcome.reply_sentiment }}
-                </span>
-              </td>
-              <td class="date">{{ outcome.created_at | date:'short' }}</td>
-            </tr>
-          </tbody>
-        </table>
+      <ng-container *ngIf="dashboardData.recent_outcomes.length > 0; else noOutcomes">
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Opportunity</th>
+                <th>Result</th>
+                <th>Clicks</th>
+                <th>Sentiment</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let outcome of dashboardData.recent_outcomes">
+                <td class="opportunity-cell">
+                  <a [routerLink]="['/opportunities', outcome.opportunity_id]" class="opportunity-link">
+                    <span class="subreddit-name">r/{{ outcome.subreddit }}</span>
+                    <span class="post-title">{{ outcome.post_title | slice:0:50 }}{{ (outcome.post_title?.length || 0) > 50 ? '...' : '' }}</span>
+                  </a>
+                </td>
+                <td>
+                  <span class="result-badge" [ngClass]="outcome.success_type || 'pending'">
+                    {{ outcome.success_type || 'pending' }}
+                  </span>
+                </td>
+                <td class="clicks">{{ outcome.clicks }}</td>
+                <td>
+                  <span class="sentiment" [ngClass]="outcome.reply_sentiment">
+                    {{ outcome.reply_sentiment }}
+                  </span>
+                </td>
+                <td class="date">{{ outcome.created_at | date:'short' }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </ng-container>
+      <ng-template #noOutcomes>
+        <div class="section-status-card">
+          <mat-icon>track_changes</mat-icon>
+          <p *ngIf="dashboardData.outcomes_status; else defaultOutcomesMsg">
+            {{ dashboardData.outcomes_status.message }}
+          </p>
+          <ng-template #defaultOutcomesMsg>
+            <p>Outcomes appear here after posting responses. Engagement tracking takes 24-48 hours.</p>
+          </ng-template>
+        </div>
+      </ng-template>
+    </div>
+
+    <!-- System Components Status -->
+    <div class="glass-card components-card" *ngIf="dashboardData.components">
+      <div class="card-header">
+        <h2>System Components</h2>
+      </div>
+      <div class="components-grid">
+        <div class="component-item">
+          <mat-icon>psychology</mat-icon>
+          <div class="component-info">
+            <div class="component-name">Patterns</div>
+            <div class="component-status">{{ dashboardData.components.patterns.message }}</div>
+          </div>
+          <div class="component-count">{{ dashboardData.components.patterns.count }}</div>
+        </div>
+        <div class="component-item">
+          <mat-icon>science</mat-icon>
+          <div class="component-info">
+            <div class="component-name">A/B Tests</div>
+            <div class="component-status">{{ dashboardData.components.ab_tests.message }}</div>
+          </div>
+          <div class="component-count">{{ dashboardData.components.ab_tests.count }}</div>
+        </div>
+        <div class="component-item">
+          <mat-icon>forum</mat-icon>
+          <div class="component-info">
+            <div class="component-name">Engagement</div>
+            <div class="component-status">{{ dashboardData.components.engagement.message }}</div>
+          </div>
+          <div class="component-count">{{ dashboardData.components.engagement.responses }} / {{ dashboardData.components.engagement.replies }}</div>
+        </div>
+        <div class="component-item">
+          <mat-icon>person_search</mat-icon>
+          <div class="component-info">
+            <div class="component-name">Author Intel</div>
+            <div class="component-status">{{ dashboardData.components.author_intelligence.message }}</div>
+          </div>
+          <div class="component-count">{{ dashboardData.components.author_intelligence.count }}</div>
+        </div>
       </div>
     </div>
   </ng-container>

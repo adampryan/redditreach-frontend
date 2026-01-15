@@ -813,3 +813,240 @@
     font-size: 12px;
   }
 }
+
+// Status Banner
+.status-banner {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 24px;
+  border-radius: 12px;
+  margin-bottom: 24px;
+  background: rgba(168, 85, 247, 0.1);
+  border: 1px solid rgba(168, 85, 247, 0.3);
+
+  mat-icon {
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+    color: #a855f7;
+  }
+
+  .status-content {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    .status-phase {
+      font-size: 12px;
+      font-weight: 600;
+      color: #a855f7;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .status-message {
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.8);
+    }
+  }
+
+  &.starting, &.collecting_data {
+    background: rgba(59, 130, 246, 0.1);
+    border-color: rgba(59, 130, 246, 0.3);
+
+    mat-icon, .status-phase {
+      color: #3b82f6;
+    }
+  }
+
+  &.analyzing, &.building_intelligence {
+    background: rgba(234, 179, 8, 0.1);
+    border-color: rgba(234, 179, 8, 0.3);
+
+    mat-icon, .status-phase {
+      color: #eab308;
+    }
+  }
+
+  &.optimizing, &.actionable {
+    background: rgba(34, 197, 94, 0.1);
+    border-color: rgba(34, 197, 94, 0.3);
+
+    mat-icon, .status-phase {
+      color: #22c55e;
+    }
+  }
+}
+
+// Section Status (inline info messages)
+.section-status {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  margin-bottom: 24px;
+  border-radius: 8px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.7);
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+  }
+
+  &.info {
+    background: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+
+    mat-icon {
+      color: #3b82f6;
+    }
+  }
+
+  &.warning {
+    background: rgba(234, 179, 8, 0.1);
+    border: 1px solid rgba(234, 179, 8, 0.2);
+
+    mat-icon {
+      color: #eab308;
+    }
+  }
+}
+
+// Section Status Card (for empty state cards)
+.section-status-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+  text-align: center;
+
+  mat-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    color: rgba(168, 85, 247, 0.5);
+    margin-bottom: 16px;
+  }
+
+  p {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.5);
+    line-height: 1.6;
+    margin: 0;
+    max-width: 300px;
+  }
+}
+
+// Stats Status
+.stats-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-top: 16px;
+  margin-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    color: #a855f7;
+  }
+
+  span {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.6);
+  }
+}
+
+// Empty subreddits with icon
+.empty-subreddits {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 48px 24px;
+  text-align: center;
+
+  mat-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    color: rgba(168, 85, 247, 0.5);
+    margin-bottom: 16px;
+  }
+
+  p {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 14px;
+    margin: 0;
+  }
+}
+
+// Components Grid
+.components-card {
+  margin-top: 24px;
+}
+
+.components-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: rgba(255, 255, 255, 0.1);
+
+  @media (max-width: 1200px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.component-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 24px;
+  background: rgba(15, 15, 26, 0.9);
+
+  mat-icon {
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+    color: #a855f7;
+    flex-shrink: 0;
+  }
+
+  .component-info {
+    flex: 1;
+    min-width: 0;
+
+    .component-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 4px;
+    }
+
+    .component-status {
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.5);
+      line-height: 1.4;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+
+  .component-count {
+    font-size: 18px;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.8);
+    flex-shrink: 0;
+  }
+}

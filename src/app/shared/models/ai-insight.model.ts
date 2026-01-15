@@ -36,12 +36,18 @@ export interface ActionOption {
   description: string;
 }
 
+export interface StatusInfo {
+  phase: string;
+  message: string;
+}
+
 export interface AIInsightStats {
   total: number;
   new: number;
   high_priority: number;
   pending_action: number;
   by_type: Record<InsightType, number>;
+  status?: StatusInfo & { posted_responses?: number };
 }
 
 // Intent tier types for the Elite Conversion System
@@ -76,8 +82,24 @@ export interface ConversionPattern {
   confidence: number;
 }
 
+export interface ComponentStatus {
+  count: number;
+  status: string;
+  message: string;
+}
+
+export interface EngagementStatus extends ComponentStatus {
+  responses: number;
+  replies: number;
+}
+
 export interface EliteDashboardData {
+  // Learning system status
+  learning_status?: StatusInfo;
+
   intent_distribution: Record<IntentTier, number>;
+  intent_distribution_status?: { has_data: boolean; message: string };
+
   metrics: {
     total_opportunities: number;
     posted_responses: number;
@@ -86,6 +108,8 @@ export interface EliteDashboardData {
     total_clicks: number;
     total_conversions: number;
   };
+  metrics_status?: { has_conversions: boolean; message: string };
+
   pending_insights: {
     id: string;
     type: InsightType;
@@ -93,6 +117,8 @@ export interface EliteDashboardData {
     title: string;
     summary: string;
   }[];
+  insights_status?: { count: number; message: string };
+
   top_subreddits: {
     name: string;
     expected_value: number;
@@ -100,6 +126,8 @@ export interface EliteDashboardData {
     total_responses: number;
     approval_rate: number;
   }[];
+  subreddits_status?: { has_data: boolean; message: string };
+
   recent_outcomes: {
     opportunity_id: string;
     subreddit: string;
@@ -109,6 +137,15 @@ export interface EliteDashboardData {
     reply_sentiment: string;
     created_at: string;
   }[];
+  outcomes_status?: { count: number; message: string };
+
+  // Component status summary
+  components?: {
+    patterns: ComponentStatus;
+    ab_tests: ComponentStatus;
+    engagement: EngagementStatus;
+    author_intelligence: ComponentStatus;
+  };
 }
 
 

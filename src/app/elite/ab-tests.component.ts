@@ -45,6 +45,13 @@ export class ABTestsComponent implements OnInit, OnDestroy {
   isLoading = true;
   activeTab: 'active' | 'completed' | 'all' = 'active';
 
+  // Status info from API
+  status: {
+    phase: string;
+    message: string;
+    suggested_tests?: string[];
+  } | null = null;
+
   constructor(
     public eliteService: EliteService,
     private dialog: MatDialog
@@ -64,8 +71,9 @@ export class ABTestsComponent implements OnInit, OnDestroy {
     this.eliteService.getABTests()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (response) => {
+        next: (response: any) => {
           this.tests = response.tests;
+          this.status = response.status || null;
           this.isLoading = false;
         },
         error: () => {

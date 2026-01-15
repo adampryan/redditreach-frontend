@@ -497,13 +497,50 @@
     font-size: 64px;
     width: 64px;
     height: 64px;
-    color: rgba(255, 255, 255, 0.2);
+    color: rgba(168, 85, 247, 0.3);
   }
 
   p {
     margin: 16px 0 24px;
-    color: rgba(255, 255, 255, 0.5);
-    font-size: 16px;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 15px;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.6;
+  }
+
+  .suggested-tests {
+    margin: 16px 0 24px;
+    padding: 16px 24px;
+    background: rgba(168, 85, 247, 0.1);
+    border: 1px solid rgba(168, 85, 247, 0.2);
+    border-radius: 12px;
+    display: inline-block;
+
+    .suggested-label {
+      font-size: 12px;
+      color: #a855f7;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 600;
+    }
+
+    .suggested-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+      justify-content: center;
+
+      .suggested-item {
+        background: rgba(255, 255, 255, 0.1);
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.8);
+      }
+    }
   }
 }
 

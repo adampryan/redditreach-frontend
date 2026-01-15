@@ -31,6 +31,18 @@
     </div>
   </div>
 
+  <!-- Status Banner -->
+  <div *ngIf="stats && stats.status" class="status-banner">
+    <mat-icon>auto_awesome</mat-icon>
+    <div class="status-content">
+      <span class="status-phase">{{ stats.status.phase }}</span>
+      <span class="status-message">{{ stats.status.message }}</span>
+      <span *ngIf="stats.status.posted_responses !== undefined" class="status-detail">
+        {{ stats.status.posted_responses }} posted responses tracked
+      </span>
+    </div>
+  </div>
+
   <!-- Filters -->
   <div class="filters-card">
     <div class="filters-row">
