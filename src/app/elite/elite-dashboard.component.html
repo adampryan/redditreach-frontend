@@ -1,9 +1,15 @@
 <div class="elite-dashboard">
   <!-- Header -->
   <div class="elite-header">
-    <div class="header-content">
-      <h1>AI Command Center</h1>
-      <p>Elite Conversion System - AI-Human Communication Dashboard</p>
+    <div class="header-left">
+      <a routerLink="/dashboard" class="back-link">
+        <mat-icon>arrow_back</mat-icon>
+        <span>Back to Dashboard</span>
+      </a>
+      <div class="header-content">
+        <h1>AI Command Center</h1>
+        <p>Elite Conversion System - AI-Human Communication Dashboard</p>
+      </div>
     </div>
     <button class="refresh-btn" (click)="loadDashboard()" [disabled]="loading">
       {{ loading ? 'Loading...' : 'Refresh' }}
