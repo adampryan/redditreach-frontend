@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { MatIconModule } from '@angular/material/icon';
 import { Subject, takeUntil, forkJoin } from 'rxjs';
 import { EliteService } from '../shared/services/elite.service';
 import {
@@ -14,9 +15,9 @@ import {
 @Component({
   selector: 'app-elite-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, MatIconModule],
   templateUrl: './elite-dashboard.component.html',
-  styleUrl: './elite-dashboard.component.scss'
+  styleUrls: ['./elite-dashboard.component.scss']
 })
 export class EliteDashboardComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
