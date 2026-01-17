@@ -9,6 +9,9 @@ import { Observable } from 'rxjs';
 import { AuthenticationService } from '../services/authentication.service';
 import { environment } from '../../../environments/environment';
 
+// Key for storing selected customer ID in localStorage
+export const SELECTED_CUSTOMER_KEY = 'threadcatch_selected_customer';
+
 @Injectable()
 export class JwtInterceptor implements HttpInterceptor {
   constructor(private authService: AuthenticationService) {}
@@ -19,11 +22,17 @@ export class JwtInterceptor implements HttpInterceptor {
                      request.url.includes('/api/token');
 
     if (token && isApiUrl) {
-      request = request.clone({
-        setHeaders: {
-          Authorization: `Bearer ${token}`
-        }
-      });
+      const headers: { [key: string]: string } = {
+        Authorization: `Bearer ${token}`
+      };
+
+      // Add X-Customer-ID header if a customer is selected
+      const selectedCustomerId = localStorage.getItem(SELECTED_CUSTOMER_KEY);
+      if (selectedCustomerId) {
+        headers['X-Customer-ID'] = selectedCustomerId;
+      }
+
+      request = request.clone({ setHeaders: headers });
     }
 
     return next.handle(request);
