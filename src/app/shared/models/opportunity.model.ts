@@ -9,6 +9,7 @@ export interface OpportunityListItem {
   post_created_at: string;
   post_flair: string;
   relevance_score: number;
+  intent_tier: IntentTier;
   status: OpportunityStatus;
   is_read: boolean;
   discovered_at: string;

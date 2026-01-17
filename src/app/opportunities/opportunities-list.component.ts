@@ -274,4 +274,18 @@ export class OpportunitiesListComponent implements OnInit {
     if (text.length <= maxLength) return text;
     return text.substring(0, maxLength) + '...';
   }
+
+  formatIntentTier(tier: string): string {
+    const tierLabels: Record<string, string> = {
+      'tier_1': 'T1 - High',
+      'tier_2': 'T2 - Medium',
+      'tier_3': 'T3 - Low',
+      'tier_4': 'T4 - Engage'
+    };
+    return tierLabels[tier] || tier;
+  }
+
+  getTierClass(tier: string): string {
+    return tier ? `tier-${tier}` : '';
+  }
 }

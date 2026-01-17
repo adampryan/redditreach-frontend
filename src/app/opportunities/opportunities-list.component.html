@@ -149,8 +149,11 @@
                 <mat-icon>chat_bubble_outline</mat-icon>
                 {{ opp.post_num_comments }}
               </span>
+              <span class="tier-badge" *ngIf="opp.intent_tier" [ngClass]="getTierClass(opp.intent_tier)">
+                {{ formatIntentTier(opp.intent_tier) }}
+              </span>
               <span class="relevance" *ngIf="opp.relevance_score">
-                {{ (opp.relevance_score * 100).toFixed(0) }}% match
+                {{ (opp.relevance_score * 100).toFixed(0) }}%
               </span>
             </div>
           </div>

@@ -316,6 +316,35 @@
         color: #667eea;
         font-weight: 500;
       }
+
+      .tier-badge {
+        font-size: 10px;
+        font-weight: 600;
+        padding: 2px 8px;
+        border-radius: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+
+        &.tier-tier_1 {
+          background: #dcfce7;
+          color: #166534;
+        }
+
+        &.tier-tier_2 {
+          background: #fef3c7;
+          color: #92400e;
+        }
+
+        &.tier-tier_3 {
+          background: #f3f4f6;
+          color: #6b7280;
+        }
+
+        &.tier-tier_4 {
+          background: #e0e7ff;
+          color: #4338ca;
+        }
+      }
     }
   }
 
