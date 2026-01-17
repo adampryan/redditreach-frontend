@@ -24,6 +24,17 @@ export class CustomerService {
     return this.http.get<CustomerStats>(`${this.apiUrl}/stats/`);
   }
 
+  // Multi-customer support
+  listCustomers(): Observable<CustomerListResponse> {
+    return this.http.get<CustomerListResponse>(`${this.apiUrl}/customers/`);
+  }
+
+  switchCustomer(customerId: string): Observable<CustomerSwitchResponse> {
+    return this.http.post<CustomerSwitchResponse>(`${this.apiUrl}/customers/switch/`, {
+      customer_id: customerId
+    });
+  }
+
   // Reddit OAuth
   getRedditConnectUrl(): Observable<{ auth_url: string }> {
     return this.http.get<{ auth_url: string }>(`${this.apiUrl}/reddit/connect/`);
@@ -97,4 +108,22 @@ export interface SupportTicketDetail {
   created_at: string;
   updated_at: string;
   messages: SupportMessage[];
+}
+
+// Multi-customer interfaces
+export interface CustomerListItem {
+  id: string;
+  name: string;
+  email: string;
+  subscription_tier: string;
+}
+
+export interface CustomerListResponse {
+  customers: CustomerListItem[];
+  current_customer_id: string | null;
+}
+
+export interface CustomerSwitchResponse {
+  success: boolean;
+  customer: CustomerListItem;
 }

@@ -128,5 +128,35 @@
       color: #666;
       font-weight: 500;
     }
+
+    .customer-selector {
+      .customer-selector-btn {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        color: #667eea;
+        font-weight: 500;
+        padding: 6px 12px;
+        border-radius: 6px;
+        background: rgba(102, 126, 234, 0.08);
+
+        &:hover {
+          background: rgba(102, 126, 234, 0.15);
+        }
+
+        span {
+          max-width: 150px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+      }
+    }
   }
+}
+
+// Customer menu item styling
+::ng-deep .active-customer {
+  background: rgba(102, 126, 234, 0.1);
+  color: #667eea !important;
 }

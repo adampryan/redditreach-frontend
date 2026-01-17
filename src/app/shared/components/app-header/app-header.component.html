@@ -49,7 +49,29 @@
             matTooltip="Support Messages">
       <mat-icon>mail</mat-icon>
     </button>
-    <span class="user-name" *ngIf="customer">{{ customer.name }}</span>
+
+    <!-- Customer Selector (for multi-customer users) -->
+    <div class="customer-selector" *ngIf="hasMultipleCustomers">
+      <button mat-button [matMenuTriggerFor]="customerMenu" class="customer-selector-btn">
+        <mat-icon>business</mat-icon>
+        <span>{{ customer?.name }}</span>
+        <mat-icon>arrow_drop_down</mat-icon>
+      </button>
+      <mat-menu #customerMenu="matMenu">
+        <button mat-menu-item
+                *ngFor="let c of availableCustomers"
+                (click)="switchToCustomer(c.id)"
+                [class.active-customer]="c.id === currentCustomerId">
+          <mat-icon *ngIf="c.id === currentCustomerId">check</mat-icon>
+          <mat-icon *ngIf="c.id !== currentCustomerId"></mat-icon>
+          <span>{{ c.name }}</span>
+        </button>
+      </mat-menu>
+    </div>
+
+    <!-- Single customer display -->
+    <span class="user-name" *ngIf="customer && !hasMultipleCustomers">{{ customer.name }}</span>
+
     <button mat-button (click)="logout()">
       <mat-icon>logout</mat-icon>
       Logout
