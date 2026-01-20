@@ -39,9 +39,27 @@
   <!-- Filters Row -->
   <div class="filters-row">
     <mat-form-field appearance="outline" class="filter-select">
-      <mat-label>Filter</mat-label>
+      <mat-label>Status</mat-label>
       <mat-select [(value)]="currentStatus" (selectionChange)="filterByStatus(currentStatus)">
         <mat-option *ngFor="let filter of statusFilters" [value]="filter.value">
+          {{ filter.label }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="filter-select">
+      <mat-label>Intent Tier</mat-label>
+      <mat-select [(value)]="currentIntentTier" (selectionChange)="onIntentTierChange()">
+        <mat-option *ngFor="let filter of intentTierFilters" [value]="filter.value">
+          {{ filter.label }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="filter-select">
+      <mat-label>Drafts</mat-label>
+      <mat-select [(value)]="currentHasDrafts" (selectionChange)="onHasDraftsChange()">
+        <mat-option *ngFor="let filter of draftFilters" [value]="filter.value">
           {{ filter.label }}
         </mat-option>
       </mat-select>
@@ -77,6 +95,15 @@
     </mat-checkbox>
 
     <div class="bulk-buttons" *ngIf="hasSelections">
+      <button mat-flat-button color="primary" (click)="bulkGenerate()" [disabled]="isGenerating || !canBulkGenerate">
+        <mat-icon>auto_awesome</mat-icon>
+        <span *ngIf="!isGenerating">Generate Responses</span>
+        <span *ngIf="isGenerating">Generating...</span>
+      </button>
+      <button mat-flat-button color="accent" (click)="bulkApprove()" [disabled]="!canBulkApprove">
+        <mat-icon>check_circle</mat-icon>
+        Approve Selected
+      </button>
       <button mat-stroked-button (click)="bulkMarkRead()">
         <mat-icon>done</mat-icon>
         Mark Read
@@ -163,9 +190,10 @@
               <span class="status" [ngClass]="getStatusClass(opp.status)">
                 {{ formatStatus(opp.status) }}
               </span>
-              <span class="badge drafts" *ngIf="opp.has_drafts">
+              <span class="badge drafts" *ngIf="opp.has_drafts" (click)="toggleDraftPreview(opp.id, $event)">
                 <mat-icon>description</mat-icon>
-                Has Drafts
+                {{ opp.draft_count }} Draft{{ opp.draft_count > 1 ? 's' : '' }}
+                <mat-icon class="expand-icon">{{ isDraftExpanded(opp.id) ? 'expand_less' : 'expand_more' }}</mat-icon>
               </span>
               <span class="badge scheduled" *ngIf="opp.scheduled_for">
                 <mat-icon>schedule</mat-icon>
@@ -173,6 +201,23 @@
               </span>
             </div>
             <mat-icon class="action-arrow">chevron_right</mat-icon>
+          </div>
+
+          <!-- Collapsible Draft Preview -->
+          <div class="draft-preview-section" *ngIf="opp.has_drafts && isDraftExpanded(opp.id)" (click)="$event.stopPropagation()">
+            <div class="draft-preview-header">
+              <mat-icon>edit_note</mat-icon>
+              <span>Draft Preview</span>
+            </div>
+            <div class="draft-preview-text">
+              {{ opp.draft_preview }}
+            </div>
+            <div class="draft-preview-actions">
+              <button mat-button color="primary" (click)="viewOpportunity(opp)">
+                <mat-icon>visibility</mat-icon>
+                View All Drafts
+              </button>
+            </div>
           </div>
         </div>
       </div>

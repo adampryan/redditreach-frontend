@@ -415,6 +415,16 @@
       &.drafts {
         background: #e0e7ff;
         color: #3730a3;
+        cursor: pointer;
+        transition: background-color 0.2s;
+
+        &:hover {
+          background: #c7d2fe;
+        }
+
+        .expand-icon {
+          margin-left: 2px;
+        }
       }
 
       &.scheduled {
@@ -425,6 +435,55 @@
 
     .action-arrow {
       color: #ccc;
+    }
+  }
+
+  .draft-preview-section {
+    margin-top: 12px;
+    padding: 12px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e0e7ff;
+
+    .draft-preview-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+      color: #3730a3;
+      font-weight: 600;
+      font-size: 13px;
+
+      mat-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+      }
+    }
+
+    .draft-preview-text {
+      font-size: 13px;
+      line-height: 1.6;
+      color: #444;
+      padding: 8px 12px;
+      background: white;
+      border-radius: 6px;
+      border-left: 3px solid #667eea;
+    }
+
+    .draft-preview-actions {
+      margin-top: 10px;
+      display: flex;
+      justify-content: flex-end;
+
+      button {
+        mat-icon {
+          font-size: 16px;
+          width: 16px;
+          height: 16px;
+          margin-right: 4px;
+        }
+      }
     }
   }
 }

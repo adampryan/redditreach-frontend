@@ -15,6 +15,8 @@ export interface OpportunityListItem {
   discovered_at: string;
   age_hours: number;
   has_drafts: boolean;
+  draft_count: number;
+  draft_preview: string | null;
   scheduled_for: string | null;
 }
 

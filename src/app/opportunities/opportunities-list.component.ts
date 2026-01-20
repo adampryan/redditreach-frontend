@@ -1,7 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
-import { OpportunityService } from '../shared/services';
+import { MatDialog } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { OpportunityService, BulkApproval } from '../shared/services';
 import { OpportunityListItem, OpportunityStats, OpportunityStatus } from '../shared/models';
+import { BulkApproveDialogComponent } from './bulk-approve-dialog.component';
 
 @Component({
   selector: 'app-opportunities-list',
@@ -13,8 +16,11 @@ export class OpportunitiesListComponent implements OnInit {
   opportunities: OpportunityListItem[] = [];
   stats: OpportunityStats | null = null;
   isLoading = true;
+  isGenerating = false;
   currentStatus: string = 'all';
   currentSubreddits: string[] = [];
+  currentIntentTier: string = '';
+  currentHasDrafts: string = '';  // '', 'true', 'false'
   currentSort: string = 'time';
   totalCount = 0;
   currentPage = 1;
@@ -23,6 +29,9 @@ export class OpportunitiesListComponent implements OnInit {
   // Bulk selection
   selectedIds: Set<string> = new Set();
   selectAll = false;
+
+  // Expanded draft previews (track which cards are expanded)
+  expandedDrafts: Set<string> = new Set();
 
   statusFilters: { value: string; label: string }[] = [
     { value: 'all', label: 'All' },
@@ -33,6 +42,20 @@ export class OpportunitiesListComponent implements OnInit {
     { value: 'posted', label: 'Posted' },
     { value: 'rejected', label: 'Rejected' },
     { value: 'expired', label: 'Expired' }
+  ];
+
+  intentTierFilters: { value: string; label: string }[] = [
+    { value: '', label: 'All Tiers' },
+    { value: 'tier_1', label: 'Tier 1 - High Intent' },
+    { value: 'tier_2', label: 'Tier 2 - Medium' },
+    { value: 'tier_3', label: 'Tier 3 - Low' },
+    { value: 'tier_4', label: 'Tier 4 - Engage Only' }
+  ];
+
+  draftFilters: { value: string; label: string }[] = [
+    { value: '', label: 'All' },
+    { value: 'true', label: 'With Drafts' },
+    { value: 'false', label: 'Without Drafts' }
   ];
 
   sortOptions: { value: string; label: string }[] = [
@@ -47,7 +70,9 @@ export class OpportunitiesListComponent implements OnInit {
   constructor(
     private opportunityService: OpportunityService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private dialog: MatDialog,
+    private snackBar: MatSnackBar
   ) {}
 
   ngOnInit(): void {
@@ -56,6 +81,8 @@ export class OpportunitiesListComponent implements OnInit {
       this.currentStatus = params['status'] || 'all';
       this.currentSort = params['sort'] || 'time';
       this.currentSubreddits = params['subreddits'] ? params['subreddits'].split(',') : [];
+      this.currentIntentTier = params['intent_tier'] || '';
+      this.currentHasDrafts = params['has_drafts'] || '';
       this.currentPage = parseInt(params['page'], 10) || 1;
       this.loadOpportunities();
     });
@@ -93,6 +120,16 @@ export class OpportunitiesListComponent implements OnInit {
     // Handle subreddits filter
     if (this.currentSubreddits.length > 0) {
       filters.subreddits = this.currentSubreddits.join(',');
+    }
+
+    // Handle intent tier filter
+    if (this.currentIntentTier) {
+      filters.intent_tier = this.currentIntentTier;
+    }
+
+    // Handle has_drafts filter
+    if (this.currentHasDrafts) {
+      filters.has_drafts = this.currentHasDrafts === 'true';
     }
 
     this.opportunityService.list(filters).subscribe({
@@ -135,6 +172,22 @@ export class OpportunitiesListComponent implements OnInit {
     this.router.navigate([], {
       relativeTo: this.route,
       queryParams: { sort: this.currentSort, page: 1 },
+      queryParamsHandling: 'merge'
+    });
+  }
+
+  onIntentTierChange(): void {
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { intent_tier: this.currentIntentTier || null, page: 1 },
+      queryParamsHandling: 'merge'
+    });
+  }
+
+  onHasDraftsChange(): void {
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { has_drafts: this.currentHasDrafts || null, page: 1 },
       queryParamsHandling: 'merge'
     });
   }
@@ -218,6 +271,109 @@ export class OpportunitiesListComponent implements OnInit {
         this.loadStats();
       }
     });
+  }
+
+  /**
+   * Bulk generate drafts for selected opportunities that don't have drafts.
+   */
+  bulkGenerate(): void {
+    const idsWithoutDrafts = Array.from(this.selectedIds).filter(id => {
+      const opp = this.opportunities.find(o => o.id === id);
+      return opp && !opp.has_drafts;
+    });
+
+    if (idsWithoutDrafts.length === 0) {
+      this.snackBar.open('All selected opportunities already have drafts', 'OK', { duration: 3000 });
+      return;
+    }
+
+    this.isGenerating = true;
+    this.opportunityService.bulkGenerate(idsWithoutDrafts).subscribe({
+      next: (result) => {
+        this.isGenerating = false;
+        this.snackBar.open(
+          `Generated drafts for ${result.generated_count} opportunities`,
+          'OK',
+          { duration: 3000 }
+        );
+        this.loadOpportunities();
+        this.loadStats();
+      },
+      error: (err) => {
+        this.isGenerating = false;
+        this.snackBar.open('Failed to generate drafts', 'OK', { duration: 3000 });
+      }
+    });
+  }
+
+  /**
+   * Open dialog to select drafts and bulk approve.
+   */
+  bulkApprove(): void {
+    const idsWithDrafts = Array.from(this.selectedIds).filter(id => {
+      const opp = this.opportunities.find(o => o.id === id);
+      return opp && opp.has_drafts;
+    });
+
+    if (idsWithDrafts.length === 0) {
+      this.snackBar.open('No selected opportunities have drafts to approve', 'OK', { duration: 3000 });
+      return;
+    }
+
+    // Open dialog with the opportunities that have drafts
+    const dialogRef = this.dialog.open(BulkApproveDialogComponent, {
+      width: '800px',
+      maxHeight: '80vh',
+      data: { opportunityIds: idsWithDrafts }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result && result.approved) {
+        this.snackBar.open(
+          `Approved ${result.approved_count} opportunities`,
+          'OK',
+          { duration: 3000 }
+        );
+        this.loadOpportunities();
+        this.loadStats();
+      }
+    });
+  }
+
+  /**
+   * Check if any selected opportunities don't have drafts.
+   */
+  get canBulkGenerate(): boolean {
+    return Array.from(this.selectedIds).some(id => {
+      const opp = this.opportunities.find(o => o.id === id);
+      return opp && !opp.has_drafts;
+    });
+  }
+
+  /**
+   * Check if any selected opportunities have drafts.
+   */
+  get canBulkApprove(): boolean {
+    return Array.from(this.selectedIds).some(id => {
+      const opp = this.opportunities.find(o => o.id === id);
+      return opp && opp.has_drafts;
+    });
+  }
+
+  /**
+   * Toggle draft preview expansion for a card.
+   */
+  toggleDraftPreview(id: string, event: Event): void {
+    event.stopPropagation();
+    if (this.expandedDrafts.has(id)) {
+      this.expandedDrafts.delete(id);
+    } else {
+      this.expandedDrafts.add(id);
+    }
+  }
+
+  isDraftExpanded(id: string): boolean {
+    return this.expandedDrafts.has(id);
   }
 
   getStatusClass(status: string): string {

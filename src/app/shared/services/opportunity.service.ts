@@ -8,9 +8,40 @@ export interface OpportunityFilters {
   status?: string;
   is_read?: boolean;
   subreddits?: string;
+  intent_tier?: string;  // comma-separated: "tier_1,tier_2"
+  has_drafts?: boolean;
   sort?: string;
   page?: number;
   page_size?: number;
+}
+
+export interface BulkApproval {
+  opportunity_id: string;
+  draft_id: number;
+  edited_text?: string;
+}
+
+export interface BulkGenerateResult {
+  success: boolean;
+  generated_count: number;
+  failed_count: number;
+  results: Array<{
+    opportunity_id: string;
+    success: boolean;
+    draft_count?: number;
+    error?: string;
+  }>;
+}
+
+export interface BulkApproveResult {
+  success: boolean;
+  approved_count: number;
+  failed_count: number;
+  results: Array<{
+    opportunity_id: string;
+    success: boolean;
+    error?: string;
+  }>;
 }
 
 @Injectable({
@@ -32,6 +63,12 @@ export class OpportunityService {
     }
     if (filters.subreddits) {
       params = params.set('subreddits', filters.subreddits);
+    }
+    if (filters.intent_tier) {
+      params = params.set('intent_tier', filters.intent_tier);
+    }
+    if (filters.has_drafts !== undefined) {
+      params = params.set('has_drafts', filters.has_drafts.toString());
     }
     if (filters.sort) {
       params = params.set('sort', filters.sort);
@@ -115,6 +152,26 @@ export class OpportunityService {
     return this.http.post<{ success: boolean; draft: any }>(
       `${this.apiUrl}/opportunities/${id}/regenerate/`,
       payload
+    );
+  }
+
+  /**
+   * Bulk generate response drafts for multiple opportunities.
+   */
+  bulkGenerate(opportunityIds: string[]): Observable<BulkGenerateResult> {
+    return this.http.post<BulkGenerateResult>(
+      `${this.apiUrl}/opportunities/bulk-generate/`,
+      { opportunity_ids: opportunityIds }
+    );
+  }
+
+  /**
+   * Bulk approve multiple opportunities with specified drafts.
+   */
+  bulkApprove(approvals: BulkApproval[]): Observable<BulkApproveResult> {
+    return this.http.post<BulkApproveResult>(
+      `${this.apiUrl}/opportunities/bulk-approve/`,
+      { approvals }
     );
   }
 }
