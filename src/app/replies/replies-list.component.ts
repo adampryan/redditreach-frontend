@@ -193,16 +193,15 @@ export class RepliesListComponent implements OnInit {
     this.isRefreshing = true;
     this.replyService.refresh().subscribe({
       next: (response) => {
-        this.isRefreshing = false;
-        const newCount = response.details?.new_replies || 0;
-        if (newCount > 0) {
-          this.snackBar.open(`Found ${newCount} new replies!`, 'Close', { duration: 5000 });
-          // Reload the list and stats
+        // Task is queued - show message and refresh list after a delay
+        this.snackBar.open(response.message || 'Checking for new replies...', 'Close', { duration: 5000 });
+
+        // Wait 10 seconds then refresh the list (task should be done by then)
+        setTimeout(() => {
+          this.isRefreshing = false;
           this.loadReplies();
           this.loadStats();
-        } else {
-          this.snackBar.open('No new replies found', 'Close', { duration: 3000 });
-        }
+        }, 10000);
       },
       error: (err) => {
         this.isRefreshing = false;
