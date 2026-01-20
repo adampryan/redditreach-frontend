@@ -9,6 +9,7 @@ export interface CommentReply {
   is_read: boolean;
   is_removed: boolean;
   requires_response: boolean;
+  is_op_reply: boolean;  // True if reply is from original post author
   subreddit_name: string;
   original_post_title: string;
   original_post_url: string;

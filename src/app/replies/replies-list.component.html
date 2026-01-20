@@ -56,6 +56,17 @@
         </mat-option>
       </mat-select>
     </mat-form-field>
+
+    <button
+      mat-stroked-button
+      color="primary"
+      class="refresh-button"
+      (click)="refreshReplies()"
+      [disabled]="isRefreshing">
+      <mat-icon *ngIf="!isRefreshing">refresh</mat-icon>
+      <mat-spinner *ngIf="isRefreshing" diameter="20"></mat-spinner>
+      {{ isRefreshing ? 'Checking...' : 'Check for Replies' }}
+    </button>
   </div>
 
   <!-- Loading -->
@@ -86,6 +97,10 @@
         <div class="header-left">
           <span class="unread-dot" *ngIf="!reply.is_read"></span>
           <span class="subreddit">r/{{ reply.subreddit_name }}</span>
+          <span class="op-badge" *ngIf="reply.is_op_reply">
+            <mat-icon>star</mat-icon>
+            OP
+          </span>
           <span class="nested-badge" *ngIf="reply.is_nested">
             <mat-icon>subdirectory_arrow_right</mat-icon>
             Nested

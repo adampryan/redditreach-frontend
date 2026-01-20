@@ -89,6 +89,30 @@
   min-width: 180px;
 }
 
+.refresh-button {
+  margin-left: auto;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+
+  mat-spinner {
+    display: inline-block;
+  }
+
+  @media (max-width: 600px) {
+    margin-left: 0;
+    width: 100%;
+    justify-content: center;
+  }
+}
+
 .loading-spinner {
   display: flex;
   justify-content: center;
@@ -162,6 +186,26 @@
       font-size: 13px;
       font-weight: 600;
       color: #667eea;
+    }
+
+    .op-badge {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #f97316;
+      background: #fff7ed;
+      padding: 2px 8px;
+      border-radius: 4px;
+      border: 1px solid #fed7aa;
+
+      mat-icon {
+        font-size: 14px;
+        width: 14px;
+        height: 14px;
+        color: #f97316;
+      }
     }
 
     .nested-badge {

@@ -14,6 +14,7 @@ export class RepliesListComponent implements OnInit {
   replies: CommentReply[] = [];
   stats: ReplyStats | null = null;
   isLoading = true;
+  isRefreshing = false;
   currentFilter: string = 'all';  // Default to 'all' so users see all replies
   currentSort: string = 'time';
   currentSubreddits: string[] = [];
@@ -24,6 +25,7 @@ export class RepliesListComponent implements OnInit {
   filterOptions: { value: string; label: string }[] = [
     { value: 'all', label: 'All' },
     { value: 'unread', label: 'Unread' },
+    { value: 'op_replies', label: 'OP Replies' },
     { value: 'needs_response', label: 'Needs Response' },
     { value: 'pending_drafts', label: 'Pending Drafts' }
   ];
@@ -78,6 +80,8 @@ export class RepliesListComponent implements OnInit {
     // Apply status filter (skip for 'all')
     if (this.currentFilter === 'unread') {
       filters.is_read = false;
+    } else if (this.currentFilter === 'op_replies') {
+      filters.is_op_reply = true;
     } else if (this.currentFilter === 'needs_response') {
       filters.requires_response = true;
     } else if (this.currentFilter === 'pending_drafts') {
@@ -181,6 +185,28 @@ export class RepliesListComponent implements OnInit {
       },
       error: () => {
         this.snackBar.open('Failed to dismiss reply', 'Dismiss', { duration: 5000 });
+      }
+    });
+  }
+
+  refreshReplies(): void {
+    this.isRefreshing = true;
+    this.replyService.refresh().subscribe({
+      next: (response) => {
+        this.isRefreshing = false;
+        const newCount = response.details?.new_replies || 0;
+        if (newCount > 0) {
+          this.snackBar.open(`Found ${newCount} new replies!`, 'Close', { duration: 5000 });
+          // Reload the list and stats
+          this.loadReplies();
+          this.loadStats();
+        } else {
+          this.snackBar.open('No new replies found', 'Close', { duration: 3000 });
+        }
+      },
+      error: (err) => {
+        this.isRefreshing = false;
+        this.snackBar.open('Failed to refresh replies', 'Close', { duration: 5000 });
       }
     });
   }

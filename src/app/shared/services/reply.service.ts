@@ -13,6 +13,7 @@ import {
 
 export interface ReplyFilters {
   is_read?: boolean;
+  is_op_reply?: boolean;
   requires_response?: boolean;
   has_pending_draft?: boolean;
   subreddits?: string;
@@ -37,6 +38,9 @@ export class ReplyService {
 
     if (filters.is_read !== undefined) {
       params = params.set('is_read', filters.is_read.toString());
+    }
+    if (filters.is_op_reply !== undefined) {
+      params = params.set('is_op_reply', filters.is_op_reply.toString());
     }
     if (filters.requires_response !== undefined) {
       params = params.set('requires_response', filters.requires_response.toString());
@@ -165,5 +169,16 @@ export class ReplyService {
    */
   getGenerationOptions(): Observable<GenerationOptions> {
     return this.http.get<GenerationOptions>(`${this.apiUrl}/generation-options/`);
+  }
+
+  /**
+   * Manually refresh replies from Reddit.
+   * Fetches new replies for all recent posted comments.
+   */
+  refresh(): Observable<{ success: boolean; message: string; details: any }> {
+    return this.http.post<{ success: boolean; message: string; details: any }>(
+      `${this.apiUrl}/replies/refresh/`,
+      {}
+    );
   }
 }
