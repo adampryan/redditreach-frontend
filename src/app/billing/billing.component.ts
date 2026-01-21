@@ -2,6 +2,14 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { BillingService, Plan, BillingStatus } from '../shared/services';
 
+// Declare global tracking functions from index.html
+declare global {
+  interface Window {
+    tcTrackSignup?: () => void;
+    tcTrackConversion?: (revenue?: number) => void;
+  }
+}
+
 @Component({
   selector: 'app-billing',
   standalone: false,
@@ -37,6 +45,16 @@ export class BillingComponent implements OnInit {
       if (params['billing'] === 'success') {
         this.successMessage = 'Your subscription has been activated! Thank you for subscribing.';
         this.loadBillingStatus(); // Reload to get updated status
+
+        // Track conversion for Reddit attribution
+        // Get the plan price from query param or default to average
+        const tier = params['tier'];
+        const plan = tier ? this.billingService.getPlanByTier(tier) : null;
+        const revenue = plan?.price || 179; // Default to Growth plan price
+
+        if (window.tcTrackConversion) {
+          window.tcTrackConversion(revenue);
+        }
       }
       if (params['billing'] === 'cancelled') {
         this.checkoutError = 'Checkout was cancelled. You can try again when ready.';

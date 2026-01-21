@@ -10,5 +10,62 @@
 </head>
 <body>
   <app-root></app-root>
+
+  <!-- ThreadCatch Attribution Tracking -->
+  <script>
+  (function() {
+    var cid = "c4d28424-1b93-4efb-bfea-b64c6eebf015";
+    var apiBase = "https://goodllama-backend.onrender.com";
+
+    var params = new URLSearchParams(window.location.search);
+    var utm = {
+      source: params.get("utm_source") || sessionStorage.getItem("tc_utm_source") || "",
+      medium: params.get("utm_medium") || sessionStorage.getItem("tc_utm_medium") || "",
+      campaign: params.get("utm_campaign") || sessionStorage.getItem("tc_utm_campaign") || "",
+      content: params.get("utm_content") || sessionStorage.getItem("tc_utm_content") || ""
+    };
+
+    if (utm.source === "reddit") {
+      sessionStorage.setItem("tc_utm_source", utm.source);
+      sessionStorage.setItem("tc_utm_medium", utm.medium);
+      sessionStorage.setItem("tc_utm_campaign", utm.campaign);
+      sessionStorage.setItem("tc_utm_content", utm.content);
+    }
+
+    var sid = sessionStorage.getItem("tc_sid");
+    if (!sid && utm.source === "reddit") {
+      sid = "tc_" + Math.random().toString(36).substr(2, 9);
+      sessionStorage.setItem("tc_sid", sid);
+    }
+
+    if (utm.source === "reddit" && params.get("utm_source")) {
+      var img = new Image();
+      img.src = apiBase + "/redditreach/api/attribution/track/?cid=" + cid +
+        "&session_id=" + sid +
+        "&utm_source=" + encodeURIComponent(utm.source) +
+        "&utm_medium=" + encodeURIComponent(utm.medium) +
+        "&utm_campaign=" + encodeURIComponent(utm.campaign) +
+        "&utm_content=" + encodeURIComponent(utm.content);
+    }
+
+    window.tcTrackSignup = function() {
+      if (!sid) return;
+      fetch(apiBase + "/redditreach/api/attribution/signup/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ customer_id: cid, session_id: sid })
+      });
+    };
+
+    window.tcTrackConversion = function(revenue) {
+      if (!sid) return;
+      fetch(apiBase + "/redditreach/api/attribution/convert/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ customer_id: cid, session_id: sid, revenue: revenue || 0 })
+      });
+    };
+  })();
+  </script>
 </body>
 </html>

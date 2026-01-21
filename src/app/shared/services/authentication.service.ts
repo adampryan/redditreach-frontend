@@ -4,6 +4,14 @@ import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { User, Customer } from '../models';
 
+// Declare global tracking functions from index.html
+declare global {
+  interface Window {
+    tcTrackSignup?: () => void;
+    tcTrackConversion?: (revenue?: number) => void;
+  }
+}
+
 interface LoginResponse {
   access: string;
   refresh: string;
@@ -93,6 +101,10 @@ export class AuthenticationService {
     return this.http.post<RegisterResponse>(`${environment.API_BASE_URL}/register/`, data).pipe(
       tap(response => {
         this.storeTokens(response.tokens.access, response.tokens.refresh);
+        // Track signup for Reddit attribution
+        if (window.tcTrackSignup) {
+          window.tcTrackSignup();
+        }
       })
     );
   }
