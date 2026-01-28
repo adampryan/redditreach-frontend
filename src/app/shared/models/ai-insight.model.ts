@@ -106,9 +106,10 @@ export interface EliteDashboardData {
     tier_1_2_rate: number;
     success_rate: number;
     total_clicks: number;
+    total_signups: number;
     total_conversions: number;
   };
-  metrics_status?: { has_conversions: boolean; message: string };
+  metrics_status?: { has_conversions: boolean; has_signups: boolean; message: string };
 
   pending_insights: {
     id: string;
