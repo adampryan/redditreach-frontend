@@ -175,8 +175,8 @@ export class ReplyService {
    * Manually refresh replies from Reddit.
    * Fetches new replies for all recent posted comments.
    */
-  refresh(): Observable<{ success: boolean; message: string; details: any }> {
-    return this.http.post<{ success: boolean; message: string; details: any }>(
+  refresh(): Observable<{ success: boolean; message: string; details: any; status?: string }> {
+    return this.http.post<{ success: boolean; message: string; details: any; status?: string }>(
       `${this.apiUrl}/replies/refresh/`,
       {}
     );
